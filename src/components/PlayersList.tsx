@@ -42,19 +42,21 @@ export const PlayersList: React.FC<PlayersListProps> = ({
   }, [lastGuesses]);
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-4 space-y-6 w-[320px] min-h-[600px]">
+    <div className="bg-white rounded-xl shadow-lg p-3 lg:p-4 space-y-4 lg:space-y-6 w-full lg:w-[320px] min-h-[500px] lg:min-h-[600px]">
       {/* Online Players Section */}
-      <div className="space-y-3 h-[250px]">
+      <div className="space-y-2 lg:space-y-3 h-[200px] lg:h-[250px]">
         <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white">
-          <div className="flex items-center gap-2">
-            <Users size={20} className="text-blue-500" />
-            <h3 className="text-lg font-semibold">Çevrimiçi Oyuncular</h3>
+          <div className="flex items-center gap-1.5 lg:gap-2">
+            <Users size={18} className="text-blue-500 lg:w-5 lg:h-5" />
+            <h3 className="text-base lg:text-lg font-semibold">
+              Çevrimiçi Oyuncular
+            </h3>
           </div>
-          <span className="text-sm px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+          <span className="text-xs lg:text-sm px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
             {onlinePlayers.length} oyuncu
           </span>
         </div>
-        <div className="overflow-y-auto h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="overflow-y-auto h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <AnimatePresence mode="popLayout">
             {onlinePlayers?.map((player) => (
               <motion.div
@@ -76,14 +78,16 @@ export const PlayersList: React.FC<PlayersListProps> = ({
       </div>
 
       {/* Last Guesses Section */}
-      <div className="space-y-3 h-[400px]">
+      <div className="space-y-2 lg:space-y-3 h-[350px] lg:h-[400px]">
         <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white">
-          <div className="flex items-center gap-2">
-            <Trophy size={20} className="text-yellow-500" />
-            <h3 className="text-lg font-semibold">Son Tahminler</h3>
+          <div className="flex items-center gap-1.5 lg:gap-2">
+            <Trophy size={18} className="text-yellow-500 lg:w-5 lg:h-5" />
+            <h3 className="text-base lg:text-lg font-semibold">
+              Son Tahminler
+            </h3>
           </div>
         </div>
-        <div className="overflow-y-auto h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="overflow-y-auto h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <AnimatePresence mode="popLayout">
             {lastGuesses?.map((guess, index) => {
               const guessId =

@@ -21,11 +21,11 @@ export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
 
   return (
     <div
-      className={`w-full max-w-md p-4 rounded-lg border ${backgrounds[type]} flex flex-col gap-2`}
+      className={`w-full max-w-md p-3 lg:p-4 rounded-lg border ${backgrounds[type]} flex flex-col gap-1.5 lg:gap-2`}
     >
-      <div className="flex items-center gap-2">
-        {icons[type]}
-        <span className="font-medium">
+      <div className="flex items-center gap-1.5 lg:gap-2">
+        <div className="w-5 h-5 lg:w-6 lg:h-6">{icons[type]}</div>
+        <span className="text-sm lg:text-base font-medium">
           {feedback === "correct" && "Doğru tahmin ettin!"}
           {feedback === "go_higher" && (
             <span>

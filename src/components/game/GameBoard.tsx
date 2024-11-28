@@ -126,27 +126,27 @@ export const GameBoard: React.FC = () => {
     const details = currentListing.details as CarListingDetails;
 
     return (
-      <div className="flex flex-wrap gap-4">
-        <div className="flex items-center gap-2">
-          <Car className="h-5 w-5" />
+      <div className="flex flex-wrap gap-2 lg:gap-4 text-sm lg:text-base">
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Car className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>
             {details.brand} {details.model}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <Calendar className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Calendar className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>{details.year}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Zap className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Zap className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>{details.mileage} km</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Filter className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Filter className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>{details.fuelType}</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Move className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Move className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>{details.transmission}</span>
         </div>
       </div>
@@ -158,27 +158,27 @@ export const GameBoard: React.FC = () => {
     const details = currentListing.details as HouseForRentListingDetails;
 
     return (
-      <div className="flex flex-wrap gap-4">
-        <div className="flex items-center gap-2">
-          <MapPin className="h-5 w-5" />
+      <div className="flex flex-wrap gap-2 lg:gap-4 text-sm lg:text-base">
+        <div className="flex items-center gap-1 lg:gap-2">
+          <MapPin className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>
             {details.city}, {details.district}
           </span>
         </div>
-        <div className="flex items-center gap-2">
-          <Home className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Home className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>{details.rooms} oda</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Maximize className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Maximize className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>{details.squareMeters} m²</span>
         </div>
-        <div className="flex items-center gap-2">
-          <Building2 className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <Building2 className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>{details.buildingAge} yaşında</span>
         </div>
-        <div className="flex items-center gap-2">
-          <ArrowDown className="h-5 w-5" />
+        <div className="flex items-center gap-1 lg:gap-2">
+          <ArrowDown className="h-4 w-4 lg:h-5 lg:w-5" />
           <span>Kat: {details.floor}</span>
         </div>
       </div>
@@ -186,17 +186,17 @@ export const GameBoard: React.FC = () => {
   };
 
   return (
-    <div className="grid grid-cols-12 gap-6">
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
       {showConfetti && (
         <ReactConfetti recycle={false} numberOfPieces={200} gravity={0.3} />
       )}
-      <div className="col-span-8 space-y-6">
+      <div className="lg:col-span-8 space-y-4 lg:space-y-6">
         <div className="relative overflow-hidden rounded-xl bg-white shadow-lg">
-          <div className="relative h-[400px]">
+          <div className="relative h-[250px] sm:h-[300px] md:h-[400px]">
             <img
               src={currentListing.details.imageUrls[currentImageIndex]}
               alt="Listing image"
-              className="w-full h-[400px] object-cover transition-opacity duration-500"
+              className="w-full h-full object-cover transition-opacity duration-500"
             />
             {/* Navigation buttons */}
             <button
@@ -240,24 +240,28 @@ export const GameBoard: React.FC = () => {
               </svg>
             </button>
           </div>
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-            <div className="text-white space-y-3">
-              <h2 className="text-2xl font-bold">{currentListing.title}</h2>
-              {currentListing.details.type === "car"
-                ? renderCarDetails()
-                : renderPropertyDetails()}
+          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
+            <div className="text-white space-y-2 lg:space-y-3">
+              <h2 className="text-xl lg:text-2xl font-bold">
+                {currentListing.title}
+              </h2>
+              <div className="text-sm lg:text-base">
+                {currentListing.details.type === "car"
+                  ? renderCarDetails()
+                  : renderPropertyDetails()}
+              </div>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col items-center gap-4">
+        <div className="flex flex-col items-center gap-3 lg:gap-4">
           <PriceInput
             onGuess={handleGuess}
             disabled={!isAuthenticated || hasCorrectGuess}
             listingType={currentListing.details.type}
           />
           {!isAuthenticated && (
-            <p className="text-red-500">
+            <p className="text-red-500 text-sm lg:text-base">
               Tahmin yapabilmek için giriş yapmalısınız
             </p>
           )}
@@ -274,7 +278,7 @@ export const GameBoard: React.FC = () => {
         <Chat messages={chatMessages} onSendMessage={handleSendMessage} />
       </div>
 
-      <div className="col-span-4 space-y-6">
+      <div className="lg:col-span-4 space-y-4 lg:space-y-6">
         <PlayersList onlinePlayers={onlinePlayers} lastGuesses={lastGuesses} />
       </div>
     </div>
