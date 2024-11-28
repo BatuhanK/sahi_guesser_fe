@@ -83,7 +83,7 @@ const ChatInput: React.FC<{
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex-none sticky bottom-0 p-3 border-t border-gray-100 bg-gray-50/95 backdrop-blur supports-[backdrop-filter]:bg-gray-50/80"
+      className="flex-none sticky bottom-0 p-3 lg:p-3 border-t border-gray-100 bg-gray-50/95 backdrop-blur supports-[backdrop-filter]:bg-gray-50/80"
     >
       <div className="flex gap-2 items-center max-w-full">
         <input
@@ -95,7 +95,7 @@ const ChatInput: React.FC<{
             "flex-1 rounded-full bg-white",
             "border border-gray-200 hover:border-gray-300",
             "focus:border-yellow-500 focus:ring focus:ring-yellow-200 focus:ring-opacity-50",
-            "px-4 py-2 text-sm transition-colors",
+            "px-4 py-3 lg:py-2 text-base lg:text-sm transition-colors",
             "placeholder:text-gray-400"
           )}
         />
@@ -104,14 +104,14 @@ const ChatInput: React.FC<{
           disabled={!message.trim()}
           className={cn(
             "flex-none",
-            "bg-yellow-400 text-white p-2.5 rounded-full",
+            "bg-yellow-400 text-white p-3.5 lg:p-2.5 rounded-full",
             "hover:bg-yellow-500 active:bg-yellow-600 transition-colors",
             "disabled:opacity-50 disabled:cursor-not-allowed",
             "focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:ring-offset-2",
-            "shadow-sm"
+            "shadow-sm touch-manipulation"
           )}
         >
-          <Send size={20} />
+          <Send size={22} className="lg:w-5 lg:h-5" />
         </button>
       </div>
     </form>

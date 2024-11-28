@@ -85,7 +85,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         type="button"
         onClick={() => adjustValue(amount)}
         disabled={disabled}
-        className={`flex items-center gap-1 px-2 lg:px-3 py-1.5 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-all
+        className={`flex items-center justify-center gap-1 px-3 lg:px-3 py-2.5 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-all min-w-[70px] lg:min-w-auto
           ${
             disabled
               ? "bg-gray-100 text-gray-400"
@@ -95,9 +95,9 @@ export const PriceInput: React.FC<PriceInputProps> = ({
           }`}
       >
         {isAddition ? (
-          <Plus size={12} className="lg:w-4 lg:h-4" />
+          <Plus size={14} className="lg:w-4 lg:h-4" />
         ) : (
-          <Minus size={12} className="lg:w-4 lg:h-4" />
+          <Minus size={14} className="lg:w-4 lg:h-4" />
         )}
         {formattedAmount}
       </button>
@@ -105,16 +105,16 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   };
 
   return (
-    <div className="w-full max-w-md space-y-2 lg:space-y-3">
-      <div className="flex gap-1.5 lg:gap-2">
-        <div className="flex flex-col gap-1.5 lg:gap-2">
+    <div className="w-full max-w-md space-y-3 lg:space-y-3">
+      <div className="flex gap-2 lg:gap-2">
+        <div className="flex flex-col gap-2 lg:gap-2">
           <QuickActionButton amount={listingType === "car" ? -1000 : -500} />
           <QuickActionButton amount={listingType === "car" ? -10000 : -1000} />
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1">
           <div className="relative">
-            <div className="absolute inset-y-0 left-0 flex items-center pl-3 lg:pl-4 pointer-events-none">
+            <div className="absolute inset-y-0 left-0 flex items-center pl-4 lg:pl-4 pointer-events-none">
               <span className="text-gray-500 text-base lg:text-lg font-medium">
                 ₺
               </span>
@@ -125,7 +125,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               type="text"
               value={value}
               onChange={handleInputChange}
-              className={`w-full pl-8 lg:pl-10 pr-16 lg:pr-20 py-3 lg:py-4 text-lg lg:text-xl bg-white border-2 
+              className={`w-full pl-10 lg:pl-10 pr-20 lg:pr-20 py-4 lg:py-4 text-lg lg:text-xl bg-white border-2 
                 ${disabled ? "border-gray-200 bg-gray-50" : "border-yellow-400"}
                 rounded-xl focus:outline-none focus:border-yellow-500 transition-colors
                 font-medium placeholder:text-gray-400`}
@@ -141,20 +141,20 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                     ? "bg-gray-300"
                     : "bg-yellow-400 hover:bg-yellow-500 active:scale-95"
                 }
-                text-white p-1.5 lg:p-2 rounded-lg transition-all`}
+                text-white p-3 lg:p-2 rounded-lg transition-all touch-manipulation`}
             >
-              <ArrowRight size={20} className="lg:w-6 lg:h-6" />
+              <ArrowRight size={24} className="lg:w-6 lg:h-6" />
             </button>
           </div>
         </form>
 
-        <div className="flex flex-col gap-1.5 lg:gap-2">
+        <div className="flex flex-col gap-2 lg:gap-2">
           <QuickActionButton amount={listingType === "car" ? 1000 : 500} />
           <QuickActionButton amount={listingType === "car" ? 10000 : 1000} />
         </div>
       </div>
 
-      <div className="flex justify-center gap-1.5 lg:gap-2">
+      <div className="flex justify-center gap-2 lg:gap-2">
         <QuickActionButton amount={listingType === "car" ? -100000 : -10000} />
         <QuickActionButton amount={listingType === "car" ? 100000 : 10000} />
       </div>

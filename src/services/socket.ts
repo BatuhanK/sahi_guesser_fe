@@ -5,6 +5,7 @@ import type {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../types/socket";
+import { soundService } from "./soundService";
 
 class SocketService {
   private socket: Socket<ServerToClientEvents, ClientToServerEvents> | null =
@@ -18,9 +19,11 @@ class SocketService {
         Authorization: `Bearer ${token}`,
       };
     }
-    this.socket = io("http://192.168.1.11:5555", {
+    this.socket = io(import.meta.env.VITE_SOCKET_URL, {
+      path: "/ws/socket.io/",
       autoConnect: false,
       extraHeaders,
+      transports: ["websocket"],
     });
 
     // if (!token) {
@@ -62,8 +65,8 @@ class SocketService {
 
     this.socket.on("intermissionStart", ({ duration }) => {
       console.log("intermissionDuration", duration);
-
       useGameStore.getState().setIntermissionDuration(duration);
+      soundService.scheduleCountdown(duration);
     });
 
     this.socket.on("onlinePlayers", ({ players }) => {
@@ -72,7 +75,6 @@ class SocketService {
 
     this.socket.on("roundStart", ({ listing, duration }) => {
       const state = useGameStore.getState();
-      // state.setDuration(duration)
 
       state.setGameStatus("playing");
       state.setFeedback(null);
@@ -82,10 +84,11 @@ class SocketService {
       state.setShowResults(false);
       state.setRoundEndScores([]);
       state.setCorrectPrice(null);
-
       state.setLastGuesses([]);
       state.setCorrectGuesses([]);
       state.setIncorrectGuesses([]);
+
+      soundService.playRoundStart();
     });
 
     this.socket.on("roundEnd", ({ correctPrice, scores }) => {
@@ -123,10 +126,18 @@ class SocketService {
       useGameStore.getState().setFeedback(direction);
       if (direction === "correct") {
         useGameStore.getState().setHasCorrectGuess(true);
+        soundService.playSuccess();
+      } else {
+        soundService.playFailure();
       }
     });
 
     this.socket.on("correctGuess", ({ userId, playerId, username }) => {
+      const authUser = useAuthStore.getState().user;
+      if (userId !== authUser?.id) {
+        soundService.playOtherPlayerSuccess();
+      }
+
       useGameStore.getState().addCorrectGuess({
         userId,
         playerId,
@@ -211,6 +222,7 @@ class SocketService {
     this.socket?.emit("leaveRoom", { roomId });
     useGameStore.getState().setRoomId(null);
     useGameStore.getState().setCurrentListing(null);
+    soundService.clearCountdownTimeout();
   }
 
   submitGuess(roomId: number, price: number): void {
@@ -219,6 +231,7 @@ class SocketService {
   }
 
   disconnect(): void {
+    soundService.clearCountdownTimeout();
     this.socket?.disconnect();
     this.socket = null;
   }
