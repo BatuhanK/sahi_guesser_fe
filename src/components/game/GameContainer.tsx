@@ -5,19 +5,11 @@ import { Category, categoryApi } from "../../services/api";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
 import { CategorySelector } from "../CategorySelector";
-import { RoundResults } from "../RoundResults";
 import { Loader } from "../ui/Loader";
 import { GameBoard } from "./GameBoard";
 
 export const GameContainer: React.FC = () => {
-  const {
-    showResults,
-    roundEndScores,
-    correctPrice,
-    currentListing,
-    roomId,
-    intermissionDuration,
-  } = useGameStore();
+  const { currentListing, roomId } = useGameStore();
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -73,15 +65,6 @@ export const GameContainer: React.FC = () => {
   return (
     <div className="h-full">
       <GameBoard />
-      {showResults && intermissionDuration && (
-        <RoundResults
-          scores={roundEndScores}
-          correctPrice={correctPrice ?? 0}
-          listing={currentListing!}
-          onNextRound={() => {}}
-          intermissionDuration={intermissionDuration}
-        />
-      )}
     </div>
   );
 };

@@ -129,7 +129,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                   <motion.div
                     initial={false}
                     animate={
-                      !guess.isCorrect && animatingGuesses.has(guessId)
+                      guess.isCorrect && animatingGuesses.has(guessId)
                         ? {
                             x: [0, -10, 10, -10, 10, 0],
                             transition: { duration: 0.5, delay: 0.3 },

@@ -23,6 +23,7 @@ import { Chat } from "../Chat";
 import { GuessStatus } from "../GuessStatus";
 import { PlayersList } from "../PlayersList";
 import { PriceInput } from "../PriceInput";
+import { RoundResults } from "../RoundResults";
 
 export const GameBoard: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -37,6 +38,10 @@ export const GameBoard: React.FC = () => {
     chatMessages,
     onlinePlayers,
     lastGuesses,
+    showResults,
+    intermissionDuration,
+    roundEndScores,
+    correctPrice,
   } = useGameStore();
   const { isAuthenticated } = useAuth();
 
@@ -194,72 +199,82 @@ export const GameBoard: React.FC = () => {
         <ReactConfetti recycle={false} numberOfPieces={200} gravity={0.3} />
       )}
       <div className="lg:col-span-8 space-y-4 lg:space-y-6">
-        <div className="relative overflow-hidden rounded-xl bg-white shadow-lg">
-          <div className="relative h-[250px] sm:h-[300px] md:h-[400px]">
-            <img
-              src={currentListing.details.imageUrls[currentImageIndex]}
-              alt="Listing image"
-              className="w-full h-full object-cover transition-opacity duration-500"
-            />
-            <button
-              onClick={handlePrevImage}
-              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-              aria-label="Previous image"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6"
+        {showResults && intermissionDuration ? (
+          <RoundResults
+            scores={roundEndScores}
+            correctPrice={correctPrice ?? 0}
+            listing={currentListing}
+            intermissionDuration={intermissionDuration}
+            onNextRound={() => {}}
+          />
+        ) : (
+          <div className="relative overflow-hidden rounded-xl bg-white shadow-lg">
+            <div className="relative h-[250px] sm:h-[300px] md:h-[400px]">
+              <img
+                src={currentListing.details.imageUrls[currentImageIndex]}
+                alt="Listing image"
+                className="w-full h-full object-cover transition-opacity duration-500"
+              />
+              <button
+                onClick={handlePrevImage}
+                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                aria-label="Previous image"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15.75 19.5L8.25 12l7.5-7.5"
-                />
-              </svg>
-            </button>
-            <button
-              onClick={handleNextImage}
-              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-              aria-label="Next image"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={2}
-                stroke="currentColor"
-                className="w-6 h-6"
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15.75 19.5L8.25 12l7.5-7.5"
+                  />
+                </svg>
+              </button>
+              <button
+                onClick={handleNextImage}
+                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                aria-label="Next image"
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                />
-              </svg>
-            </button>
-          </div>
-          <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
-            <div className="text-white space-y-2 lg:space-y-3">
-              <h2 className="text-xl lg:text-2xl font-bold">
-                {currentListing.title}
-              </h2>
-              <div className="text-sm lg:text-base">
-                {currentListing.details.type === "car"
-                  ? renderCarDetails()
-                  : renderPropertyDetails()}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={2}
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
+              <div className="text-white space-y-2 lg:space-y-3">
+                <h2 className="text-xl lg:text-2xl font-bold">
+                  {currentListing.title}
+                </h2>
+                <div className="text-sm lg:text-base">
+                  {currentListing.details.type === "car"
+                    ? renderCarDetails()
+                    : renderPropertyDetails()}
+                </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
 
         <div className="flex flex-col items-center gap-3 lg:gap-4">
           <PriceInput
             onGuess={handleGuess}
-            disabled={!isAuthenticated || hasCorrectGuess}
+            disabled={!isAuthenticated || hasCorrectGuess || showResults}
             listingType={currentListing.details.type}
           />
           {!isAuthenticated && (
@@ -267,7 +282,7 @@ export const GameBoard: React.FC = () => {
               Tahmin yapabilmek için giriş yapmalısınız
             </p>
           )}
-          {feedback && (
+          {feedback && !showResults && (
             <div className={shake ? "animate-shake" : ""}>
               <GuessStatus
                 feedback={feedback}
