@@ -23,6 +23,11 @@ class SocketService {
       path: "/ws/socket.io/",
       autoConnect: false,
       extraHeaders,
+      transportOptions: {
+        websocket: {
+          extraHeaders,
+        },
+      },
       transports: ["websocket"],
     });
 
