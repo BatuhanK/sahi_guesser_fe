@@ -67,7 +67,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
     return [...scoresWithAccuracy]
       .filter((score) => score.roundScore)
       .sort((a, b) => b.roundScore! - a.roundScore!);
-  }, [scores]);
+  }, [scoresWithAccuracy]);
 
   const getMedalColor = (index: number): string => {
     switch (index) {

@@ -1,18 +1,31 @@
 export type GameStatus = "waiting" | "playing" | "intermission" | "finished";
 
+export type CarListingDetails = {
+  type: "car";
+  brand: string;
+  model: string;
+  year: number;
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  imageUrls: string[];
+};
+
+export type HouseForRentListingDetails = {
+  type: "house-for-rent";
+  rooms: number;
+  squareMeters: number;
+  buildingAge: number;
+  floor: number;
+  city: string;
+  district: string;
+  imageUrls: string[];
+};
+
 export interface Listing {
   id: number;
   title: string;
-  details: {
-    brand: string;
-    fuelType: string;
-    imageUrls: string[];
-    mileage: number;
-    model: string;
-    transmission: string;
-    type: string;
-    year: number;
-  };
+  details: CarListingDetails | HouseForRentListingDetails;
 }
 
 export interface Player {

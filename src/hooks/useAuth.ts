@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { authApi } from "../services/api";
+import { socketService } from "../services/socket";
 import { useAuthStore } from "../store/authStore";
 
 export function useAuth() {
@@ -18,12 +19,16 @@ export function useAuth() {
     const { user, token } = await authApi.login(username, password);
     setUser(user);
     setToken(token.token);
+
+    socketService.reconnect();
   };
 
   const register = async (username: string, password: string) => {
     const { user, token } = await authApi.register(username, password);
     setUser(user);
     setToken(token.token);
+
+    socketService.reconnect();
   };
 
   return {

@@ -29,15 +29,32 @@ export const authApi = {
   },
 };
 
+export type Category = {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string;
+  onlinePlayerCount: number;
+};
+
+export type Room = {
+  id: number;
+  name: string;
+  slug: string;
+  status: string;
+};
+
 export const categoryApi = {
   getAll: async () => {
-    const response = await api.get("/categories");
-    return response.data;
+    const response = await api.get<{ categories: Category[] }>("/categories");
+    return response.data.categories;
   },
 
   getRooms: async (slug: string) => {
-    const response = await api.get(`/categories/${slug}/rooms`);
-    return response.data;
+    const response = await api.get<{ rooms: Room[] }>(
+      `/categories/${slug}/rooms`
+    );
+    return response.data.rooms;
   },
 };
 

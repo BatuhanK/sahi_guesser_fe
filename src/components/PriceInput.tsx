@@ -4,11 +4,13 @@ import React, { useRef, useState } from "react";
 interface PriceInputProps {
   onGuess: (guess: number) => void;
   disabled?: boolean;
+  listingType: string;
 }
 
 export const PriceInput: React.FC<PriceInputProps> = ({
   onGuess,
   disabled,
+  listingType,
 }) => {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,8 +104,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
     <div className="w-full max-w-md space-y-3">
       <div className="flex gap-2">
         <div className="flex flex-col gap-2">
-          <QuickActionButton amount={-1000} />
-          <QuickActionButton amount={-10000} />
+          <QuickActionButton amount={listingType === "car" ? -1000 : -500} />
+          <QuickActionButton amount={listingType === "car" ? -10000 : -1000} />
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1">
@@ -140,14 +142,14 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         </form>
 
         <div className="flex flex-col gap-2">
-          <QuickActionButton amount={1000} />
-          <QuickActionButton amount={10000} />
+          <QuickActionButton amount={listingType === "car" ? 1000 : 500} />
+          <QuickActionButton amount={listingType === "car" ? 10000 : 1000} />
         </div>
       </div>
 
       <div className="flex justify-center gap-2">
-        <QuickActionButton amount={-100000} />
-        <QuickActionButton amount={100000} />
+        <QuickActionButton amount={listingType === "car" ? -100000 : -10000} />
+        <QuickActionButton amount={listingType === "car" ? 100000 : 10000} />
       </div>
     </div>
   );

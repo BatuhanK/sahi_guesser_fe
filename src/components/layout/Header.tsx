@@ -20,7 +20,7 @@ const AnimatedIcons = () => {
     }, 2000); // Switch every 2 seconds
 
     return () => clearInterval(interval);
-  }, []);
+  }, [icons.length]);
 
   return (
     <AnimatePresence mode="wait">
@@ -79,12 +79,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     };
   }, [currentListing, roundStartTime, roundDuration]);
 
-  useEffect(() => {
-    console.log("room id " + roomId);
-  }, [roomId]);
-
   const handleLeaveRoom = () => {
-    console.log("leaving room");
     if (roomId) {
       socketService.leaveRoom(roomId);
     }

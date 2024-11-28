@@ -1,8 +1,24 @@
+import {
+  ArrowDown,
+  Building2,
+  Calendar,
+  Car,
+  Filter,
+  Home,
+  MapPin,
+  Maximize,
+  Move,
+  Zap,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useAuth } from "../../hooks/useAuth";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
+import {
+  CarListingDetails,
+  HouseForRentListingDetails,
+} from "../../types/socket";
 import { Chat } from "../Chat";
 import { GuessStatus } from "../GuessStatus";
 import { PlayersList } from "../PlayersList";
@@ -11,6 +27,7 @@ import { PriceInput } from "../PriceInput";
 export const GameBoard: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [shake, setShake] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
   const {
     currentListing,
@@ -22,6 +39,43 @@ export const GameBoard: React.FC = () => {
     lastGuesses,
   } = useGameStore();
   const { isAuthenticated } = useAuth();
+
+  // Auto slideshow effect with reset capability
+  useEffect(() => {
+    if (!currentListing) return;
+
+    const startSlideshow = () => {
+      return setInterval(() => {
+        setCurrentImageIndex((prevIndex) =>
+          prevIndex === currentListing.details.imageUrls.length - 1
+            ? 0
+            : prevIndex + 1
+        );
+      }, 3000);
+    };
+
+    let interval = startSlideshow();
+
+    // Expose the reset function to window for access from click handlers
+    const resetTimer = () => {
+      clearInterval(interval);
+      interval = startSlideshow();
+    };
+
+    //@ts-expect-error windowa koyduk allah affetsin
+    window._resetSlideshowTimer = resetTimer;
+
+    return () => {
+      clearInterval(interval);
+      //@ts-expect-error windowa koyduk allah affetsin
+      delete window._resetSlideshowTimer;
+    };
+  }, [currentListing]);
+
+  // Reset image index when listing changes
+  useEffect(() => {
+    setCurrentImageIndex(0);
+  }, [currentListing?.id]);
 
   useEffect(() => {
     if (feedback === "correct") {
@@ -47,6 +101,90 @@ export const GameBoard: React.FC = () => {
     socketService.sendMessage(roomId, message);
   }
 
+  const handlePrevImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === 0
+        ? currentListing.details.imageUrls.length - 1
+        : prevIndex - 1
+    );
+    //@ts-expect-error windowa koyduk allah affetsin
+    window._resetSlideshowTimer?.();
+  };
+
+  const handleNextImage = () => {
+    setCurrentImageIndex((prevIndex) =>
+      prevIndex === currentListing.details.imageUrls.length - 1
+        ? 0
+        : prevIndex + 1
+    );
+    //@ts-expect-error windowa koyduk allah affetsin
+    window._resetSlideshowTimer?.();
+  };
+
+  const renderCarDetails = () => {
+    if (currentListing.details.type !== "car") return null;
+    const details = currentListing.details as CarListingDetails;
+
+    return (
+      <div className="flex flex-wrap gap-4">
+        <div className="flex items-center gap-2">
+          <Car className="h-5 w-5" />
+          <span>
+            {details.brand} {details.model}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Calendar className="h-5 w-5" />
+          <span>{details.year}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Zap className="h-5 w-5" />
+          <span>{details.mileage} km</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Filter className="h-5 w-5" />
+          <span>{details.fuelType}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Move className="h-5 w-5" />
+          <span>{details.transmission}</span>
+        </div>
+      </div>
+    );
+  };
+
+  const renderPropertyDetails = () => {
+    if (currentListing.details.type !== "house-for-rent") return null;
+    const details = currentListing.details as HouseForRentListingDetails;
+
+    return (
+      <div className="flex flex-wrap gap-4">
+        <div className="flex items-center gap-2">
+          <MapPin className="h-5 w-5" />
+          <span>
+            {details.city}, {details.district}
+          </span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Home className="h-5 w-5" />
+          <span>{details.rooms} oda</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Maximize className="h-5 w-5" />
+          <span>{details.squareMeters} m²</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <Building2 className="h-5 w-5" />
+          <span>{details.buildingAge} yaşında</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <ArrowDown className="h-5 w-5" />
+          <span>Kat: {details.floor}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div className="grid grid-cols-12 gap-6">
       {showConfetti && (
@@ -54,18 +192,60 @@ export const GameBoard: React.FC = () => {
       )}
       <div className="col-span-8 space-y-6">
         <div className="relative overflow-hidden rounded-xl bg-white shadow-lg">
-          <img
-            src={currentListing.details.imageUrls[0]}
-            alt="Property"
-            className="w-full h-[400px] object-cover"
-          />
+          <div className="relative h-[400px]">
+            <img
+              src={currentListing.details.imageUrls[currentImageIndex]}
+              alt="Listing image"
+              className="w-full h-[400px] object-cover transition-opacity duration-500"
+            />
+            {/* Navigation buttons */}
+            <button
+              onClick={handlePrevImage}
+              className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              aria-label="Previous image"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15.75 19.5L8.25 12l7.5-7.5"
+                />
+              </svg>
+            </button>
+            <button
+              onClick={handleNextImage}
+              className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+              aria-label="Next image"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth={2}
+                stroke="currentColor"
+                className="w-6 h-6"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                />
+              </svg>
+            </button>
+          </div>
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-6">
-            <div className="text-white">
+            <div className="text-white space-y-3">
               <h2 className="text-2xl font-bold">{currentListing.title}</h2>
-              <p className="text-lg">
-                {currentListing.details.brand} {currentListing.details.model}{" "}
-                {currentListing.details.year}
-              </p>
+              {currentListing.details.type === "car"
+                ? renderCarDetails()
+                : renderPropertyDetails()}
             </div>
           </div>
         </div>
@@ -74,6 +254,7 @@ export const GameBoard: React.FC = () => {
           <PriceInput
             onGuess={handleGuess}
             disabled={!isAuthenticated || hasCorrectGuess}
+            listingType={currentListing.details.type}
           />
           {!isAuthenticated && (
             <p className="text-red-500">

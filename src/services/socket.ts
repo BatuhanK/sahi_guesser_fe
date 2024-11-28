@@ -11,19 +11,38 @@ class SocketService {
 
   connect(): void {
     const token = localStorage.getItem("token");
+    let extraHeaders: Record<string, string> = {};
+    if (token) {
+      extraHeaders = {
+        Authorization: `Bearer ${token}`,
+      };
+    }
     this.socket = io("http://192.168.1.11:5555", {
       autoConnect: false,
-      extraHeaders: {
-        Authorization: `Bearer ${token}`,
-      },
+      extraHeaders,
     });
 
-    if (!token) {
-      console.log("No token, not connecting to socket");
-    } else {
-      this.socket.connect();
-      this.setupListeners();
+    // if (!token) {
+    //   console.log("No token, not connecting to socket");
+    // } else {
+    //   this.socket.connect();
+    //   this.setupListeners();
+    // }
+
+    this.socket.connect();
+    this.setupListeners();
+  }
+
+  reconnect(): void {
+    if (this.socket) {
+      // Clean up existing listeners and disconnect
+      this.socket.removeAllListeners();
+      this.socket.disconnect();
+      this.socket = null;
     }
+
+    // Establish new connection
+    this.connect();
   }
 
   private setupListeners(): void {
@@ -53,6 +72,7 @@ class SocketService {
     this.socket.on("roundStart", ({ listing, duration }) => {
       const state = useGameStore.getState();
       // state.setDuration(duration)
+
       state.setGameStatus("playing");
       state.setFeedback(null);
       state.setHasCorrectGuess(false);
@@ -70,8 +90,19 @@ class SocketService {
     this.socket.on("roundEnd", ({ correctPrice, scores }) => {
       const state = useGameStore.getState();
 
+      const onlinePlayers = state.onlinePlayers;
+      const updatedOnlinePlayers = onlinePlayers.map((player) => {
+        const score = scores.find((s) => s.playerId === player.playerId);
+        return {
+          ...player,
+          totalScore: score?.userScore || 0,
+          roomScore: score?.roomScore || 0,
+        };
+      });
+      state.setOnlinePlayers(updatedOnlinePlayers);
       state.setCorrectPrice(correctPrice);
       state.setRoundEndScores(scores);
+
       state.setShowResults(true);
     });
 

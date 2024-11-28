@@ -29,12 +29,12 @@ export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
           {feedback === "correct" && "Doğru tahmin ettin!"}
           {feedback === "go_higher" && (
             <span>
-              Daha <b>yüksek</b> bir tahmin deneyin
+              Daha <b className="text-red-500">yüksek</b> bir tahmin deneyin
             </span>
           )}
           {feedback === "go_lower" && (
             <span>
-              Daha <b>düşük</b> bir tahmin deneyin
+              Daha <b className="text-red-500">düşük</b> bir tahmin deneyin
             </span>
           )}
         </span>
