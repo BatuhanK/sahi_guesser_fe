@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { AuthModal } from "./components/auth/AuthModals";
 import { GameContainer } from "./components/game/GameContainer";
@@ -8,6 +8,23 @@ import { useAuth } from "./hooks/useAuth";
 function App() {
   const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
   const { login, register } = useAuth();
+
+  useEffect(() => {
+    const updateHeight = () => {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty("--vh", `${vh}px`);
+    };
+
+    updateHeight();
+
+    window.addEventListener("resize", updateHeight);
+    window.addEventListener("orientationchange", updateHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateHeight);
+      window.removeEventListener("orientationchange", updateHeight);
+    };
+  }, []);
 
   const handleAuth = async (username: string, password: string) => {
     try {

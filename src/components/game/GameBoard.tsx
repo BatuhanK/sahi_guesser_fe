@@ -97,6 +97,9 @@ export const GameBoard: React.FC = () => {
   if (!currentListing) return null;
 
   function handleSendMessage(message: string): void {
+    console.log(message, "--message");
+    console.log(isAuthenticated, "--isAuthenticated");
+    console.log(roomId, "--roomId");
     if (!isAuthenticated || !roomId) return;
     socketService.sendMessage(roomId, message);
   }
@@ -198,7 +201,6 @@ export const GameBoard: React.FC = () => {
               alt="Listing image"
               className="w-full h-full object-cover transition-opacity duration-500"
             />
-            {/* Navigation buttons */}
             <button
               onClick={handlePrevImage}
               className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
@@ -275,7 +277,9 @@ export const GameBoard: React.FC = () => {
           )}
         </div>
 
-        <Chat messages={chatMessages} onSendMessage={handleSendMessage} />
+        <div className="h-[400px] lg:h-[500px]">
+          <Chat messages={chatMessages} onSendMessage={handleSendMessage} />
+        </div>
       </div>
 
       <div className="lg:col-span-4 space-y-4 lg:space-y-6">

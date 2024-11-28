@@ -1,4 +1,5 @@
 import { io, Socket } from "socket.io-client";
+import { useAuthStore } from "../store/authStore";
 import { useGameStore } from "../store/gameStore";
 import type {
   ClientToServerEvents,
@@ -89,10 +90,15 @@ class SocketService {
 
     this.socket.on("roundEnd", ({ correctPrice, scores }) => {
       const state = useGameStore.getState();
+      const authState = useAuthStore.getState();
 
+      let currentUserScore = 0;
       const onlinePlayers = state.onlinePlayers;
       const updatedOnlinePlayers = onlinePlayers.map((player) => {
         const score = scores.find((s) => s.playerId === player.playerId);
+        if (player.userId === authState.user?.id) {
+          currentUserScore = score?.userScore || 0;
+        }
         return {
           ...player,
           totalScore: score?.userScore || 0,
@@ -104,6 +110,13 @@ class SocketService {
       state.setRoundEndScores(scores);
 
       state.setShowResults(true);
+
+      if (authState.user) {
+        authState.setUser({
+          ...authState.user,
+          score: currentUserScore,
+        });
+      }
     });
 
     this.socket.on("guessResult", ({ direction }) => {
@@ -189,6 +202,8 @@ class SocketService {
   }
 
   sendMessage(roomId: number, message: string) {
+    console.log(message, "--message send message");
+    console.log(roomId, "--roomId send message");
     this.socket?.emit("chatMessage", { roomId, message });
   }
 

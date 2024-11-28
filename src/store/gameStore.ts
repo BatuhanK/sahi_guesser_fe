@@ -84,7 +84,7 @@ export const useGameStore = create<GameState>((set) => ({
   setRoundInfo: (startTime, duration) =>
     set({ roundStartTime: startTime, roundDuration: duration }),
   setPlayers: (players) => set({ players }),
-  setRoomId: (roomId) => set({ roomId }),
+  setRoomId: (roomId) => set({ roomId, chatMessages: [] }),
   setFeedback: (feedback) => set({ feedback }),
   setHasCorrectGuess: (hasCorrectGuess) => set({ hasCorrectGuess }),
   setChatMessages: (chatMessages) => set({ chatMessages }),

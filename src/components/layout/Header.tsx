@@ -1,7 +1,16 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Car, HelpCircle, Home, LogIn, UserPlus } from "lucide-react";
+import {
+  Car,
+  HelpCircle,
+  Home,
+  LogIn,
+  LogOut,
+  Menu,
+  UserPlus,
+} from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
 import { ScoreBoard } from "../ScoreBoard";
@@ -45,10 +54,13 @@ interface HeaderProps {
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const [showUserMenu, setShowUserMenu] = useState(false);
   const { currentListing, roundStartTime, roundDuration, roomId } =
     useGameStore();
   const [timeLeft, setTimeLeft] = useState<number>(roundDuration);
+  const [showMobileMenu, setShowMobileMenu] = useState(false);
 
   useEffect(() => {
     let intervalId: number;
@@ -85,8 +97,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     }
   };
 
+  const handleLogout = () => {
+    logout();
+    setShowUserMenu(false);
+    window.location.reload();
+  };
+
   return (
-    <header className="bg-yellow-400 p-4 shadow-md">
+    <header className="bg-yellow-400 p-4 shadow-md relative">
       <div className="max-w-6xl mx-auto flex items-center justify-between">
         <div
           className="flex items-center gap-2 cursor-pointer"
@@ -96,7 +114,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
             <AnimatedIcons />
           </div>
           <h1
-            className="text-2xl font-bold text-white"
+            className={`${
+              isMobile ? "text-xl" : "text-2xl"
+            } font-bold text-white`}
             style={{
               textShadow: "0 0 3px rgba(255, 255, 255, 0.3)",
             }}
@@ -105,38 +125,113 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
           </h1>
         </div>
 
-        <div className="flex items-center gap-4">
-          {currentListing && roundStartTime && <Timer timeLeft={timeLeft} />}
-
-          {user && <ScoreBoard totalScore={user.score} />}
-
-          {user && (
-            <div className="flex items-center gap-2">
-              <span className="text-white">
-                Hoşgeldin, <b>{user.username}</b>
-              </span>
-            </div>
-          )}
-
-          {!isAuthenticated && (
-            <div className="flex gap-2">
-              <button
-                onClick={() => onOpenAuth("login")}
-                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <LogIn size={20} />
-                <span>Giriş</span>
-              </button>
-              <button
-                onClick={() => onOpenAuth("register")}
-                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <UserPlus size={20} />
-                <span>Kayıt</span>
-              </button>
-            </div>
-          )}
-        </div>
+        {isMobile ? (
+          <div className="flex items-center gap-2">
+            {currentListing && roundStartTime && (
+              <div className="mr-2">
+                <Timer timeLeft={timeLeft} />
+              </div>
+            )}
+            <button
+              onClick={() => setShowMobileMenu(!showMobileMenu)}
+              className="text-white"
+            >
+              <Menu size={24} />
+            </button>
+            {showMobileMenu && (
+              <div className="absolute top-full right-0 mt-2 w-full bg-white shadow-lg rounded-b-lg p-4 z-50">
+                <div className="flex flex-col gap-4">
+                  {user && <ScoreBoard totalScore={user.score} />}
+                  {user && (
+                    <div className="flex flex-col gap-2">
+                      <div
+                        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 rounded"
+                        onClick={() => setShowUserMenu(!showUserMenu)}
+                      >
+                        <span>
+                          Hoşgeldin, <b>{user.username}</b>
+                        </span>
+                      </div>
+                      {showUserMenu && (
+                        <button
+                          onClick={handleLogout}
+                          className="flex items-center gap-2 text-red-500 p-2 hover:bg-gray-100 rounded"
+                        >
+                          <LogOut size={20} />
+                          <span>Çıkış Yap</span>
+                        </button>
+                      )}
+                    </div>
+                  )}
+                  {!isAuthenticated && (
+                    <div className="flex flex-col gap-2">
+                      <button
+                        onClick={() => onOpenAuth("login")}
+                        className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
+                      >
+                        <LogIn size={20} />
+                        <span>Giriş</span>
+                      </button>
+                      <button
+                        onClick={() => onOpenAuth("register")}
+                        className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
+                      >
+                        <UserPlus size={20} />
+                        <span>Kayıt</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="flex items-center gap-4">
+            {currentListing && roundStartTime && <Timer timeLeft={timeLeft} />}
+            {user && <ScoreBoard totalScore={user.score} />}
+            {user && (
+              <div className="relative">
+                <div
+                  className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-yellow-500 transition-colors"
+                  onClick={() => setShowUserMenu(!showUserMenu)}
+                >
+                  <span className="text-white">
+                    Hoşgeldin, <b>{user.username}</b>
+                  </span>
+                </div>
+                {showUserMenu && (
+                  <div className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg py-2 min-w-[200px] z-50">
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-gray-100 text-red-500"
+                    >
+                      <LogOut size={20} />
+                      <span>Çıkış Yap</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+            {!isAuthenticated && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onOpenAuth("login")}
+                  className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <LogIn size={20} />
+                  <span>Giriş</span>
+                </button>
+                <button
+                  onClick={() => onOpenAuth("register")}
+                  className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  <UserPlus size={20} />
+                  <span>Kayıt</span>
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

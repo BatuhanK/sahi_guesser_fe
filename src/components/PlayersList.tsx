@@ -3,6 +3,7 @@ import { Trophy, Users } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 
+import { useMediaQuery } from "../hooks/useMediaQuery";
 import { cn } from "../lib/utils";
 import { GuessResult } from "../types";
 import { OnlinePlayer } from "../types/socket";
@@ -16,6 +17,8 @@ export const PlayersList: React.FC<PlayersListProps> = ({
   onlinePlayers,
   lastGuesses,
 }) => {
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
   const [confettiGuessId, setConfettiGuessId] = useState<string | null>(null);
   const [animatingGuesses, setAnimatingGuesses] = useState<Set<string>>(
     new Set()
@@ -41,6 +44,10 @@ export const PlayersList: React.FC<PlayersListProps> = ({
     }
   }, [lastGuesses]);
 
+  if (!isDesktop) {
+    return null;
+  }
+
   return (
     <div className="bg-white rounded-xl shadow-lg p-3 lg:p-4 space-y-4 lg:space-y-6 w-full lg:w-[320px] min-h-[500px] lg:min-h-[600px]">
       {/* Online Players Section */}
@@ -56,7 +63,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             {onlinePlayers.length} oyuncu
           </span>
         </div>
-        <div className="overflow-y-auto h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="overflow-y-auto no-scrollbar h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <AnimatePresence mode="popLayout">
             {onlinePlayers?.map((player) => (
               <motion.div
@@ -87,7 +94,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             </h3>
           </div>
         </div>
-        <div className="overflow-y-auto h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="overflow-y-auto no-scrollbar h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <AnimatePresence mode="popLayout">
             {lastGuesses?.map((guess, index) => {
               const guessId =

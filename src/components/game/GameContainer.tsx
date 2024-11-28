@@ -71,7 +71,7 @@ export const GameContainer: React.FC = () => {
   }
 
   return (
-    <>
+    <div className="h-full">
       <GameBoard />
       {showResults && intermissionDuration && (
         <RoundResults
@@ -82,6 +82,6 @@ export const GameContainer: React.FC = () => {
           intermissionDuration={intermissionDuration}
         />
       )}
-    </>
+    </div>
   );
 };
