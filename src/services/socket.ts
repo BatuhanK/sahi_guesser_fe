@@ -28,6 +28,9 @@ class SocketService {
           extraHeaders,
         },
       },
+      query: {
+        token,
+      },
       transports: ["websocket"],
     });
 
