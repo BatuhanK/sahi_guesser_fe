@@ -5,7 +5,6 @@ import {
   Home,
   LogIn,
   LogOut,
-  Medal,
   Menu,
   UserPlus,
 } from "lucide-react";
@@ -14,10 +13,8 @@ import { useAuth } from "../../hooks/useAuth";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
-import { LeaderboardTable } from "../LeaderboardTable";
 import { ScoreBoard } from "../ScoreBoard";
 import { Timer } from "../Timer";
-import { Modal } from "../ui/Modal";
 
 const AnimatedIcons = () => {
   const [currentIcon, setCurrentIcon] = React.useState(0);
@@ -68,7 +65,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     useGameStore();
   const [timeLeft, setTimeLeft] = useState<number>(roundDuration);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
-  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
     let intervalId: number;
@@ -142,13 +138,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                 </div>
               )}
               <button
-                onClick={() => setShowLeaderboard(true)}
-                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-all relative shine-button"
-              >
-                <Medal size={20} />
-                <span>Sıralama</span>
-              </button>
-              <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
                 className="text-white"
               >
@@ -206,13 +195,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
               {currentListing && roundStartTime && (
                 <Timer timeLeft={timeLeft} />
               )}
-              <button
-                onClick={() => setShowLeaderboard(true)}
-                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-all relative shine-button"
-              >
-                <Medal size={20} />
-                <span>Sıralama</span>
-              </button>
               {user && <ScoreBoard totalScore={user.score} />}
               {user && (
                 <div className="relative">
@@ -259,14 +241,6 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
           )}
         </div>
       </header>
-
-      <Modal
-        isOpen={showLeaderboard}
-        onClose={() => setShowLeaderboard(false)}
-        title="Lider Tablosu"
-      >
-        <LeaderboardTable />
-      </Modal>
     </>
   );
 };
