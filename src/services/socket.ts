@@ -75,7 +75,6 @@ class SocketService {
     );
 
     this.socket.on("intermissionStart", ({ duration }) => {
-      console.log("intermissionDuration", duration);
       useGameStore.getState().setIntermissionDuration(duration);
       soundService.scheduleCountdown(duration);
     });
@@ -264,8 +263,6 @@ class SocketService {
   }
 
   sendMessage(roomId: number, message: string) {
-    console.log(message, "--message send message");
-    console.log(roomId, "--roomId send message");
     this.socket?.emit("chatMessage", { roomId, message });
   }
 
