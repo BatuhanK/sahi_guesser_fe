@@ -272,7 +272,6 @@ class SocketService {
   }
 
   submitGuess(roomId: number, price: number): void {
-    useGameStore.getState().setFeedback(null);
     this.socket?.emit("submitGuess", { roomId, price });
   }
 
