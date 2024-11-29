@@ -18,11 +18,17 @@ export default {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.85" },
         },
+        "pulse-once": {
+          "0%": { opacity: "1" },
+          "50%": { opacity: "0.7" },
+          "100%": { opacity: "1" },
+        },
       },
       animation: {
         shake: "shake 0.5s cubic-bezier(.36,.07,.19,.97) both",
         highlight: "highlight 2s ease-in-out 1",
         "pulse-subtle": "pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "pulse-once": "pulse-once 1s ease-in-out",
       },
     },
   },

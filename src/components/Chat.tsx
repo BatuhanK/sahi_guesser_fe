@@ -3,7 +3,7 @@ import Picker from "@emoji-mart/react";
 import { formatDistanceToNow } from "date-fns";
 import { tr } from "date-fns/locale";
 import { MessageCircle, Send, Smile } from "lucide-react";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { cn } from "../lib/utils";
@@ -17,7 +17,7 @@ interface ChatProps {
 }
 
 const isOwnMessage = (message: ChatMessage, user: User | null) => {
-  return String(message.userId) === String(user?.id);
+  return message.username === user?.username;
 };
 
 const shouldShowTimestamp = (messages: ChatMessage[], index: number) => {
@@ -34,21 +34,21 @@ const shouldShowTimestamp = (messages: ChatMessage[], index: number) => {
 const renderMessageWithMentions = (
   message: string,
   mentions?: ChatMention[],
-  currentUserId?: string | null
+  currentUsername?: string | null
 ) => {
   if (!mentions?.length) return message;
 
   const result = [];
   let lastIndex = 0;
   const isCurrentUserMentioned = mentions.some(
-    (mention) => String(mention.userId) === String(currentUserId)
+    (mention) => mention.username === currentUsername
   );
 
   mentions
     .sort((a, b) => a.indices[0] - b.indices[0])
     .forEach((mention) => {
       const [start, end] = mention.indices;
-      const isSelfMention = String(mention.userId) === String(currentUserId);
+      const isSelfMention = mention.username === currentUsername;
 
       // Add text before mention
       if (start > lastIndex) {
@@ -79,30 +79,44 @@ const renderMessageWithMentions = (
     result.push(message.slice(lastIndex));
   }
 
-  return result;
+  return (
+    <div className={cn(isCurrentUserMentioned && "animate-pulse-once")}>
+      {result}
+    </div>
+  );
 };
 
 const ChatMessage: React.FC<{
   message: ChatMessage;
   isOwn: boolean;
   showTimestamp: boolean;
-  currentUserId?: string | null;
-}> = ({ message, isOwn, showTimestamp, currentUserId }) => {
+  currentUsername?: string | null;
+  onMentionClick?: (username: string) => void;
+}> = ({ message, isOwn, showTimestamp, currentUsername, onMentionClick }) => {
   const isMentioned = message.mentions?.some(
-    (mention) => String(mention.userId) === String(currentUserId)
+    (mention) => mention.username === currentUsername
   );
 
   return (
     <div
-      className={cn("flex flex-col mb-3", isOwn ? "items-end" : "items-start")}
+      className={cn(
+        "flex flex-col mb-3",
+        isOwn ? "items-end" : "items-start",
+        "group"
+      )}
     >
       {showTimestamp && (
         <div className="flex items-center gap-2 mb-1">
           <span
             className={cn(
-              "font-medium text-sm",
-              isOwn ? "text-yellow-600" : "text-gray-700"
+              "font-medium text-sm cursor-pointer",
+              isOwn ? "text-yellow-600" : "text-gray-700",
+              "opacity-80 hover:opacity-100 transition-opacity",
+              !isOwn && "group-hover:underline"
             )}
+            onClick={() => onMentionClick?.(message.username)}
+            role="button"
+            tabIndex={0}
           >
             {message.username}
           </span>
@@ -128,7 +142,7 @@ const ChatMessage: React.FC<{
           {renderMessageWithMentions(
             message.message,
             message.mentions,
-            currentUserId
+            currentUsername
           )}
         </p>
       </div>
@@ -207,15 +221,45 @@ const EmojiHelp: React.FC = () => {
   );
 };
 
+const fuzzySearch = (text: string, query: string): boolean => {
+  const pattern = query
+    .toLowerCase()
+    .split("")
+    .map((char) => char.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))
+    .join(".*");
+  const regex = new RegExp(pattern);
+  return regex.test(text.toLowerCase());
+};
+
 const ChatInput: React.FC<{
   onSubmit: (message: string) => void;
-}> = ({ onSubmit }) => {
+  setMentionHandler: (handler: (username: string) => void) => void;
+}> = ({ onSubmit, setMentionHandler }) => {
   const [message, setMessage] = useState("");
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showMentions, setShowMentions] = useState(false);
   const [cursorPosition, setCursorPosition] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
   const onlinePlayers = useGameStore((state) => state.onlinePlayers);
+
+  // Add this method to handle adding mentions
+  const addMention = useCallback(
+    (username: string) => {
+      const start = message.slice(0, cursorPosition);
+      const end = message.slice(cursorPosition);
+      const hasSpace = start.endsWith(" ") || start.length === 0 ? "" : " ";
+      const newMessage = start + hasSpace + `@${username} ` + end;
+
+      setMessage(newMessage);
+      inputRef.current?.focus();
+    },
+    [message, cursorPosition]
+  );
+
+  // Register the mention handler
+  useEffect(() => {
+    setMentionHandler(addMention);
+  }, [setMentionHandler, addMention]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,6 +268,8 @@ const ChatInput: React.FC<{
       const messageWithEmojis = convertEmojis(message.trim());
       onSubmit(messageWithEmojis);
       setMessage("");
+      setShowMentions(false); // Close mentions popover
+      setShowEmojiPicker(false); // Also close emoji picker if open
     }
   };
 
@@ -240,9 +286,10 @@ const ChatInput: React.FC<{
     setMessage(newValue);
     setCursorPosition(e.currentTarget.selectionStart ?? 0);
 
-    // Check for @ symbol for mentions
+    // Check for @ symbol and get search query
     const lastAtSymbol = newValue.lastIndexOf("@");
     if (lastAtSymbol !== -1 && lastAtSymbol >= newValue.lastIndexOf(" ")) {
+      const searchQuery = newValue.slice(lastAtSymbol + 1);
       setShowMentions(true);
     } else {
       setShowMentions(false);
@@ -261,6 +308,16 @@ const ChatInput: React.FC<{
     inputRef.current?.focus();
   };
 
+  // Get filtered players based on search query
+  const getFilteredPlayers = () => {
+    const lastAtSymbol = message.lastIndexOf("@");
+    const searchQuery = message.slice(lastAtSymbol + 1);
+
+    return onlinePlayers.filter((player) =>
+      fuzzySearch(player.username, searchQuery)
+    );
+  };
+
   return (
     <div className="relative">
       {showEmojiPicker && (
@@ -270,16 +327,53 @@ const ChatInput: React.FC<{
       )}
 
       {showMentions && (
-        <div className="absolute bottom-full left-0 mb-2 w-64 bg-white rounded-lg shadow-lg border border-gray-200">
-          {onlinePlayers.map((player) => (
-            <button
-              key={player.id}
-              className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors"
-              onClick={() => handleMentionSelect(player)}
-            >
-              {player.username}
-            </button>
-          ))}
+        <div className="absolute bottom-[calc(100%+0.5rem)] left-16 w-72 bg-white rounded-lg shadow-xl border border-gray-200 max-h-48 overflow-y-auto divide-y divide-gray-100">
+          <div className="px-3 py-2 text-xs font-medium text-gray-500 bg-gray-50/80 sticky top-0 backdrop-blur-sm">
+            Kullanıcılar
+          </div>
+          <div className="py-1">
+            {getFilteredPlayers().map((player) => {
+              const lastAtSymbol = message.lastIndexOf("@");
+              const searchQuery = message.slice(lastAtSymbol + 1).toLowerCase();
+              const username = player.username;
+              const index = username.toLowerCase().indexOf(searchQuery);
+
+              return (
+                <button
+                  key={player.userId}
+                  className="w-full px-3 py-2 text-left hover:bg-gray-50 transition-colors flex items-center gap-2 group"
+                  onClick={() => handleMentionSelect(player)}
+                >
+                  <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700 font-medium text-sm">
+                    {username.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="flex-1 block truncate">
+                      {index >= 0 ? (
+                        <>
+                          {username.slice(0, index)}
+                          <span className="bg-yellow-100 text-yellow-900 font-medium px-1 rounded">
+                            {username.slice(index, index + searchQuery.length)}
+                          </span>
+                          {username.slice(index + searchQuery.length)}
+                        </>
+                      ) : (
+                        username
+                      )}
+                    </span>
+                    {fuzzySearch(username, searchQuery) && searchQuery && (
+                      <span className="text-xs text-gray-400 group-hover:text-gray-500">
+                        *
+                      </span>
+                    )}
+                  </div>
+                  <span className="text-gray-400 group-hover:text-gray-500">
+                    <MessageCircle className="w-4 h-4" />
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 
@@ -301,7 +395,9 @@ const ChatInput: React.FC<{
             type="text"
             value={message}
             onChange={handleInputChange}
-            onSelect={(e) => setCursorPosition(e.currentTarget.selectionStart)}
+            onSelect={(e) =>
+              setCursorPosition(e.currentTarget.selectionStart ?? 0)
+            }
             placeholder="Mesajınızı yazın..."
             className={cn(
               "flex-1 rounded-full bg-white",
@@ -344,6 +440,18 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const mentionHandlerRef = useRef<(username: string) => void>();
+
+  const setMentionHandler = useCallback(
+    (handler: (username: string) => void) => {
+      mentionHandlerRef.current = handler;
+    },
+    []
+  );
+
+  const handleMentionClick = useCallback((username: string) => {
+    mentionHandlerRef.current?.(username);
+  }, []);
 
   const scrollToBottom = () => {
     if (isDesktop && messages.length > 0) {
@@ -365,12 +473,16 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
             message={msg}
             isOwn={isOwnMessage(msg, user)}
             showTimestamp={shouldShowTimestamp(messages, index)}
-            currentUserId={user?.id}
+            currentUsername={user?.username}
+            onMentionClick={handleMentionClick}
           />
         ))}
         <div ref={messagesEndRef} />
       </div>
-      <ChatInput onSubmit={onSendMessage} />
+      <ChatInput
+        onSubmit={onSendMessage}
+        setMentionHandler={setMentionHandler}
+      />
     </div>
   );
 };
