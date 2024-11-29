@@ -68,6 +68,7 @@ export interface ServerToClientEvents {
   guessResult: (data: {
     roomId: number;
     direction: "correct" | "go_higher" | "go_lower";
+    guessCount: number;
   }) => void;
   chatMessage: (data: {
     userId: string;
@@ -80,11 +81,13 @@ export interface ServerToClientEvents {
     userId: number;
     playerId: number;
     username: string;
+    guessCount: number;
   }) => void;
   incorrectGuess: (data: {
     userId: number;
     playerId: number;
     username: string;
+    guessCount: number;
   }) => void;
 
   playerJoined: (data: {

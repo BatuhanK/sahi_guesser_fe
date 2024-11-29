@@ -42,6 +42,8 @@ export const GameBoard: React.FC = () => {
     intermissionDuration,
     roundEndScores,
     correctPrice,
+    room,
+    guessCount,
   } = useGameStore();
   const { isAuthenticated } = useAuth();
 
@@ -203,6 +205,9 @@ export const GameBoard: React.FC = () => {
 
   if (!currentListing) return null;
 
+  const maxGuessExceeded =
+    guessCount >= (room?.roomSettings.maxGuessesPerRound ?? 20);
+
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
       {showConfetti && (
@@ -284,16 +289,28 @@ export const GameBoard: React.FC = () => {
         <div className="flex flex-col items-center gap-3 lg:gap-4">
           <PriceInput
             onGuess={handleGuess}
-            disabled={!isAuthenticated || hasCorrectGuess || showResults}
+            disabled={
+              !isAuthenticated ||
+              hasCorrectGuess ||
+              showResults ||
+              maxGuessExceeded
+            }
             listingType={currentListing.details.type}
             listingId={currentListing.id}
           />
+          {isAuthenticated &&
+            room?.roomSettings.maxGuessesPerRound &&
+            guessCount >= room.roomSettings.maxGuessesPerRound && (
+              <p className="text-red-500 text-sm lg:text-base">
+                Bu tur için maksimum tahmin hakkınızı kullandınız
+              </p>
+            )}
           {!isAuthenticated && (
             <p className="text-red-500 text-sm lg:text-base">
               Tahmin yapabilmek için giriş yapmalısınız
             </p>
           )}
-          {feedback && !showResults && (
+          {feedback && !showResults && !maxGuessExceeded && (
             <div className={shake ? "animate-shake" : ""}>
               <GuessStatus
                 feedback={feedback}

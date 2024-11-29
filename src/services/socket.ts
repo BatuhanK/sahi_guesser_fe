@@ -87,6 +87,7 @@ class SocketService {
     this.socket.on("roundStart", ({ listing, duration }) => {
       const state = useGameStore.getState();
 
+      state.setGuessCount(0);
       state.setGameStatus("playing");
       state.setFeedback(null);
       state.setHasCorrectGuess(false);
@@ -148,8 +149,11 @@ class SocketService {
       { leading: true, trailing: false }
     );
 
-    this.socket.on("guessResult", ({ direction }) => {
+    this.socket.on("guessResult", ({ direction, guessCount }) => {
+      const state = useGameStore.getState();
       debouncedGuessResult(direction);
+
+      state.setGuessCount(guessCount);
     });
 
     this.socket.on("correctGuess", ({ userId, playerId, username }) => {
@@ -249,6 +253,7 @@ class SocketService {
       const state = useGameStore.getState();
 
       state.setRoomId(null);
+      state.setRoom(null);
       state.setCurrentListing(null);
     });
   }
@@ -267,6 +272,7 @@ class SocketService {
   leaveRoom(roomId: number): void {
     this.socket?.emit("leaveRoom", { roomId });
     useGameStore.getState().setRoomId(null);
+
     useGameStore.getState().setCurrentListing(null);
     soundService.clearCountdownTimeout();
   }

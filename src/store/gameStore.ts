@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { Room } from "../services/api";
 import { ChatMessage, GuessResult } from "../types";
 import type {
   GameStatus,
@@ -15,6 +16,7 @@ interface GameState {
   roundDuration: number;
   players: Player[];
   roomId: number | null;
+  room: Room | null;
   feedback: "correct" | "go_higher" | "go_lower" | null;
   hasCorrectGuess: boolean;
   chatMessages: ChatMessage[];
@@ -23,6 +25,7 @@ interface GameState {
   incorrectGuesses: GuessResult[];
   correctPrice: number | null;
   roundEndScores: RoundEndScore[];
+  guessCount: number;
   lastGuesses: GuessResult[];
   showResults: boolean;
   intermissionDuration: number;
@@ -31,6 +34,7 @@ interface GameState {
   setRoundInfo: (startTime: Date, duration: number) => void;
   setPlayers: (players: Player[]) => void;
   setRoomId: (roomId: number | null) => void;
+  setRoom: (room: Room | null) => void;
   setFeedback: (feedback: "correct" | "go_higher" | "go_lower" | null) => void;
   setHasCorrectGuess: (hasCorrectGuess: boolean) => void;
   setChatMessages: (chatMessages: ChatMessage[]) => void;
@@ -43,6 +47,7 @@ interface GameState {
   setLastGuesses: (lastGuesses: GuessResult[]) => void;
   setCorrectGuesses: (correctGuesses: GuessResult[]) => void;
   setIncorrectGuesses: (incorrectGuesses: GuessResult[]) => void;
+  setGuessCount: (guessCount: number) => void;
   setIntermissionDuration: (intermissionDuration: number) => void;
 }
 
@@ -53,7 +58,9 @@ export const useGameStore = create<GameState>((set) => ({
   roundDuration: 0,
   players: [],
   roomId: null,
+  room: null,
   feedback: null,
+  guessCount: 0,
   hasCorrectGuess: false,
   correctGuesses: [],
   incorrectGuesses: [],
@@ -85,6 +92,8 @@ export const useGameStore = create<GameState>((set) => ({
     set({ roundStartTime: startTime, roundDuration: duration }),
   setPlayers: (players) => set({ players }),
   setRoomId: (roomId) => set({ roomId, chatMessages: [] }),
+  setGuessCount: (guessCount) => set({ guessCount }),
+  setRoom: (room) => set({ room }),
   setFeedback: (feedback) => set({ feedback }),
   setHasCorrectGuess: (hasCorrectGuess) => set({ hasCorrectGuess }),
   setChatMessages: (chatMessages) => set({ chatMessages }),

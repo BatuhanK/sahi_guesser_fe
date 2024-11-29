@@ -40,6 +40,7 @@ export const GameContainer: React.FC = () => {
     setSelectedCategory(categorySlug);
     const rooms = await categoryApi.getRooms(categorySlug);
     if (rooms.length > 0) {
+      useGameStore.getState().setRoom(rooms[0]);
       socketService.joinRoom(rooms[0].id);
     } else {
       toast.error("Bu kategori için oda bulunamadı.");

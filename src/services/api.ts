@@ -57,6 +57,9 @@ export type Room = {
   name: string;
   slug: string;
   status: string;
+  roomSettings: {
+    maxGuessesPerRound: number;
+  };
 };
 
 export const categoryApi = {
