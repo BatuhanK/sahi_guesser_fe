@@ -298,6 +298,12 @@ export const GameBoard: React.FC = () => {
             listingType={currentListing.details.type}
             listingId={currentListing.id}
           />
+          {isAuthenticated && room?.roomSettings.maxGuessesPerRound && (
+            <p className="text-sm lg:text-base text-gray-600">
+              Tahmin Hakkı: {guessCount} /{" "}
+              {room.roomSettings.maxGuessesPerRound}
+            </p>
+          )}
           {isAuthenticated &&
             room?.roomSettings.maxGuessesPerRound &&
             guessCount >= room.roomSettings.maxGuessesPerRound && (
