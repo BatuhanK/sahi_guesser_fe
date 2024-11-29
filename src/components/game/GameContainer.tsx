@@ -52,7 +52,7 @@ export const GameContainer: React.FC = () => {
   }
 
   if (!currentListing && roomId) {
-    return <Loader text="Oyun için kullanıcı bekleniyor..." />;
+    return <Loader text="Oyuna bağlanılıyor..." />;
   }
 
   if (!roomId) {
