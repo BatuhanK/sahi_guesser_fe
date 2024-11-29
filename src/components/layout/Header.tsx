@@ -23,7 +23,11 @@ const AnimatedIcons = () => {
   const [currentIcon, setCurrentIcon] = React.useState(0);
   const icons = [
     { component: Home, key: "home" },
+    { component: Home, key: "home" },
+    { component: Home, key: "home" },
     { component: HelpCircle, key: "help" },
+    { component: Car, key: "car" },
+    { component: Car, key: "car" },
     { component: Car, key: "car" },
   ];
   React.useEffect(() => {

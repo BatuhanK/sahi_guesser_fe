@@ -1,7 +1,8 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
+import toast from "react-hot-toast";
 
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.API_URL || window.location.origin + "/api",
 });
 
 api.interceptors.request.use((config) => {
@@ -11,6 +12,20 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+api.interceptors.response.use(
+  (response) => response,
+  (error: AxiosError) => {
+    const errorMessage =
+      error.response?.data?.message || error.message || "An error occurred";
+
+    if (error.config?.url !== "/auth/me" || error.response?.status !== 401) {
+      toast.error(errorMessage);
+    }
+
+    return Promise.reject(error);
+  }
+);
 
 export const authApi = {
   login: async (username: string, password: string) => {

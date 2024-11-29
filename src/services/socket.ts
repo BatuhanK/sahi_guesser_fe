@@ -19,10 +19,10 @@ class SocketService {
         Authorization: `Bearer ${token}`,
       };
     }
-    const socketUrl = import.meta.env.VITE_SOCKET_URL;
-    const isLocal = socketUrl.includes("local");
-    this.socket = io(import.meta.env.VITE_SOCKET_URL, {
-      path: !isLocal ? "/ws/socket.io/" : "/socket.io/",
+
+    const isLocal = window.location.origin.includes("local");
+    this.socket = io("/", {
+      path: isLocal ? "/socket.io/" : "/ws/socket.io/",
       autoConnect: false,
       extraHeaders,
       transportOptions: {

@@ -11,10 +11,7 @@ RUN npm ci
 
 # Copy source code
 COPY . .
-
-ENV VITE_SOCKET_URL=https://sahikaca.com/
-ENV VITE_API_URL=https://sahikaca.com/api/
-
+COPY .env .
 # Build the application
 RUN npm run build
 
