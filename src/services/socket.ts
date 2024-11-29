@@ -171,6 +171,7 @@ class SocketService {
       userId: number;
       playerId: number;
       username: string;
+      isCorrect: false;
     }> = [];
     const flushIncorrectGuesses = debounce(() => {
       if (incorrectGuessBuffer.length > 0) {
@@ -180,21 +181,21 @@ class SocketService {
             isCorrect: false,
           }))
         );
-        useGameStore.getState().setLastGuesses(
-          [...incorrectGuessBuffer].map(
-            (guess) => ({
-              ...guess,
-              isCorrect: false,
-            }),
-            ...useGameStore.getState().lastGuesses
-          )
-        );
+        useGameStore
+          .getState()
+          .setLastGuesses([
+            ...incorrectGuessBuffer,
+            ...useGameStore.getState().lastGuesses,
+          ]);
         incorrectGuessBuffer = [];
       }
     }, 100);
 
     this.socket.on("incorrectGuess", (data) => {
-      incorrectGuessBuffer.push(data);
+      incorrectGuessBuffer.push({
+        ...data,
+        isCorrect: false,
+      });
       flushIncorrectGuesses();
     });
 
