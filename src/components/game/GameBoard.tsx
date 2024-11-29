@@ -286,6 +286,7 @@ export const GameBoard: React.FC = () => {
             onGuess={handleGuess}
             disabled={!isAuthenticated || hasCorrectGuess || showResults}
             listingType={currentListing.details.type}
+            listingId={currentListing.id}
           />
           {!isAuthenticated && (
             <p className="text-red-500 text-sm lg:text-base">
