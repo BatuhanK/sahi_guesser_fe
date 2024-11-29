@@ -180,6 +180,15 @@ class SocketService {
             isCorrect: false,
           }))
         );
+        useGameStore.getState().setLastGuesses(
+          [...incorrectGuessBuffer].map(
+            (guess) => ({
+              ...guess,
+              isCorrect: false,
+            }),
+            ...useGameStore.getState().lastGuesses
+          )
+        );
         incorrectGuessBuffer = [];
       }
     }, 100);
