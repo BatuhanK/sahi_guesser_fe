@@ -33,6 +33,7 @@ export interface ChatMessage {
   username: string;
   message: string;
   timestamp: Date;
+  mentions?: ChatMention[];
 }
 
 export interface GuessResult {
@@ -48,4 +49,16 @@ export interface RoundGuess {
   guess: number;
   accuracy: number;
   score: number;
+}
+
+export interface ChatMention {
+  userId: string | number;
+  username: string;
+  indices: [number, number];
+}
+
+export interface OnlinePlayer {
+  id: string | number;
+  username: string;
+  // ... other properties
 }
