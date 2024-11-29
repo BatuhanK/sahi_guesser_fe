@@ -24,3 +24,42 @@
     scrollbar-width: none; /* Firefox */
   }
 }
+
+@keyframes shine {
+  0% {
+    transform: translateX(-100%);
+  }
+  50%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.shine-button {
+  background: white;
+  overflow: hidden;
+}
+
+.shine-button::after {
+  position: absolute;
+  content: "";
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent 0%,
+    transparent 25%,
+    rgba(255, 215, 0, 0.4) 45%,
+    rgba(255, 215, 0, 0.6) 50%,
+    rgba(255, 215, 0, 0.4) 55%,
+    transparent 75%,
+    transparent 100%
+  );
+  animation: shine 4s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+.shine-button:hover::after {
+  animation: shine 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}

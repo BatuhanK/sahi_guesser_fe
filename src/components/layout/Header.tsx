@@ -5,6 +5,7 @@ import {
   Home,
   LogIn,
   LogOut,
+  Medal,
   Menu,
   UserPlus,
 } from "lucide-react";
@@ -13,8 +14,10 @@ import { useAuth } from "../../hooks/useAuth";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
+import { LeaderboardTable } from "../LeaderboardTable";
 import { ScoreBoard } from "../ScoreBoard";
 import { Timer } from "../Timer";
+import { Modal } from "../ui/Modal";
 
 const AnimatedIcons = () => {
   const [currentIcon, setCurrentIcon] = React.useState(0);
@@ -61,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     useGameStore();
   const [timeLeft, setTimeLeft] = useState<number>(roundDuration);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const [showLeaderboard, setShowLeaderboard] = useState(false);
 
   useEffect(() => {
     let intervalId: number;
@@ -104,135 +108,161 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
   };
 
   return (
-    <header className="bg-yellow-400 p-4 shadow-md relative">
-      <div className="max-w-6xl mx-auto flex items-center justify-between">
-        <div
-          className="flex items-center gap-2 cursor-pointer"
-          onClick={() => handleLeaveRoom()}
-        >
-          <div className="flex items-center gap-4">
-            <AnimatedIcons />
-          </div>
-          <h1
-            className={`${
-              isMobile ? "text-xl" : "text-2xl"
-            } font-bold text-white`}
-            style={{
-              textShadow: "0 0 3px rgba(255, 255, 255, 0.3)",
-            }}
+    <>
+      <header className="bg-yellow-400 p-4 shadow-md relative">
+        <div className="max-w-6xl mx-auto flex items-center justify-between">
+          <div
+            className="flex items-center gap-2 cursor-pointer"
+            onClick={() => handleLeaveRoom()}
           >
-            sahikaca
-          </h1>
-        </div>
-
-        {isMobile ? (
-          <div className="flex items-center gap-2">
-            {currentListing && roundStartTime && (
-              <div className="mr-2">
-                <Timer timeLeft={timeLeft} />
-              </div>
-            )}
-            <button
-              onClick={() => setShowMobileMenu(!showMobileMenu)}
-              className="text-white"
+            <div className="flex items-center gap-4">
+              <AnimatedIcons />
+            </div>
+            <h1
+              className={`${
+                isMobile ? "text-xl" : "text-2xl"
+              } font-bold text-white`}
+              style={{
+                textShadow: "0 0 3px rgba(255, 255, 255, 0.3)",
+              }}
             >
-              <Menu size={24} />
-            </button>
-            {showMobileMenu && (
-              <div className="absolute top-full right-0 mt-2 w-full bg-white shadow-lg rounded-b-lg p-4 z-50">
-                <div className="flex flex-col gap-4">
-                  {user && <ScoreBoard totalScore={user.score} />}
-                  {user && (
-                    <div className="flex flex-col gap-2">
-                      <div
-                        className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 rounded"
-                        onClick={() => setShowUserMenu(!showUserMenu)}
-                      >
-                        <span>
-                          Hoşgeldin, <b>{user.username}</b>
-                        </span>
-                      </div>
-                      {showUserMenu && (
-                        <button
-                          onClick={handleLogout}
-                          className="flex items-center gap-2 text-red-500 p-2 hover:bg-gray-100 rounded"
+              sahikaca
+            </h1>
+          </div>
+
+          {isMobile ? (
+            <div className="flex items-center gap-2">
+              {currentListing && roundStartTime && (
+                <div className="mr-2">
+                  <Timer timeLeft={timeLeft} />
+                </div>
+              )}
+              <button
+                onClick={() => setShowLeaderboard(true)}
+                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-all relative shine-button"
+              >
+                <Medal size={20} />
+                <span>Sıralama</span>
+              </button>
+              <button
+                onClick={() => setShowMobileMenu(!showMobileMenu)}
+                className="text-white"
+              >
+                <Menu size={24} />
+              </button>
+              {showMobileMenu && (
+                <div className="absolute top-full right-0 mt-2 w-full bg-white shadow-lg rounded-b-lg p-4 z-50">
+                  <div className="flex flex-col gap-4">
+                    {user && <ScoreBoard totalScore={user.score} />}
+                    {user && (
+                      <div className="flex flex-col gap-2">
+                        <div
+                          className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 rounded"
+                          onClick={() => setShowUserMenu(!showUserMenu)}
                         >
-                          <LogOut size={20} />
-                          <span>Çıkış Yap</span>
+                          <span>
+                            Hoşgeldin, <b>{user.username}</b>
+                          </span>
+                        </div>
+                        {showUserMenu && (
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 text-red-500 p-2 hover:bg-gray-100 rounded"
+                          >
+                            <LogOut size={20} />
+                            <span>Çıkış Yap</span>
+                          </button>
+                        )}
+                      </div>
+                    )}
+                    {!isAuthenticated && (
+                      <div className="flex flex-col gap-2">
+                        <button
+                          onClick={() => onOpenAuth("login")}
+                          className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
+                        >
+                          <LogIn size={20} />
+                          <span>Giriş</span>
                         </button>
-                      )}
-                    </div>
-                  )}
-                  {!isAuthenticated && (
-                    <div className="flex flex-col gap-2">
-                      <button
-                        onClick={() => onOpenAuth("login")}
-                        className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
-                      >
-                        <LogIn size={20} />
-                        <span>Giriş</span>
-                      </button>
-                      <button
-                        onClick={() => onOpenAuth("register")}
-                        className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
-                      >
-                        <UserPlus size={20} />
-                        <span>Kayıt</span>
-                      </button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="flex items-center gap-4">
-            {currentListing && roundStartTime && <Timer timeLeft={timeLeft} />}
-            {user && <ScoreBoard totalScore={user.score} />}
-            {user && (
-              <div className="relative">
-                <div
-                  className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-yellow-500 transition-colors"
-                  onClick={() => setShowUserMenu(!showUserMenu)}
-                >
-                  <span className="text-white">
-                    Hoşgeldin, <b>{user.username}</b>
-                  </span>
-                </div>
-                {showUserMenu && (
-                  <div className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg py-2 min-w-[200px] z-50">
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-gray-100 text-red-500"
-                    >
-                      <LogOut size={20} />
-                      <span>Çıkış Yap</span>
-                    </button>
+                        <button
+                          onClick={() => onOpenAuth("register")}
+                          className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
+                        >
+                          <UserPlus size={20} />
+                          <span>Kayıt</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
-            {!isAuthenticated && (
-              <div className="flex gap-2">
-                <button
-                  onClick={() => onOpenAuth("login")}
-                  className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <LogIn size={20} />
-                  <span>Giriş</span>
-                </button>
-                <button
-                  onClick={() => onOpenAuth("register")}
-                  className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
-                >
-                  <UserPlus size={20} />
-                  <span>Kayıt</span>
-                </button>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
-    </header>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex items-center gap-4">
+              {currentListing && roundStartTime && (
+                <Timer timeLeft={timeLeft} />
+              )}
+              <button
+                onClick={() => setShowLeaderboard(true)}
+                className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-all relative shine-button"
+              >
+                <Medal size={20} />
+                <span>Sıralama</span>
+              </button>
+              {user && <ScoreBoard totalScore={user.score} />}
+              {user && (
+                <div className="relative">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-yellow-500 transition-colors"
+                    onClick={() => setShowUserMenu(!showUserMenu)}
+                  >
+                    <span className="text-white">
+                      Hoşgeldin, <b>{user.username}</b>
+                    </span>
+                  </div>
+                  {showUserMenu && (
+                    <div className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg py-2 min-w-[200px] z-50">
+                      <button
+                        onClick={handleLogout}
+                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-gray-100 text-red-500"
+                      >
+                        <LogOut size={20} />
+                        <span>Çıkış Yap</span>
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+              {!isAuthenticated && (
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onOpenAuth("login")}
+                    className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <LogIn size={20} />
+                    <span>Giriş</span>
+                  </button>
+                  <button
+                    onClick={() => onOpenAuth("register")}
+                    className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                  >
+                    <UserPlus size={20} />
+                    <span>Kayıt</span>
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </header>
+
+      <Modal
+        isOpen={showLeaderboard}
+        onClose={() => setShowLeaderboard(false)}
+        title="Lider Tablosu"
+      >
+        <LeaderboardTable />
+      </Modal>
+    </>
   );
 };

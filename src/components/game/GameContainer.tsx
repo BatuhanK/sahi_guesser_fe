@@ -5,6 +5,7 @@ import { Category, categoryApi } from "../../services/api";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
 import { CategorySelector } from "../CategorySelector";
+import { LeaderboardTable } from "../LeaderboardTable";
 import { Loader } from "../ui/Loader";
 import { GameBoard } from "./GameBoard";
 
@@ -55,10 +56,13 @@ export const GameContainer: React.FC = () => {
 
   if (!roomId) {
     return (
-      <CategorySelector
-        categories={categories}
-        onSelect={handleCategorySelect}
-      />
+      <div className="space-y-6">
+        <CategorySelector
+          categories={categories}
+          onSelect={handleCategorySelect}
+        />
+        <LeaderboardTable />
+      </div>
     );
   }
 
