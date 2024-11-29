@@ -26,7 +26,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
             <button
               key={category.id}
               onClick={() => onSelect(category.slug)}
-              className="flex flex-col items-center gap-3 p-8 bg-white rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+              className="flex flex-col items-center gap-3 p-8 bg-white rounded-xl shadow-lg 
+                hover:shadow-xl transition-all duration-300 ease-out transform hover:scale-105"
             >
               <IconComponent size={48} className="text-yellow-400" />
               <span className="text-xl font-medium">{category.name}</span>
