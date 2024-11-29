@@ -183,10 +183,12 @@ class SocketService {
         );
         useGameStore
           .getState()
-          .setLastGuesses([
-            ...incorrectGuessBuffer,
-            ...useGameStore.getState().lastGuesses,
-          ]);
+          .setLastGuesses(
+            [
+              ...incorrectGuessBuffer,
+              ...useGameStore.getState().lastGuesses,
+            ].slice(0, 5)
+          );
         incorrectGuessBuffer = [];
       }
     }, 100);
