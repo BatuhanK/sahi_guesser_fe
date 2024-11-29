@@ -1,10 +1,11 @@
 import { AnimatePresence, motion } from "framer-motion";
-import { Trophy, Users } from "lucide-react";
+import { Check, Trophy, Users } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 
 import { useMediaQuery } from "../hooks/useMediaQuery";
 import { cn } from "../lib/utils";
+import { useGameStore } from "../store/gameStore";
 import { GuessResult } from "../types";
 import { OnlinePlayer } from "../types/socket";
 
@@ -18,10 +19,27 @@ export const PlayersList: React.FC<PlayersListProps> = ({
   lastGuesses,
 }) => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
+  const correctGuesses = useGameStore((state) => state.correctGuesses);
 
   const [confettiGuessId, setConfettiGuessId] = useState<string | null>(null);
   const [animatingGuesses, setAnimatingGuesses] = useState<Set<string>>(
     new Set()
+  );
+
+  // Group players based on correct guesses
+  const groupedPlayers = onlinePlayers.reduce(
+    (acc, player) => {
+      const hasCorrectGuess = correctGuesses.some(
+        (guess) => guess.playerId === player.playerId
+      );
+      if (hasCorrectGuess) {
+        acc.correct.push(player);
+      } else {
+        acc.incorrect.push(player);
+      }
+      return acc;
+    },
+    { correct: [] as OnlinePlayer[], incorrect: [] as OnlinePlayer[] }
   );
 
   // Watch for new guesses and trigger animations
@@ -65,7 +83,28 @@ export const PlayersList: React.FC<PlayersListProps> = ({
         </div>
         <div className="overflow-y-auto no-scrollbar h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
           <AnimatePresence mode="popLayout">
-            {onlinePlayers?.map((player) => (
+            {/* Correct guesses group */}
+            {groupedPlayers.correct.map((player) => (
+              <motion.div
+                key={player.playerId}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                layout
+                className="flex items-center justify-between bg-green-50 p-2 rounded-lg hover:bg-green-100 transition-colors mb-2"
+              >
+                <div className="flex items-center gap-2">
+                  <Check size={16} className="text-green-600" />
+                  <span className="font-medium">{player.username}</span>
+                </div>
+                <span className="text-sm px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                  {player.roomScore} puan
+                </span>
+              </motion.div>
+            ))}
+
+            {/* Incorrect/waiting group */}
+            {groupedPlayers.incorrect.map((player) => (
               <motion.div
                 key={player.playerId}
                 initial={{ opacity: 0, y: 20 }}
