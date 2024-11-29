@@ -160,7 +160,6 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   );
 
   const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
-  const shouldShowUserScore = userRank > 2;
 
   return (
     <AnimatePresence>
@@ -186,15 +185,17 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
               <div className="space-y-4">
                 {sortedScores.slice(0, 3).map((score, index) => renderScoreRow(score, index))}
                 
-                {shouldShowUserScore && (
-                  <>
+               
+                  {userRank > 3 && (
                     <div className="flex justify-center py-1">
                       <div className="flex flex-col items-center gap-[2px]">
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                       </div>
-                    </div>
+                    </div>)}
+                    {userRank > 2 && (
+                  <>
                     {renderScoreRow(sortedScores[userRank], userRank)}
                   </>
                 )}
