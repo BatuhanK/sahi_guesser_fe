@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Medal } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
 import { Listing, RoundEndScore } from "../types/socket";
+import { useAuth } from "../hooks/useAuth";
 
 interface RoundResultsProps {
   scores: RoundEndScore[];
@@ -97,6 +98,70 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
     }
   };
 
+  const { user } = useAuth();
+
+  const renderScoreRow = (score: typeof sortedScores[0], index: number) => (
+    <motion.div
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      transition={{ delay: index * 0.1 }}
+      key={score.userId}
+      className={`flex items-center justify-between p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
+        index
+      )} backdrop-blur-sm backdrop-filter`}
+    >
+      <div className="flex items-center gap-4">
+        {index <= 2 ? (
+          <motion.div
+            initial={{ rotate: -180, scale: 0 }}
+            animate={{ rotate: 0, scale: 1 }}
+            transition={{ type: "spring", stiffness: 200, delay: index * 0.1 }}
+          >
+            <Medal className={`${getMedalColor(index)} drop-shadow-md`} size={28} />
+          </motion.div>
+        ) : (
+          <span className="w-7 text-center font-medium text-gray-500">
+            {index + 1}
+          </span>
+        )}
+        <span className="font-medium text-lg">{score.username}</span>
+      </div>
+      
+      <div className="flex items-center gap-6">
+        <span className="text-gray-700 font-medium">
+          ₺{score.guess.toLocaleString("tr-TR")}
+        </span>
+        <div className="w-24 text-center">
+          <motion.span
+            initial={{ scale: 0 }}
+            animate={{ scale: 1 }}
+            transition={{ delay: index * 0.1 + 0.2 }}
+            className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+              score.accuracy >= 90
+                ? "bg-green-100 text-green-700"
+                : score.accuracy >= 70
+                ? "bg-yellow-100 text-yellow-700"
+                : "bg-red-100 text-red-700"
+            }`}
+          >
+            %{score.accuracy.toFixed(1)}
+          </motion.span>
+        </div>
+        <motion.span
+          initial={{ x: 20, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ delay: index * 0.1 + 0.3 }}
+          className="font-bold text-green-600 w-20 text-right"
+        >
+          +{score.roundScore}
+        </motion.span>
+      </div>
+    </motion.div>
+  );
+
+  const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
+  const shouldShowUserScore = userRank > 2;
+
   return (
     <AnimatePresence>
       <motion.div
@@ -119,48 +184,20 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
               </div>
 
               <div className="space-y-4">
-                {sortedScores.map((score, index) => (
-                  <div
-                    key={score.userId}
-                    className={`flex items-center justify-between p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
-                      index
-                    )}`}
-                  >
-                    <div className="flex items-center gap-4">
-                      {index <= 2 ? (
-                        <Medal className={getMedalColor(index)} size={28} />
-                      ) : (
-                        <span className="w-7 text-center font-medium text-gray-500">
-                          {index + 1}
-                        </span>
-                      )}
-                      <span className="font-medium text-lg">
-                        {score.username}
-                      </span>
-                    </div>
-                    <div className="flex items-center gap-6">
-                      <span className="text-gray-700 font-medium">
-                        ₺{score.guess.toLocaleString("tr-TR")}
-                      </span>
-                      <div className="w-24 text-center">
-                        <span
-                          className={`px-3 py-1 rounded-full text-sm font-medium ${
-                            score.accuracy >= 90
-                              ? "bg-green-100 text-green-700"
-                              : score.accuracy >= 70
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                          }`}
-                        >
-                          %{score.accuracy.toFixed(1)}
-                        </span>
+                {sortedScores.slice(0, 3).map((score, index) => renderScoreRow(score, index))}
+                
+                {shouldShowUserScore && (
+                  <>
+                    <div className="flex justify-center py-1">
+                      <div className="flex flex-col items-center gap-[2px]">
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                       </div>
-                      <span className="font-bold text-green-600 w-20 text-right">
-                        +{score.roundScore}
-                      </span>
                     </div>
-                  </div>
-                ))}
+                    {renderScoreRow(sortedScores[userRank], userRank)}
+                  </>
+                )}
               </div>
 
               {/* Advertisement Space */}

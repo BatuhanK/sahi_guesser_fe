@@ -24,6 +24,7 @@ import { GuessStatus } from "../GuessStatus";
 import { PlayersList } from "../PlayersList";
 import { PriceInput } from "../PriceInput";
 import { RoundResults } from "../RoundResults";
+import { motion } from "framer-motion";
 
 export const GameBoard: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
@@ -287,42 +288,65 @@ export const GameBoard: React.FC = () => {
         )}
 
         <div className="flex flex-col items-center gap-3 lg:gap-4">
-          <PriceInput
-            onGuess={handleGuess}
-            disabled={
-              !isAuthenticated ||
-              hasCorrectGuess ||
-              showResults ||
-              maxGuessExceeded
-            }
-            listingType={currentListing.details.type}
-            listingId={currentListing.id}
-          />
-          {isAuthenticated && room?.roomSettings.maxGuessesPerRound && (
-            <p className="text-sm lg:text-base text-gray-600">
-              Tahmin Hakkı: {guessCount} /{" "}
-              {room.roomSettings.maxGuessesPerRound}
-            </p>
-          )}
-          {isAuthenticated &&
-            room?.roomSettings.maxGuessesPerRound &&
-            guessCount >= room.roomSettings.maxGuessesPerRound && (
-              <p className="text-red-500 text-sm lg:text-base">
-                Bu tur için maksimum tahmin hakkınızı kullandınız
-              </p>
-            )}
-          {!isAuthenticated && (
-            <p className="text-red-500 text-sm lg:text-base">
-              Tahmin yapabilmek için giriş yapmalısınız
-            </p>
-          )}
+          <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6 border-2 border-yellow-100">
+            <div className="flex flex-col items-center">
+              <PriceInput
+                onGuess={handleGuess}
+                disabled={
+                  !isAuthenticated ||
+                  hasCorrectGuess ||
+                  showResults ||
+                  maxGuessExceeded
+                }
+                listingType={currentListing.details.type}
+                listingId={currentListing.id}
+              />
+              
+              {isAuthenticated && room?.roomSettings.maxGuessesPerRound && (
+                <div className="mt-2 w-full max-w-md flex items-center gap-1">
+                  <div className="h-2 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-yellow-400 transition-all duration-300"
+                      style={{ 
+                        width: `${(guessCount / room.roomSettings.maxGuessesPerRound) * 100}%`,
+                        backgroundColor: guessCount >= room.roomSettings.maxGuessesPerRound ? '#EF4444' : undefined 
+                      }}
+                    />
+                  </div>
+                  <span className="text-sm font-medium text-gray-600 min-w-60px] text-right">
+                    {guessCount} / {room.roomSettings.maxGuessesPerRound}
+                  </span>
+                </div>
+              )}
+
+              {!isAuthenticated && (
+                <p className="mt-3 text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full max-w-md">
+                  Tahmin yapabilmek için giriş yapmalısınız
+                </p>
+              )}
+              
+              {isAuthenticated &&
+                room?.roomSettings.maxGuessesPerRound &&
+                guessCount >= room.roomSettings.maxGuessesPerRound && (
+                  <p className="mt-3 text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full max-w-md">
+                    Bu tur için maksimum tahmin hakkınızı kullandınız
+                  </p>
+              )}
+            </div>
+          </div>
+
           {feedback && !showResults && !maxGuessExceeded && (
-            <div className={shake ? "animate-shake" : ""}>
+            <motion.div 
+              className={`${shake ? "animate-shake" : ""} w-full flex justify-center`}
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: "spring", stiffness: 200, damping: 15 }}
+            >
               <GuessStatus
                 feedback={feedback}
                 type={feedback === "correct" ? "success" : "error"}
               />
-            </div>
+            </motion.div>
           )}
         </div>
 
