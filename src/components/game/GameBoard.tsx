@@ -10,7 +10,7 @@ import {
   Move,
   Zap,
 } from "lucide-react";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useAuth } from "../../hooks/useAuth";
 import { socketService } from "../../services/socket";
@@ -102,38 +102,9 @@ export const GameBoard: React.FC = () => {
     [currentListing, isAuthenticated, roomId]
   );
 
-  if (!currentListing) return null;
-
-  function handleSendMessage(message: string): void {
-    console.log(message, "--message");
-    console.log(isAuthenticated, "--isAuthenticated");
-    console.log(roomId, "--roomId");
-    if (!isAuthenticated || !roomId) return;
-    socketService.sendMessage(roomId, message);
-  }
-
-  const handlePrevImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === 0
-        ? currentListing.details.imageUrls.length - 1
-        : prevIndex - 1
-    );
-    //@ts-expect-error windowa koyduk allah affetsin
-    window._resetSlideshowTimer?.();
-  };
-
-  const handleNextImage = () => {
-    setCurrentImageIndex((prevIndex) =>
-      prevIndex === currentListing.details.imageUrls.length - 1
-        ? 0
-        : prevIndex + 1
-    );
-    //@ts-expect-error windowa koyduk allah affetsin
-    window._resetSlideshowTimer?.();
-  };
-
-  const renderCarDetails = () => {
-    if (currentListing.details.type !== "car") return null;
+  // Memoize car details rendering
+  const carDetails = useMemo(() => {
+    if (currentListing?.details.type !== "car") return null;
     const details = currentListing.details as CarListingDetails;
 
     return (
@@ -162,10 +133,11 @@ export const GameBoard: React.FC = () => {
         </div>
       </div>
     );
-  };
+  }, [currentListing?.details]);
 
-  const renderPropertyDetails = () => {
-    if (currentListing.details.type !== "house-for-rent") return null;
+  // Memoize property details rendering
+  const propertyDetails = useMemo(() => {
+    if (currentListing?.details.type !== "house-for-rent") return null;
     const details = currentListing.details as HouseForRentListingDetails;
 
     return (
@@ -194,7 +166,42 @@ export const GameBoard: React.FC = () => {
         </div>
       </div>
     );
-  };
+  }, [currentListing?.details]);
+
+  // Memoize image navigation handlers
+  const imageHandlers = useMemo(
+    () => ({
+      handlePrevImage: () => {
+        setCurrentImageIndex((prevIndex) =>
+          prevIndex === 0
+            ? (currentListing?.details.imageUrls.length ?? 1) - 1
+            : prevIndex - 1
+        );
+        //@ts-expect-error windowa koyduk allah affetsin
+        window._resetSlideshowTimer?.();
+      },
+      handleNextImage: () => {
+        setCurrentImageIndex((prevIndex) =>
+          prevIndex === (currentListing?.details.imageUrls.length ?? 1) - 1
+            ? 0
+            : prevIndex + 1
+        );
+        //@ts-expect-error windowa koyduk allah affetsin
+        window._resetSlideshowTimer?.();
+      },
+    }),
+    [currentListing?.details.imageUrls.length, currentListing?.id]
+  );
+
+  const handleSendMessage = useCallback(
+    (message: string): void => {
+      if (!isAuthenticated || !roomId) return;
+      socketService.sendMessage(roomId, message);
+    },
+    [isAuthenticated, roomId]
+  );
+
+  if (!currentListing) return null;
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
@@ -219,7 +226,7 @@ export const GameBoard: React.FC = () => {
                 className="w-full h-full object-cover transition-opacity duration-500"
               />
               <button
-                onClick={handlePrevImage}
+                onClick={imageHandlers.handlePrevImage}
                 className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                 aria-label="Previous image"
               >
@@ -239,7 +246,7 @@ export const GameBoard: React.FC = () => {
                 </svg>
               </button>
               <button
-                onClick={handleNextImage}
+                onClick={imageHandlers.handleNextImage}
                 className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
                 aria-label="Next image"
               >
@@ -266,8 +273,8 @@ export const GameBoard: React.FC = () => {
                 </h2>
                 <div className="text-sm lg:text-base">
                   {currentListing.details.type === "car"
-                    ? renderCarDetails()
-                    : renderPropertyDetails()}
+                    ? carDetails
+                    : propertyDetails}
                 </div>
               </div>
             </div>
