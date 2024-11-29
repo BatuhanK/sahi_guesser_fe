@@ -1,19 +1,25 @@
 import { ArrowRight, Minus, Plus } from "lucide-react";
-import React, { useCallback, useMemo, useRef, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 interface PriceInputProps {
   onGuess: (guess: number) => void;
   disabled?: boolean;
   listingType: string;
+  listingId: number;
 }
 
 export const PriceInput: React.FC<PriceInputProps> = ({
   onGuess,
   disabled,
   listingType,
+  listingId
 }) => {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setValue("");
+  }, [listingId]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

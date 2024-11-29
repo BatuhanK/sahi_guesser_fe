@@ -64,6 +64,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
     return () => clearInterval(interval);
   }, [intermissionDuration]);
 
+
   const sortedScores = useMemo(() => {
     return [...scoresWithAccuracy]
       .filter((score) => score.roundScore)
@@ -163,9 +164,9 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
               </div>
 
               {/* Advertisement Space */}
-              <div className="bg-gray-100 p-6 rounded-lg text-center">
+              {/* <div className="bg-gray-100 p-6 rounded-lg text-center">
                 <p className="text-gray-500">Reklam Alanı</p>
-              </div>
+              </div> */}
 
               <button
                 onClick={onNextRound}

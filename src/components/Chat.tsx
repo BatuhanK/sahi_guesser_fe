@@ -475,7 +475,10 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
 
   const scrollToBottom = () => {
     if (isDesktop && messages.length > 0) {
-      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+      const chatContainer = messagesEndRef.current?.parentElement;
+      if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+      }
     }
   };
 

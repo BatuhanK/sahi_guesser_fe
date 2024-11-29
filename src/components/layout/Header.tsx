@@ -130,7 +130,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                 textShadow: "0 0 3px rgba(255, 255, 255, 0.3)",
               }}
             >
-              sahikaca
+              sahi kaca?
             </h1>
           </div>
 
