@@ -10,7 +10,7 @@ import {
   Move,
   Zap,
 } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactConfetti from "react-confetti";
 import { useAuth } from "../../hooks/useAuth";
 import { socketService } from "../../services/socket";
@@ -94,10 +94,13 @@ export const GameBoard: React.FC = () => {
     }
   }, [feedback]);
 
-  const handleGuess = (guess: number) => {
-    if (!currentListing || !isAuthenticated || !roomId) return;
-    socketService.submitGuess(roomId, guess);
-  };
+  const handleGuess = useCallback(
+    (guess: number) => {
+      if (!currentListing || !isAuthenticated || !roomId) return;
+      socketService.submitGuess(roomId, guess);
+    },
+    [currentListing, isAuthenticated, roomId]
+  );
 
   if (!currentListing) return null;
 

@@ -1,5 +1,5 @@
 import { ArrowRight, Minus, Plus } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { useCallback, useMemo, useRef, useState } from "react";
 
 interface PriceInputProps {
   onGuess: (guess: number) => void;
@@ -23,40 +23,42 @@ export const PriceInput: React.FC<PriceInputProps> = ({
     }
   };
 
-  const formatNumber = (
-    input: string,
-    cursorPosition: number | null = null
-  ) => {
-    const numbers = input.replace(/[^0-9]/g, "");
-    if (numbers === "") return "";
+  const formatNumber = useCallback(
+    (input: string, cursorPosition: number | null = null) => {
+      const numbers = input.replace(/[^0-9]/g, "");
+      if (numbers === "") return "";
 
-    const formatted = new Intl.NumberFormat("tr-TR").format(parseInt(numbers));
+      const formatted = new Intl.NumberFormat("tr-TR").format(
+        parseInt(numbers)
+      );
 
-    if (cursorPosition !== null && inputRef.current) {
-      const digitsBeforeCursor = input
-        .slice(0, cursorPosition)
-        .replace(/\./g, "").length;
-      let newPosition = 0;
-      let digitCount = 0;
+      if (cursorPosition !== null && inputRef.current) {
+        const digitsBeforeCursor = input
+          .slice(0, cursorPosition)
+          .replace(/\./g, "").length;
+        let newPosition = 0;
+        let digitCount = 0;
 
-      for (
-        let i = 0;
-        i < formatted.length && digitCount < digitsBeforeCursor;
-        i++
-      ) {
-        if (formatted[i] !== ".") digitCount++;
-        newPosition = i + 1;
+        for (
+          let i = 0;
+          i < formatted.length && digitCount < digitsBeforeCursor;
+          i++
+        ) {
+          if (formatted[i] !== ".") digitCount++;
+          newPosition = i + 1;
+        }
+
+        requestAnimationFrame(() => {
+          if (inputRef.current) {
+            inputRef.current.setSelectionRange(newPosition, newPosition);
+          }
+        });
       }
 
-      requestAnimationFrame(() => {
-        if (inputRef.current) {
-          inputRef.current.setSelectionRange(newPosition, newPosition);
-        }
-      });
-    }
-
-    return formatted;
-  };
+      return formatted;
+    },
+    []
+  );
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
@@ -68,48 +70,63 @@ export const PriceInput: React.FC<PriceInputProps> = ({
     }
   };
 
-  const adjustValue = (amount: number) => {
-    const currentValue = parseInt(value.replace(/[^0-9]/g, "")) || 0;
-    const newValue = Math.max(0, currentValue + amount);
-    setValue(formatNumber(newValue.toString()));
-  };
+  const adjustValue = useCallback(
+    (amount: number) => {
+      const currentValue = parseInt(value.replace(/[^0-9]/g, "")) || 0;
+      const newValue = Math.max(0, currentValue + amount);
+      setValue(formatNumber(newValue.toString()));
+    },
+    [value, formatNumber]
+  );
 
-  const QuickActionButton: React.FC<{ amount: number }> = ({ amount }) => {
-    const isAddition = amount > 0;
-    const formattedAmount = new Intl.NumberFormat("tr-TR").format(
-      Math.abs(amount)
-    );
+  const QuickActionButton = useMemo(() => {
+    return React.memo<{ amount: number }>(({ amount }) => {
+      const isAddition = amount > 0;
+      const formattedAmount = new Intl.NumberFormat("tr-TR").format(
+        Math.abs(amount)
+      );
 
-    return (
-      <button
-        type="button"
-        onClick={() => adjustValue(amount)}
-        disabled={disabled}
-        className={`flex items-center justify-center gap-1 px-3 lg:px-3 py-2.5 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-all min-w-[70px] lg:min-w-auto
-          ${
-            disabled
-              ? "bg-gray-100 text-gray-400"
-              : isAddition
-              ? "bg-green-100 text-green-700 hover:bg-green-200 active:scale-95"
-              : "bg-red-100 text-red-700 hover:bg-red-200 active:scale-95"
-          }`}
-      >
-        {isAddition ? (
-          <Plus size={14} className="lg:w-4 lg:h-4" />
-        ) : (
-          <Minus size={14} className="lg:w-4 lg:h-4" />
-        )}
-        {formattedAmount}
-      </button>
-    );
-  };
+      return (
+        <button
+          type="button"
+          onClick={() => adjustValue(amount)}
+          disabled={disabled}
+          className={`flex items-center justify-center gap-1 px-3 lg:px-3 py-2.5 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-all min-w-[70px] lg:min-w-auto
+            ${
+              disabled
+                ? "bg-gray-100 text-gray-400"
+                : isAddition
+                ? "bg-green-100 text-green-700 hover:bg-green-200 active:scale-95"
+                : "bg-red-100 text-red-700 hover:bg-red-200 active:scale-95"
+            }`}
+        >
+          {isAddition ? (
+            <Plus size={14} className="lg:w-4 lg:h-4" />
+          ) : (
+            <Minus size={14} className="lg:w-4 lg:h-4" />
+          )}
+          {formattedAmount}
+        </button>
+      );
+    });
+  }, [disabled, adjustValue]);
+
+  const quickActionAmounts = useMemo(() => {
+    const baseAmounts =
+      listingType === "car" ? [1000, 10000, 100000] : [500, 1000, 10000];
+    return baseAmounts.map((amount) => ({
+      positive: amount,
+      negative: -amount,
+    }));
+  }, [listingType]);
 
   return (
     <div className="w-full max-w-md space-y-3 lg:space-y-3">
       <div className="flex gap-2 lg:gap-2">
         <div className="flex flex-col gap-2 lg:gap-2">
-          <QuickActionButton amount={listingType === "car" ? -1000 : -500} />
-          <QuickActionButton amount={listingType === "car" ? -10000 : -1000} />
+          {quickActionAmounts.slice(0, 2).map(({ negative }, idx) => (
+            <QuickActionButton key={`neg-${idx}`} amount={negative} />
+          ))}
         </div>
 
         <form onSubmit={handleSubmit} className="flex-1">
@@ -149,14 +166,15 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         </form>
 
         <div className="flex flex-col gap-2 lg:gap-2">
-          <QuickActionButton amount={listingType === "car" ? 1000 : 500} />
-          <QuickActionButton amount={listingType === "car" ? 10000 : 1000} />
+          {quickActionAmounts.slice(0, 2).map(({ positive }, idx) => (
+            <QuickActionButton key={`pos-${idx}`} amount={positive} />
+          ))}
         </div>
       </div>
 
       <div className="flex justify-center gap-2 lg:gap-2">
-        <QuickActionButton amount={listingType === "car" ? -100000 : -10000} />
-        <QuickActionButton amount={listingType === "car" ? 100000 : 10000} />
+        <QuickActionButton amount={quickActionAmounts[2].negative} />
+        <QuickActionButton amount={quickActionAmounts[2].positive} />
       </div>
     </div>
   );

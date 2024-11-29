@@ -1,3 +1,4 @@
+import { debounce } from "lodash";
 import { io, Socket } from "socket.io-client";
 import { useAuthStore } from "../store/authStore";
 import { useGameStore } from "../store/gameStore";
@@ -132,14 +133,23 @@ class SocketService {
       }
     });
 
+    // Debounce the guess result handler
+    const debouncedGuessResult = debounce(
+      (direction: "correct" | "go_higher" | "go_lower") => {
+        useGameStore.getState().setFeedback(direction);
+        if (direction === "correct") {
+          useGameStore.getState().setHasCorrectGuess(true);
+          soundService.playSuccess();
+        } else {
+          soundService.playFailure();
+        }
+      },
+      100,
+      { leading: true, trailing: false }
+    );
+
     this.socket.on("guessResult", ({ direction }) => {
-      useGameStore.getState().setFeedback(direction);
-      if (direction === "correct") {
-        useGameStore.getState().setHasCorrectGuess(true);
-        soundService.playSuccess();
-      } else {
-        soundService.playFailure();
-      }
+      debouncedGuessResult(direction);
     });
 
     this.socket.on("correctGuess", ({ userId, playerId, username }) => {
@@ -156,13 +166,27 @@ class SocketService {
       });
     });
 
-    this.socket.on("incorrectGuess", ({ userId, playerId, username }) => {
-      useGameStore.getState().addIncorrectGuess({
-        userId,
-        playerId,
-        username,
-        isCorrect: false,
-      });
+    // Batch incorrect guesses
+    let incorrectGuessBuffer: Array<{
+      userId: number;
+      playerId: number;
+      username: string;
+    }> = [];
+    const flushIncorrectGuesses = debounce(() => {
+      if (incorrectGuessBuffer.length > 0) {
+        useGameStore.getState().setIncorrectGuesses(
+          incorrectGuessBuffer.map((guess) => ({
+            ...guess,
+            isCorrect: false,
+          }))
+        );
+        incorrectGuessBuffer = [];
+      }
+    }, 100);
+
+    this.socket.on("incorrectGuess", (data) => {
+      incorrectGuessBuffer.push(data);
+      flushIncorrectGuesses();
     });
 
     this.socket.on("chatMessage", ({ userId, username, message }) => {

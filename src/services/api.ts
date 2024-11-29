@@ -2,7 +2,7 @@ import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 
 const api = axios.create({
-  baseURL: import.meta.env.API_URL || window.location.origin + "/api",
+  baseURL: import.meta.env.VITE_API_URL || window.location.origin + "/api",
 });
 
 api.interceptors.request.use((config) => {
