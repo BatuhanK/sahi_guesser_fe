@@ -22,7 +22,7 @@ class SocketService {
     }
 
     const isLocal = window.location.origin.includes("local");
-    this.socket = io("/", {
+    this.socket = io(import.meta.env.VITE_SOCKET_URL ?? "/", {
       path: isLocal ? "/socket.io/" : "/ws/socket.io/",
       autoConnect: false,
       extraHeaders,
