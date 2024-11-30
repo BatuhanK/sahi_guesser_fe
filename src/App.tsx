@@ -34,7 +34,7 @@ function App() {
       } else if (authModalType === "register") {
         await register(username, password);
       }
-      setIsAuthModalOpen(true);
+      setIsAuthModalOpen(false);
     } catch (error) {
       console.error("Authentication error:", error);
     }
