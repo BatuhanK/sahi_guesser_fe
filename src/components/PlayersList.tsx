@@ -74,11 +74,11 @@ export const PlayersList: React.FC<PlayersListProps> = ({
           <div className="flex items-center gap-1.5 lg:gap-2">
             <Users size={18} className="text-blue-500 lg:w-5 lg:h-5" />
             <h3 className="text-base lg:text-lg font-semibold">
-              Çevrimiçi Oyuncular
+              Çevrimiçi
             </h3>
           </div>
           <span className="text-xs lg:text-sm px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
-            {onlinePlayers.length} oyuncu
+            {onlinePlayers.length}
           </span>
         </div>
         <div className="overflow-y-auto h-[calc(100%-48px)] p-3">
