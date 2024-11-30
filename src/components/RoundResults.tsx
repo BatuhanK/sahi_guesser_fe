@@ -176,7 +176,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 <div className="text-center">
                   <h2 className="text-3xl font-bold mb-3">Tur Sonuçları</h2>
                   <div className="flex flex-col gap-2">
-                    <p className="text-gray-600 text-lg">İlan: {listing.title}</p>
+                    <p className="text-gray-600 text-lg">{listing.details.type === "car" ? `${listing.details.brand} ${listing.details.model}` : `${listing.details.rooms} oda ${listing.details.squareMeters} m² ${listing.details.city} ${listing.details.district}`}</p>
                     <p className="text-2xl font-semibold text-green-600">
                       Gerçek Fiyat: ₺{correctPrice.toLocaleString("tr-TR")}
                     </p>

@@ -1,5 +1,6 @@
 import { ArrowRight, Minus, Plus } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useMediaQuery } from "../hooks/useMediaQuery";
 
 interface PriceInputProps {
   onGuess: (guess: number) => void;
@@ -16,6 +17,9 @@ export const PriceInput: React.FC<PriceInputProps> = ({
 }) => {
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
+  const isMobile = useMediaQuery("(max-width: 768px)");
+  const minPrice = listingType === "car" ? 500000 : 2000;
+  const maxPrice = listingType === "car" ? 20000000  : 100000 ;
 
   useEffect(() => {
     setValue("");
@@ -129,11 +133,12 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   return (
     <div className="w-full max-w-md space-y-3 lg:space-y-3">
       <div className="flex gap-2 lg:gap-2">
+        {!isMobile && (
         <div className="flex flex-col gap-2 lg:gap-2">
           {quickActionAmounts.slice(0, 2).map(({ negative }, idx) => (
             <QuickActionButton key={`neg-${idx}`} amount={negative} />
           ))}
-        </div>
+        </div>)}
 
         <form onSubmit={handleSubmit} className="flex-1">
           <div className="relative">
@@ -147,7 +152,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               ref={inputRef}
               type="text"
               value={value}
-              onChange={handleInputChange}
+              onChange={(handleInputChange)}
               className={`w-full pl-10 lg:pl-10 pr-20 lg:pr-20 py-4 lg:py-4 text-lg lg:text-xl bg-white border-2 
                 ${disabled ? "border-gray-200 bg-gray-50" : "border-yellow-400"}
                 rounded-xl focus:outline-none focus:border-yellow-500 transition-colors
@@ -169,13 +174,32 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               <ArrowRight size={24} className="lg:w-6 lg:h-6" />
             </button>
           </div>
+          {isMobile && (
+          <div className="w-full px-2 mt-2">
+            <input
+              type="range"
+              min={minPrice}
+              max={maxPrice}
+              step={listingType === "car" ? 1000 : 100}
+              value={Number(value.replace(/[^0-9]/g, ''))}
+              onChange={(e)=>setValue(formatNumber(e.target.value))}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+            />
+            <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <span>₺{minPrice}</span>
+              <span>₺{maxPrice}</span>
+            </div>
+          </div>
+        )}
         </form>
 
+       
+{!isMobile && (
         <div className="flex flex-col gap-2 lg:gap-2">
           {quickActionAmounts.slice(0, 2).map(({ positive }, idx) => (
             <QuickActionButton key={`pos-${idx}`} amount={positive} />
           ))}
-        </div>
+        </div>)}
       </div>
 
       <div className="flex justify-center gap-2 lg:gap-2">
