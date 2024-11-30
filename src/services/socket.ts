@@ -255,6 +255,18 @@ class SocketService {
       state.setRoom(null);
       state.setCurrentListing(null);
     });
+
+    this.socket?.io.on("reconnect", () => {
+      try {
+        const state = useGameStore.getState();
+        const roomId = state.roomId;
+        if (roomId) {
+          this.joinRoom(roomId);
+        }
+      } catch (error) {
+        console.error("Error reconnecting to socket", error);
+      }
+    });
   }
 
   joinRoom(roomId: number): void {
