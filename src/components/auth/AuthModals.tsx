@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -22,6 +22,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     onAuth(username, password);
   };
+
+  useEffect(() => {
+    setUsername("");
+    setPassword("");
+  }, [isOpen]);
 
   return (
     <Transition show={isOpen} as={React.Fragment}>
@@ -86,7 +91,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full bg-yellow-400 text-white py-2 px-4 rounded-md hover:bg-yellow-500 transition-colors"
+                  disabled={username === "" || password === ""}
+                  className="w-full bg-yellow-400 text-white py-2 px-4 rounded-md hover:bg-yellow-500  disabled:bg-yellow-500  disabled:bg-opacity-50 transition-colors"
                 >
                   {type === "login" ? "Giriş Yap" : "Kayıt Ol"}
                 </button>
