@@ -367,7 +367,7 @@ export const GameBoard: React.FC = () => {
         {/* Sağ Taraf - Chat */}
         <div className="md:col-span-1 lg:col-span-1 xl:col-span-4 order-3">
           <div className="xl:sticky xl:top-6">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden md:h-[calc(100vh-8rem)] xl:h-[calc(100vh-15rem)] flex flex-col">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-5rem)] md:h-[calc(100vh-8rem)] xl:h-[calc(100vh-15rem)] flex flex-col">
               <Chat 
                 messages={chatMessages} 
                 onSendMessage={handleSendMessage}
