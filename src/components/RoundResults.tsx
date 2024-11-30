@@ -161,30 +161,31 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
 
   return (
-    <AnimatePresence>
-      <motion.div
-        initial={{ opacity: 0, y: -20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 20 }}
-        transition={{ duration: 0.5, ease: "easeIn" }}
-      >
-        <div className="round-results-container">
-          <div className="border-4 border-yellow-400 rounded-xl shadow-xl p-8 max-w-3xl w-full">
-            <div className="space-y-8">
-              <div className="text-center">
-                <h2 className="text-3xl font-bold mb-3">Tur Sonuçları</h2>
-                <div className="flex flex-col gap-2">
-                  <p className="text-gray-600 text-lg">İlan: {listing.title}</p>
-                  <p className="text-2xl font-semibold text-green-600">
-                    Gerçek Fiyat: ₺{correctPrice.toLocaleString("tr-TR")}
-                  </p>
+    <div className="h-full lg:p-6 rounded-xl" style={{padding: 0}}>
+      <AnimatePresence>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 20 }}
+          transition={{ duration: 0.5, ease: "easeIn" }}
+          className="h-full"
+        >
+          <div className="round-results-container h-full rounded-xl bg-white">
+            <div className="border-4 border-yellow-400 rounded-xl shadow-xl p-8 h-full flex flex-col">
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-3xl font-bold mb-3">Tur Sonuçları</h2>
+                  <div className="flex flex-col gap-2">
+                    <p className="text-gray-600 text-lg">İlan: {listing.title}</p>
+                    <p className="text-2xl font-semibold text-green-600">
+                      Gerçek Fiyat: ₺{correctPrice.toLocaleString("tr-TR")}
+                    </p>
+                  </div>
                 </div>
-              </div>
 
-              <div className="space-y-4">
-                {sortedScores.slice(0, 3).map((score, index) => renderScoreRow(score, index))}
-                
-               
+                <div className="space-y-4">
+                  {sortedScores.slice(0, 3).map((score, index) => renderScoreRow(score, index))}
+                  
                   {userRank > 3 && (
                     <div className="flex justify-center py-1">
                       <div className="flex flex-col items-center gap-[2px]">
@@ -193,21 +194,15 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                       </div>
                     </div>)}
-                    {userRank > 2 && (
-                  <>
-                    {renderScoreRow(sortedScores[userRank], userRank)}
-                  </>
-                )}
+                  {userRank > 2 && (
+                    <>
+                      {renderScoreRow(sortedScores[userRank], userRank)}
+                    </>
+                  )}
+                </div>
               </div>
 
-              {/* Advertisement Space */}
-              {/* <div className="bg-gray-100 p-6 rounded-lg text-center">
-                <p className="text-gray-500">Reklam Alanı</p>
-              </div> */}
-
-              <div
-                className="w-full bg-yellow-500 text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center"
-              >
+              <div className="w-full bg-yellow-500 text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center mt-8">
                 Sonraki Tur{" "}
                 {remainingSeconds > 0 && (
                   <span className="text-sm">({remainingSeconds}s)</span>
@@ -215,8 +210,8 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
               </div>
             </div>
           </div>
-        </div>
-      </motion.div>
-    </AnimatePresence>
+        </motion.div>
+      </AnimatePresence>
+    </div>
   );
 };

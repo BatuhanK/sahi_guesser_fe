@@ -9,6 +9,8 @@ import {
   Maximize,
   Move,
   Zap,
+  Users,
+  Trophy,
 } from "lucide-react";
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import ReactConfetti from "react-confetti";
@@ -210,152 +212,212 @@ export const GameBoard: React.FC = () => {
     guessCount >= (room?.roomSettings.maxGuessesPerRound ?? 20);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 lg:gap-6">
-      {showConfetti && (
-        <ReactConfetti recycle={false} numberOfPieces={200} gravity={0.3} />
-      )}
-      <div className="lg:col-span-8 space-y-4 lg:space-y-6">
-        {showResults && intermissionDuration ? (
-          <RoundResults
-            scores={roundEndScores}
-            correctPrice={correctPrice ?? 0}
-            listing={currentListing}
-            intermissionDuration={intermissionDuration}
-          />
-        ) : (
-          <div className="relative overflow-hidden rounded-xl bg-white shadow-lg">
-            <div className="relative h-[250px] sm:h-[300px] md:h-[400px]">
-              <img
-                src={currentListing.details.imageUrls[currentImageIndex]}
-                alt="Listing image"
-                className="w-full h-full object-cover transition-opacity duration-500"
-              />
-              <button
-                onClick={imageHandlers.handlePrevImage}
-                className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                aria-label="Previous image"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15.75 19.5L8.25 12l7.5-7.5"
-                  />
-                </svg>
-              </button>
-              <button
-                onClick={imageHandlers.handleNextImage}
-                className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
-                aria-label="Next image"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth={2}
-                  stroke="currentColor"
-                  className="w-6 h-6"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M8.25 4.5l7.5 7.5-7.5 7.5"
-                  />
-                </svg>
-              </button>
+    <div className="max-w-[1920px] mx-auto px-4 lg:px-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-12 gap-6 lg:gap-8">
+        {showConfetti && (
+          <ReactConfetti recycle={false} numberOfPieces={200} gravity={0.3} />
+        )}
+
+        {/* Sol Taraf - Oyuncu Listesi */}
+        <div className="hidden xl:block xl:col-span-3 order-2 xl:order-1">
+          <div className="xl:sticky xl:top-6">
+            <div className="bg-white rounded-xl shadow-lg overflow-auto h-[calc(100vh-15rem)]">
+              <PlayersList onlinePlayers={onlinePlayers} lastGuesses={lastGuesses} />
             </div>
-            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
-              <div className="text-white space-y-2 lg:space-y-3">
-                <h2 className="text-xl lg:text-2xl font-bold">
-                  {currentListing.title}
-                </h2>
-                <div className="text-sm lg:text-base">
-                  {currentListing.details.type === "car"
-                    ? carDetails
-                    : propertyDetails}
+          </div>
+        </div>
+
+        {/* Orta - Ana İçerik */}
+        <div className="md:col-span-1 lg:col-span-1 xl:col-span-5 space-y-4 lg:space-y-6 order-1 xl:order-2 flex flex-col h-[calc(100vh-15rem)]">
+          {showResults && intermissionDuration ? (
+            <RoundResults
+              scores={roundEndScores}
+              correctPrice={correctPrice ?? 0}
+              listing={currentListing}
+              intermissionDuration={intermissionDuration}
+            />
+          ) : (
+            <div className="flex flex-col gap-4 lg:gap-6 h-full">
+              <div className="relative overflow-hidden rounded-xl bg-white shadow-lg">
+                <div className="relative h-[250px] sm:h-[300px] md:h-[400px]">
+                  <img
+                    src={currentListing.details.imageUrls[currentImageIndex]}
+                    alt="Listing image"
+                    className="w-full h-full object-cover transition-opacity duration-500"
+                  />
+                  <button
+                    onClick={imageHandlers.handlePrevImage}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                    aria-label="Previous image"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M15.75 19.5L8.25 12l7.5-7.5"
+                      />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={imageHandlers.handleNextImage}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/50 text-white p-2 rounded-full hover:bg-black/70 transition-colors"
+                    aria-label="Next image"
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      strokeWidth={2}
+                      stroke="currentColor"
+                      className="w-6 h-6"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                      />
+                    </svg>
+                  </button>
+                </div>
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
+                  <div className="text-white space-y-2 lg:space-y-3">
+                    <h2 className="text-xl lg:text-2xl font-bold">
+                      {currentListing.title}
+                    </h2>
+                    <div className="text-sm lg:text-base">
+                      {currentListing.details.type === "car"
+                        ? carDetails
+                        : propertyDetails}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-center gap-3 lg:gap-4 flex-1">
+                <div className="w-full h-full bg-white rounded-xl shadow-lg p-6 border-2 border-yellow-100">
+                  <div className="flex flex-col items-center h-full pt-10">
+                    <PriceInput
+                      onGuess={handleGuess}
+                      disabled={
+                        !isAuthenticated ||
+                        hasCorrectGuess ||
+                        showResults ||
+                        maxGuessExceeded
+                      }
+                      listingType={currentListing.details.type}
+                      listingId={currentListing.id}
+                    />
+                    
+                    <div className="w-full max-w-md space-y-4 mt-16">
+                      {isAuthenticated && room?.roomSettings.maxGuessesPerRound && (
+                        <div className="w-full flex items-center gap-1">
+                          <div className="h-2 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                            <div 
+                              className="h-full bg-yellow-400 transition-all duration-300"
+                              style={{ 
+                                width: `${(guessCount / room.roomSettings.maxGuessesPerRound) * 100}%`,
+                                backgroundColor: guessCount >= room.roomSettings.maxGuessesPerRound ? '#EF4444' : undefined 
+                              }}
+                            />
+                          </div>
+                          <span className="text-sm font-medium text-gray-600 min-w-[60px] text-right">
+                            {guessCount} / {room.roomSettings.maxGuessesPerRound}
+                          </span>
+                        </div>
+                      )}
+
+                      <div className="h-[60px] flex items-center justify-center">
+                        {!isAuthenticated ? (
+                          <p className="text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full">
+                            Tahmin yapabilmek için giriş yapmalısınız
+                          </p>
+                        ) : maxGuessExceeded ? (
+                          <p className="text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full">
+                            Bu tur için maksimum tahmin hakkınızı kullandınız
+                          </p>
+                        ) : (feedback && !showResults) && (
+                          <motion.div 
+                            className={`${shake ? "animate-shake" : ""} w-full flex justify-center`}
+                            initial={{ scale: 0.8, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            transition={{ type: "spring", stiffness: 200, damping: 15 }}
+                          >
+                            <GuessStatus
+                              feedback={feedback}
+                              type={feedback === "correct" ? "success" : "error"}
+                            />
+                          </motion.div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-
-        <div className="flex flex-col items-center gap-3 lg:gap-4">
-          <div className="w-full max-w-2xl mx-auto bg-white rounded-xl shadow-lg p-6 border-2 border-yellow-100">
-            <div className="flex flex-col items-center">
-              <PriceInput
-                onGuess={handleGuess}
-                disabled={
-                  !isAuthenticated ||
-                  hasCorrectGuess ||
-                  showResults ||
-                  maxGuessExceeded
-                }
-                listingType={currentListing.details.type}
-                listingId={currentListing.id}
-              />
-              
-              {isAuthenticated && room?.roomSettings.maxGuessesPerRound && (
-                <div className="mt-2 w-full max-w-md flex items-center gap-1">
-                  <div className="h-2 flex-1 bg-gray-200 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-yellow-400 transition-all duration-300"
-                      style={{ 
-                        width: `${(guessCount / room.roomSettings.maxGuessesPerRound) * 100}%`,
-                        backgroundColor: guessCount >= room.roomSettings.maxGuessesPerRound ? '#EF4444' : undefined 
-                      }}
-                    />
-                  </div>
-                  <span className="text-sm font-medium text-gray-600 min-w-60px] text-right">
-                    {guessCount} / {room.roomSettings.maxGuessesPerRound}
-                  </span>
-                </div>
-              )}
-
-              {!isAuthenticated && (
-                <p className="mt-3 text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full max-w-md">
-                  Tahmin yapabilmek için giriş yapmalısınız
-                </p>
-              )}
-              
-              {isAuthenticated &&
-                room?.roomSettings.maxGuessesPerRound &&
-                guessCount >= room.roomSettings.maxGuessesPerRound && (
-                  <p className="mt-3 text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full max-w-md">
-                    Bu tur için maksimum tahmin hakkınızı kullandınız
-                  </p>
-              )}
-            </div>
-          </div>
-
-          {feedback && !showResults && !maxGuessExceeded && (
-            <motion.div 
-              className={`${shake ? "animate-shake" : ""} w-full flex justify-center`}
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              transition={{ type: "spring", stiffness: 200, damping: 15 }}
-            >
-              <GuessStatus
-                feedback={feedback}
-                type={feedback === "correct" ? "success" : "error"}
-              />
-            </motion.div>
           )}
         </div>
 
-        <div className="h-[400px] lg:h-[500px]">
-          <Chat messages={chatMessages} onSendMessage={handleSendMessage} />
+        {/* Sağ Taraf - Chat */}
+        <div className="md:col-span-1 lg:col-span-1 xl:col-span-4 order-3">
+          <div className="xl:sticky xl:top-6">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-15rem)] flex flex-col">
+              <Chat 
+                messages={chatMessages} 
+                onSendMessage={handleSendMessage}
+              />
+            </div>
+          </div>
         </div>
-      </div>
 
-      <div className="lg:col-span-4 space-y-4 lg:space-y-6">
-        <PlayersList onlinePlayers={onlinePlayers} lastGuesses={lastGuesses} />
+        {/* Alt Kısım - Tablet görünümünde Oyuncular ve Tahminler */}
+        <div className="hidden md:flex lg:flex xl:hidden col-span-2 gap-6 order-4">
+          <div className="flex-1 bg-white rounded-xl shadow-lg overflow-auto h-[400px]">
+            <div className="p-3 border-b">
+              <div className="flex items-center gap-2">
+                <Users size={18} className="text-blue-500" />
+                <h3 className="font-semibold">Çevrimiçi Oyuncular</h3>
+              </div>
+            </div>
+            <div className="p-3">
+              {onlinePlayers.map(player => (
+                <div key={player.playerId} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 mb-2">
+                  <span className="font-medium truncate">{player.username}</span>
+                  <span className="text-sm px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+                    {player.roomScore} puan
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex-1 bg-white rounded-xl shadow-lg overflow-auto h-[400px]">
+            <div className="p-3 border-b">
+              <div className="flex items-center gap-2">
+                <Trophy size={18} className="text-yellow-500" />
+                <h3 className="font-semibold">Son Tahminler</h3>
+              </div>
+            </div>
+            <div className="p-3">
+              {lastGuesses?.map(guess => (
+                <div key={guess.id} className="flex items-center justify-between p-2 rounded-lg bg-gray-50 mb-2">
+                  <span className="font-medium truncate">{guess.username}</span>
+                  <span className={`text-sm px-2 py-1 rounded-full ${
+                    guess.isCorrect ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
+                  }`}>
+                    {guess.isCorrect ? "Doğru" : "Yanlış"}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );
