@@ -242,6 +242,7 @@ export const GameBoard: React.FC = () => {
                 <div className="relative h-[250px] sm:h-[300px] md:h-[400px]">
                   <img
                     src={currentListing.details.imageUrls[currentImageIndex]}
+                    onContextMenu={(e) => e.preventDefault()}
                     alt="Listing image"
                     className="w-full h-full object-cover transition-opacity duration-500"
                   />
