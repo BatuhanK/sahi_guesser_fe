@@ -67,10 +67,10 @@ export const PlayersList: React.FC<PlayersListProps> = ({
   }
 
   return (
-    <div className="bg-white rounded-xl shadow-lg p-3 lg:p-4 space-y-4 lg:space-y-6 w-full lg:w-[320px] min-h-[500px] lg:min-h-[600px]">
-      {/* Online Players Section */}
-      <div className="space-y-2 lg:space-y-3 h-[200px] lg:h-[250px]">
-        <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white">
+    <div className="flex flex-col h-full">
+      {/* Çevrimiçi Oyuncular Bölümü - 50% */}
+      <div className="h-1/2 border-b border-gray-200">
+        <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white p-3">
           <div className="flex items-center gap-1.5 lg:gap-2">
             <Users size={18} className="text-blue-500 lg:w-5 lg:h-5" />
             <h3 className="text-base lg:text-lg font-semibold">
@@ -81,7 +81,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             {onlinePlayers.length} oyuncu
           </span>
         </div>
-        <div className="overflow-y-auto no-scrollbar h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="overflow-y-auto h-[calc(100%-48px)] p-3">
           <AnimatePresence mode="popLayout">
             {/* Correct guesses group */}
             {groupedPlayers.correct.map((player) => (
@@ -123,9 +123,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
         </div>
       </div>
 
-      {/* Last Guesses Section */}
-      <div className="space-y-2 lg:space-y-3 h-[350px] lg:h-[400px]">
-        <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white">
+      {/* Son Tahminler Bölümü - 50% */}
+      <div className="h-1/2">
+        <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white p-3">
           <div className="flex items-center gap-1.5 lg:gap-2">
             <Trophy size={18} className="text-yellow-500 lg:w-5 lg:h-5" />
             <h3 className="text-base lg:text-lg font-semibold">
@@ -133,7 +133,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             </h3>
           </div>
         </div>
-        <div className="overflow-y-auto no-scrollbar h-[calc(100%-40px)] lg:h-[calc(100%-48px)] pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+        <div className="overflow-y-auto h-[calc(100%-48px)] p-3">
           <AnimatePresence mode="popLayout">
             {lastGuesses?.map((guess, index) => {
               const guessId =

@@ -199,6 +199,9 @@ const convertEmojis = (message: string): string => {
 
 const EmojiHelp: React.FC = () => {
   const [showHelp, setShowHelp] = useState(false);
+  const isDesktop = useMediaQuery("(min-width: 1024px)");
+
+  if (!isDesktop) return null;
 
   return (
     <div className="relative">
@@ -487,7 +490,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   }, [messages, isDesktop]);
 
   return (
-    <div className="flex flex-col h-full bg-white rounded-xl shadow-lg overflow-hidden">
+    <div className="flex flex-col h-full">
       <ChatHeader />
       <div className="flex-1 overflow-y-auto no-scrollbar p-4">
         {messages?.map((msg, index) => (
@@ -505,6 +508,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
       <ChatInput
         onSubmit={onSendMessage}
         setMentionHandler={setMentionHandler}
+      
       />
     </div>
   );
