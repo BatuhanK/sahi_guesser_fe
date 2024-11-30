@@ -66,7 +66,7 @@ function App() {
       <div className="min-h-screen bg-gray-100">
         <Header onOpenAuth={handleOpenAuthModal} />
 
-        <main className="mx-auto p-4" style={{ maxWidth: '90rem' }}>
+        <main className="mx-auto p-4" style={{ maxWidth: '95rem' }}>
           <GameContainer />
         </main>
         <AuthModal

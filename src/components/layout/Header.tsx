@@ -110,7 +110,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
   return (
     <>
       <header className="bg-yellow-400 p-4 shadow-md relative">
-        <div className="mx-auto flex items-center justify-between" style={{ maxWidth: '90rem' }}>
+        <div className="mx-auto flex items-center justify-between" style={{ maxWidth: '95rem' }}>
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => handleLeaveRoom()}
