@@ -93,11 +93,11 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                 layout
                 className="flex items-center justify-between bg-green-50 p-2 rounded-lg hover:bg-green-100 transition-colors mb-2"
               >
-                <div className="flex items-center gap-2">
-                  <Check size={16} className="text-green-600" />
-                  <span className="font-medium">{player.username}</span>
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  <Check size={16} className="text-green-600 shrink-0" />
+                  <span className="font-medium truncate">{player.username}</span>
                 </div>
-                <span className="text-sm px-2 py-1 bg-green-100 text-green-700 rounded-full">
+                <span className="text-sm px-2 py-1 bg-green-100 text-green-700 rounded-full shrink-0 ml-2">
                   {player.roomScore} puan
                 </span>
               </motion.div>
@@ -113,8 +113,8 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                 layout
                 className="flex items-center justify-between bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors mb-2"
               >
-                <span className="font-medium">{player.username}</span>
-                <span className="text-sm px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full">
+                <span className="font-medium truncate flex-1 min-w-0">{player.username}</span>
+                <span className="text-sm px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full shrink-0 ml-2">
                   {player.roomScore} puan
                 </span>
               </motion.div>
@@ -182,19 +182,17 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                         : "bg-red-50 hover:bg-red-100"
                     )}
                   >
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{guess.username}</span>
-                      <span
-                        className={cn(
-                          "text-sm px-2 py-1 rounded-full",
-                          guess.isCorrect
-                            ? "bg-green-100 text-green-700"
-                            : "bg-red-100 text-red-700"
-                        )}
-                      >
-                        {guess.isCorrect ? "Doğru Tahmin" : "Yanlış Tahmin"}
-                      </span>
-                    </div>
+                    <span className="font-medium truncate flex-1 mr-2">{guess.username}</span>
+                    <span
+                      className={cn(
+                        "text-sm px-2 py-1 rounded-full shrink-0",
+                        guess.isCorrect
+                          ? "bg-green-100 text-green-700"
+                          : "bg-red-100 text-red-700"
+                      )}
+                    >
+                      {guess.isCorrect ? "Doğru Tahmin" : "Yanlış Tahmin"}
+                    </span>
                   </motion.div>
                 </motion.div>
               );
