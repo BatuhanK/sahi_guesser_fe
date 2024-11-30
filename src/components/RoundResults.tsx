@@ -9,7 +9,6 @@ interface RoundResultsProps {
   correctPrice: number;
   listing: Listing;
   intermissionDuration: number;
-  onNextRound: () => void;
 }
 
 export const RoundResults: React.FC<RoundResultsProps> = ({
@@ -17,7 +16,6 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   correctPrice,
   listing,
   intermissionDuration,
-  onNextRound,
 }) => {
   const scoresWithAccuracy = scores
     .filter((score) => score.roundScore)
@@ -206,15 +204,14 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 <p className="text-gray-500">Reklam Alanı</p>
               </div> */}
 
-              <button
-                onClick={onNextRound}
-                className="w-full bg-yellow-500 text-white py-4 px-6 rounded-lg hover:bg-yellow-600 transition-all text-lg font-medium hover:shadow-lg active:transform active:scale-95"
+              <div
+                className="w-full bg-yellow-500 text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center"
               >
                 Sonraki Tur{" "}
                 {remainingSeconds > 0 && (
                   <span className="text-sm">({remainingSeconds}s)</span>
                 )}
-              </button>
+              </div>
             </div>
           </div>
         </div>
