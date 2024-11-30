@@ -6,7 +6,8 @@ import { Header } from "./components/layout/Header";
 import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  const [authModal, setAuthModal] = useState<"login" | "register" | null>(null);
+  const [authModalType, setAuthModalType] = useState<"login" | "register" | null>(null);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { login, register } = useAuth();
 
   useEffect(() => {
@@ -28,15 +29,20 @@ function App() {
 
   const handleAuth = async (username: string, password: string) => {
     try {
-      if (authModal === "login") {
+      if (authModalType === "login") {
         await login(username, password);
-      } else if (authModal === "register") {
+      } else if (authModalType === "register") {
         await register(username, password);
       }
-      setAuthModal(null);
+      setIsAuthModalOpen(false);
     } catch (error) {
       console.error("Authentication error:", error);
     }
+  };
+
+  const handleOpenAuthModal = (authType: "login" | "register") => {
+    setIsAuthModalOpen(true);
+    setAuthModalType(authType);
   };
 
   return (
@@ -58,16 +64,15 @@ function App() {
         }}
       />
       <div className="min-h-screen bg-gray-100">
-        <Header onOpenAuth={setAuthModal} />
+        <Header onOpenAuth={handleOpenAuthModal} />
 
         <main className="max-w-6xl mx-auto p-4">
           <GameContainer />
         </main>
-
         <AuthModal
-          isOpen={authModal !== null}
-          onClose={() => setAuthModal(null)}
-          type={authModal || "login"}
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          type={authModalType || "login"}
           onAuth={handleAuth}
         />
       </div>

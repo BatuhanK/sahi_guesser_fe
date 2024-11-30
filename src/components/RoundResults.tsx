@@ -9,7 +9,6 @@ interface RoundResultsProps {
   correctPrice: number;
   listing: Listing;
   intermissionDuration: number;
-  onNextRound: () => void;
 }
 
 export const RoundResults: React.FC<RoundResultsProps> = ({
@@ -17,7 +16,6 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   correctPrice,
   listing,
   intermissionDuration,
-  onNextRound,
 }) => {
   const scoresWithAccuracy = scores
     .filter((score) => score.roundScore)
@@ -106,37 +104,38 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 0.1 }}
       key={score.userId}
-      className={`flex items-center justify-between p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
+      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
         index
       )} backdrop-blur-sm backdrop-filter`}
     >
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3 w-full sm:w-auto sm:flex-1 min-w-0">
         {index <= 2 ? (
           <motion.div
             initial={{ rotate: -180, scale: 0 }}
             animate={{ rotate: 0, scale: 1 }}
             transition={{ type: "spring", stiffness: 200, delay: index * 0.1 }}
+            className="shrink-0"
           >
-            <Medal className={`${getMedalColor(index)} drop-shadow-md`} size={28} />
+            <Medal className={`${getMedalColor(index)} drop-shadow-md`} size={24} />
           </motion.div>
         ) : (
-          <span className="w-7 text-center font-medium text-gray-500">
+          <span className="w-6 text-center font-medium text-gray-500 shrink-0">
             {index + 1}
           </span>
         )}
-        <span className="font-medium text-lg">{score.username}</span>
+        <span className="font-medium text-base sm:text-lg truncate">{score.username}</span>
       </div>
       
-      <div className="flex items-center gap-6">
-        <span className="text-gray-700 font-medium">
+      <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
+        <span className="text-gray-700 font-medium text-sm sm:text-base whitespace-nowrap">
           ₺{score.guess.toLocaleString("tr-TR")}
         </span>
-        <div className="w-24 text-center">
+        <div className="shrink-0">
           <motion.span
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: index * 0.1 + 0.2 }}
-            className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
+            className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
               score.accuracy >= 90
                 ? "bg-green-100 text-green-700"
                 : score.accuracy >= 70
@@ -151,7 +150,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: index * 0.1 + 0.3 }}
-          className="font-bold text-green-600 w-20 text-right"
+          className="font-bold text-green-600 text-sm sm:text-base shrink-0 min-w-[60px] text-right"
         >
           +{score.roundScore}
         </motion.span>
@@ -206,15 +205,14 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 <p className="text-gray-500">Reklam Alanı</p>
               </div> */}
 
-              <button
-                onClick={onNextRound}
-                className="w-full bg-yellow-500 text-white py-4 px-6 rounded-lg hover:bg-yellow-600 transition-all text-lg font-medium hover:shadow-lg active:transform active:scale-95"
+              <div
+                className="w-full bg-yellow-500 text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center"
               >
                 Sonraki Tur{" "}
                 {remainingSeconds > 0 && (
                   <span className="text-sm">({remainingSeconds}s)</span>
                 )}
-              </button>
+              </div>
             </div>
           </div>
         </div>

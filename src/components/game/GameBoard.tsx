@@ -221,7 +221,6 @@ export const GameBoard: React.FC = () => {
             correctPrice={correctPrice ?? 0}
             listing={currentListing}
             intermissionDuration={intermissionDuration}
-            onNextRound={() => {}}
           />
         ) : (
           <div className="relative overflow-hidden rounded-xl bg-white shadow-lg">
