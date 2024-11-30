@@ -300,8 +300,8 @@ export const GameBoard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-3 lg:gap-4">
-                <div className="w-full bg-white rounded-xl shadow-lg p-4 lg:p-6 border-2 border-yellow-100">
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-full bg-white rounded-xl shadow-lg p-4 lg:p-6 border-2 border-yellow-100 h-full">
                   <div className="flex flex-col items-center h-full pt-4 lg:pt-10">
                     <PriceInput
                       onGuess={handleGuess}
