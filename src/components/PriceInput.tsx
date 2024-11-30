@@ -18,8 +18,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
-  const minPrice = listingType === "car" ? 500000 : 2000;
-  const maxPrice = listingType === "car" ? 20000000  : 100000 ;
+  const minPrice = listingType === "car" ? 500000 : 5000;
+  const maxPrice = listingType === "car" ? 5000000  : 50000 ;
 
   useEffect(() => {
     setValue("");
@@ -123,7 +123,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
 
   const quickActionAmounts = useMemo(() => {
     const baseAmounts =
-      listingType === "car" ? [1000, 10000, 100000] : [500, 1000, 10000];
+      listingType === "car" ? [1000, 10000, 100000,5000] : [500, 1000, 10000,500];
     return baseAmounts.map((amount) => ({
       positive: amount,
       negative: -amount,
@@ -177,17 +177,23 @@ export const PriceInput: React.FC<PriceInputProps> = ({
           {isMobile && (
           <div className="w-full px-2 mt-2">
             <input
+            id="price-range"
               type="range"
               min={minPrice}
               max={maxPrice}
-              step={listingType === "car" ? 1000 : 100}
+              step={listingType === "car" ? 10000 : 1000}
               value={Number(value.replace(/[^0-9]/g, ''))}
               onChange={(e)=>setValue(formatNumber(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+              className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+              style={{
+                WebkitAppearance: 'none',
+                MozAppearance: 'none',
+                appearance: 'none',
+              }}
             />
             <div className="flex justify-between text-xs text-gray-500 mt-1">
-              <span>₺{minPrice}</span>
-              <span>₺{maxPrice}</span>
+              <span>₺{formatNumber(minPrice.toString())}</span>
+              <span>₺{formatNumber(maxPrice.toString())}</span>
             </div>
           </div>
         )}
@@ -203,8 +209,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
       </div>
 
       <div className="flex justify-center gap-2 lg:gap-2">
-        <QuickActionButton amount={quickActionAmounts[2].negative} />
-        <QuickActionButton amount={quickActionAmounts[2].positive} />
+        <QuickActionButton amount={isMobile ? quickActionAmounts[3].negative : quickActionAmounts[2].negative} />
+        <QuickActionButton amount={isMobile ? quickActionAmounts[3].positive : quickActionAmounts[2].positive} />
       </div>
     </div>
   );

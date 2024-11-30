@@ -63,3 +63,22 @@
 .shine-button:hover::after {
   animation: shine 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
+
+
+#price-range::-webkit-slider-thumb {
+  width: 20px; /* Tutamacın genişliği */
+  height: 20px; /* Tutamacın yüksekliği */
+  background: #facc15; /* Sarı renk */
+  border-radius: 50%; /* Yuvarlak yapmak için */
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+#price-range::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #facc15;
+  border-radius: 50%;
+  cursor: pointer;
+}
