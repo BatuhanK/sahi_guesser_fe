@@ -228,7 +228,7 @@ export const GameBoard: React.FC = () => {
         </div>
 
         {/* Orta - Ana İçerik */}
-        <div className="md:col-span-1 lg:col-span-1 xl:col-span-5 space-y-4 lg:space-y-6 order-1 xl:order-2 flex flex-col h-[calc(100vh-15rem)]">
+        <div className="md:col-span-1 lg:col-span-1 xl:col-span-5 space-y-4 lg:space-y-6 order-1 xl:order-2 flex flex-col md:h-[calc(100vh-8rem)] xl:h-[calc(100vh-15rem)]">
           {showResults && intermissionDuration ? (
             <RoundResults
               scores={roundEndScores}
@@ -300,9 +300,9 @@ export const GameBoard: React.FC = () => {
                 </div>
               </div>
 
-              <div className="flex flex-col items-center gap-3 lg:gap-4 flex-1">
-                <div className="w-full h-full bg-white rounded-xl shadow-lg p-6 border-2 border-yellow-100">
-                  <div className="flex flex-col items-center h-full pt-10">
+              <div className="flex flex-col items-center flex-1">
+                <div className="w-full bg-white rounded-xl shadow-lg p-4 lg:p-6 border-2 border-yellow-100 h-full">
+                  <div className="flex flex-col items-center h-full pt-4 lg:pt-10">
                     <PriceInput
                       onGuess={handleGuess}
                       disabled={
@@ -315,7 +315,7 @@ export const GameBoard: React.FC = () => {
                       listingId={currentListing.id}
                     />
                     
-                    <div className="w-full max-w-md space-y-4 mt-16">
+                    <div className="w-full max-w-md space-y-2 lg:space-y-4 mt-4 lg:mt-16">
                       {isAuthenticated && room?.roomSettings.maxGuessesPerRound && (
                         <div className="w-full flex items-center gap-1">
                           <div className="h-2 flex-1 bg-gray-200 rounded-full overflow-hidden">
@@ -333,13 +333,13 @@ export const GameBoard: React.FC = () => {
                         </div>
                       )}
 
-                      <div className="h-[60px] flex items-center justify-center">
+                      <div className="h-[32px] lg:h-[60px] flex items-center justify-center">
                         {!isAuthenticated ? (
-                          <p className="text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full">
+                          <p className="text-center text-red-500 text-sm lg:text-base bg-red-50 p-1.5 lg:p-2 rounded-lg w-full">
                             Tahmin yapabilmek için giriş yapmalısınız
                           </p>
                         ) : maxGuessExceeded ? (
-                          <p className="text-center text-red-500 text-sm lg:text-base bg-red-50 p-2 rounded-lg w-full">
+                          <p className="text-center text-red-500 text-sm lg:text-base bg-red-50 p-1.5 lg:p-2 rounded-lg w-full">
                             Bu tur için maksimum tahmin hakkınızı kullandınız
                           </p>
                         ) : (feedback && !showResults) && (
@@ -367,7 +367,7 @@ export const GameBoard: React.FC = () => {
         {/* Sağ Taraf - Chat */}
         <div className="md:col-span-1 lg:col-span-1 xl:col-span-4 order-3">
           <div className="xl:sticky xl:top-6">
-            <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-15rem)] flex flex-col">
+            <div className="bg-white rounded-xl shadow-lg overflow-hidden h-[calc(100vh-5rem)] md:h-[calc(100vh-8rem)] xl:h-[calc(100vh-15rem)] flex flex-col">
               <Chat 
                 messages={chatMessages} 
                 onSendMessage={handleSendMessage}
