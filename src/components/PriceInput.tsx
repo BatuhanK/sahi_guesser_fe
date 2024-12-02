@@ -136,10 +136,9 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   }, [disabled, adjustValue]);
 
   const quickActionAmounts = useMemo(() => {
-    let baseAmounts: number[] = [];
+    let baseAmounts: number[] = [1000, 10000, 100000, 5000];
     if (listingType === "car") baseAmounts = [1000, 10000, 100000, 5000];
     if (listingType === "letgo") baseAmounts = [500, 1000, 10000, 500];
-    if (listingType === "home") baseAmounts = [1000, 10000, 100000, 5000];
 
     return baseAmounts.map((amount) => ({
       positive: amount,
