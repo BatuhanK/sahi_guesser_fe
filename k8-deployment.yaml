@@ -4,7 +4,7 @@ metadata:
   name: frontend
   namespace: sahi-guesser
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: frontend
@@ -13,6 +13,12 @@ spec:
       labels:
         app: frontend
     spec:
+    strategy:
+    type: RollingUpdate
+
+    rollingUpdate:
+      maxUnavailable: 1 # Number of pods that can be unavailable during the update
+      maxSurge: 1
       containers:
         - name: frontend
           image: sjc.vultrcr.com/sahiguessercs/sahi-guesser-frontend:latest
@@ -28,3 +34,9 @@ spec:
               value: "12"
           ports:
             - containerPort: 9999
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 9999
+            initialDelaySeconds: 3
+            periodSeconds: 5
