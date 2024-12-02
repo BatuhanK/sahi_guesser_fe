@@ -90,11 +90,11 @@ export function LeaderboardTable() {
               <span className="font-medium">{entry.username}</span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="font-bold text-green-600 text-sm">
-                {entry.score.toLocaleString("tr-TR")} puan
-              </span>
               <span className="text-xs text-gray-500 hidden sm:inline">
                 {getDaysAgo(entry.createdAt)}
+              </span>
+              <span className="font-bold text-green-600 text-sm">
+                {entry.score.toLocaleString("tr-TR")} puan
               </span>
             </div>
           </div>
