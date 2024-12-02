@@ -28,12 +28,12 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   console.log("listingType", listingType);
   if (listingType === "car") minPrice = 500000;
   if (listingType === "letgo") minPrice = 500;
-  if (listingType === "home") minPrice = 5000;
+  if (listingType === "house-for-rent") minPrice = 5000;
 
   let maxPrice = 0;
   if (listingType === "car") maxPrice = 20_000_000;
   if (listingType === "letgo") maxPrice = 50_000;
-  if (listingType === "home") maxPrice = 50_000;
+  if (listingType === "house-for-rent") maxPrice = 50_000;
 
   useEffect(() => {
     setValue("");
