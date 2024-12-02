@@ -15,7 +15,7 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
+  (error: AxiosError<{ message?: string }>) => {
     const errorMessage =
       error.response?.data?.message || error.message || "An error occurred";
 
@@ -40,6 +40,11 @@ export const authApi = {
 
   getCurrentUser: async () => {
     const response = await api.get("/auth/me");
+    return response.data;
+  },
+
+  getLiveKitToken: async (roomId: string): Promise<string> => {
+    const response = await api.get(`/auth/livekit-token/${roomId}`);
     return response.data;
   },
 };

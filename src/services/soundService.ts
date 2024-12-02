@@ -64,6 +64,14 @@ class SoundService {
       this.countdownTimeout = null;
     }
   }
+
+  setVolume(volume: number) {
+    this.successSound.volume = volume;
+    this.failureSound.volume = volume;
+    this.roundStartSound.volume = volume;
+    this.otherPlayerSuccessSound.volume = volume;
+    this.countdownSound.volume = volume * 0.2; // Keep countdown relatively quieter
+  }
 }
 
 export const soundService = new SoundService();
