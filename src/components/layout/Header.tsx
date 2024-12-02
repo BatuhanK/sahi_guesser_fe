@@ -6,6 +6,7 @@ import {
   LogIn,
   LogOut,
   Menu,
+  ShoppingBag,
   UserPlus,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -20,17 +21,14 @@ const AnimatedIcons = () => {
   const [currentIcon, setCurrentIcon] = React.useState(0);
   const icons = [
     { component: Home, key: "home" },
-    { component: Home, key: "home" },
-    { component: Home, key: "home" },
+    { component: Car, key: "car" },
+    { component: ShoppingBag, key: "letgo" },
     { component: HelpCircle, key: "help" },
-    { component: Car, key: "car" },
-    { component: Car, key: "car" },
-    { component: Car, key: "car" },
   ];
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIcon((prev) => (prev + 1) % icons.length);
-    }, 2000); // Switch every 2 seconds
+    }, 1500); // Switch every 2 seconds
 
     return () => clearInterval(interval);
   }, [icons.length]);
@@ -39,13 +37,13 @@ const AnimatedIcons = () => {
     <AnimatePresence mode="wait">
       <motion.div
         key={icons[currentIcon].key}
-        initial={{ opacity: 0, scale: 0.5 }}
+        initial={{ opacity: 0, scale: 0.2 }}
         animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.5 }}
+        exit={{ opacity: 0, scale: 0.2 }}
         transition={{ duration: 0.3 }}
       >
         {React.createElement(icons[currentIcon].component, {
-          className: "text-white",
+          className: "text-yellow-100",
           size: 32,
         })}
       </motion.div>
