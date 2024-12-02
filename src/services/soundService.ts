@@ -5,6 +5,7 @@ class SoundService {
   private failureSound: HTMLAudioElement;
   private countdownSound: HTMLAudioElement;
   private countdownTimeout: number | null = null;
+  private volume: number = 1;
 
   constructor() {
     this.successSound = new Audio(
@@ -26,27 +27,31 @@ class SoundService {
 
   playSuccess() {
     this.successSound.currentTime = 0;
+    this.successSound.volume = this.volume;
     this.successSound.play();
   }
 
   playFailure() {
     this.failureSound.currentTime = 0;
+    this.failureSound.volume = this.volume;
     this.failureSound.play();
   }
 
   playRoundStart() {
     this.roundStartSound.currentTime = 0;
+    this.roundStartSound.volume = this.volume;
     this.roundStartSound.play();
   }
 
   playOtherPlayerSuccess() {
     this.otherPlayerSuccessSound.currentTime = 0;
+    this.otherPlayerSuccessSound.volume = this.volume;
     this.otherPlayerSuccessSound.play();
   }
 
   playCountdown() {
     this.countdownSound.currentTime = 0;
-    this.countdownSound.volume = 0.2;
+    this.countdownSound.volume = this.volume * 0.2;
     this.countdownSound.play();
   }
 
@@ -66,11 +71,13 @@ class SoundService {
   }
 
   setVolume(volume: number) {
-    this.successSound.volume = volume;
-    this.failureSound.volume = volume;
-    this.roundStartSound.volume = volume;
-    this.otherPlayerSuccessSound.volume = volume;
-    this.countdownSound.volume = volume * 0.2; // Keep countdown relatively quieter
+    this.volume = volume;
+    // Update all audio elements immediately
+    this.successSound.volume = this.volume;
+    this.failureSound.volume = this.volume;
+    this.roundStartSound.volume = this.volume;
+    this.otherPlayerSuccessSound.volume = this.volume;
+    this.countdownSound.volume = this.volume * 0.2;
   }
 }
 

@@ -17,6 +17,8 @@ import {
   PhoneOff,
   Send,
   Smile,
+  Volume2,
+  VolumeX,
 } from "lucide-react";
 import React, {
   useCallback,
@@ -481,6 +483,7 @@ interface AudioState {
   room: Room | null;
   error: string | null;
   isMuted: boolean;
+  isRoomMuted: boolean;
 }
 
 interface RemoteParticipantState {
@@ -528,12 +531,14 @@ const ChatHeader: React.FC<{
   audioState: AudioState;
   onToggleAudio: () => void;
   onToggleMute: () => void;
+  onToggleRoomMute: () => void;
   remoteParticipants: Map<string, RemoteParticipantState>;
   onToggleParticipantMute: (participantId: string) => void;
 }> = ({
   audioState,
   onToggleAudio,
   onToggleMute,
+  onToggleRoomMute,
   remoteParticipants,
   onToggleParticipantMute,
 }) => (
@@ -545,22 +550,46 @@ const ChatHeader: React.FC<{
       </div>
       <div className="flex items-center gap-2">
         {audioState.isConnected && (
-          <button
-            onClick={onToggleMute}
-            className={cn(
-              "p-2 rounded-full transition-colors",
-              audioState.isMuted
-                ? "bg-gray-100 text-gray-500"
-                : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
-            )}
-            title={audioState.isMuted ? "Mikrofonunu Aç" : "Mikrofonunu Kapat"}
-          >
-            {audioState.isMuted ? (
-              <MicOff className="w-5 h-5" />
-            ) : (
-              <Mic className="w-5 h-5" />
-            )}
-          </button>
+          <>
+            <button
+              onClick={onToggleRoomMute}
+              className={cn(
+                "p-2 rounded-full transition-colors",
+                audioState.isRoomMuted
+                  ? "bg-gray-100 text-gray-500"
+                  : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+              )}
+              title={
+                audioState.isRoomMuted
+                  ? "Odanın Sesini Aç"
+                  : "Odanın Sesini Kapat"
+              }
+            >
+              {audioState.isRoomMuted ? (
+                <VolumeX className="w-5 h-5" />
+              ) : (
+                <Volume2 className="w-5 h-5" />
+              )}
+            </button>
+            <button
+              onClick={onToggleMute}
+              className={cn(
+                "p-2 rounded-full transition-colors",
+                audioState.isMuted
+                  ? "bg-gray-100 text-gray-500"
+                  : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+              )}
+              title={
+                audioState.isMuted ? "Mikrofonunu Aç" : "Mikrofonunu Kapat"
+              }
+            >
+              {audioState.isMuted ? (
+                <MicOff className="w-5 h-5" />
+              ) : (
+                <Mic className="w-5 h-5" />
+              )}
+            </button>
+          </>
         )}
         <button
           onClick={onToggleAudio}
@@ -599,6 +628,29 @@ const ChatHeader: React.FC<{
   </div>
 );
 
+// Add this helper at the top of the file
+const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+
+// Add this function to handle iOS audio initialization
+const initializeIOSAudio = () => {
+  // Create a silent audio context
+  const audioContext = new (window.AudioContext ||
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (window as any).webkitAudioContext)();
+
+  // Create and play a silent buffer
+  const buffer = audioContext.createBuffer(1, 1, 22050);
+  const source = audioContext.createBufferSource();
+  source.buffer = buffer;
+  source.connect(audioContext.destination);
+  source.start();
+
+  // Resume audio context
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+};
+
 export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   const { user } = useAuth();
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -610,6 +662,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
     room: null,
     error: null,
     isMuted: false,
+    isRoomMuted: false,
   });
   const [remoteParticipants, setRemoteParticipants] = useState<
     Map<string, RemoteParticipantState>
@@ -651,6 +704,12 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         alert("Oda bulunamadı.");
         return;
       }
+
+      // Initialize iOS audio before connecting
+      if (isIOS) {
+        initializeIOSAudio();
+      }
+
       setAudioState((prev) => ({ ...prev, isConnecting: true, error: null }));
 
       const token = await authApi.getLiveKitToken(roomId.toString());
@@ -674,17 +733,27 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
 
       room.on(
         RoomEvent.TrackSubscribed,
-        (track: RemoteTrack, publication, participant) => {
+        (track: RemoteTrack, _publication, participant) => {
           if (track.kind === Track.Kind.Audio) {
             const mediaTrack = track.mediaStreamTrack;
             const audioElement = new Audio();
-            audioElement.setAttribute(
-              "data-participant-id",
-              participant.identity
-            );
+
+            // For iOS, we need to play on user interaction
+            if (isIOS) {
+              audioElement.setAttribute("playsinline", "true");
+              audioElement.muted = false;
+            }
+
             const mediaStream = new MediaStream([mediaTrack]);
             audioElement.srcObject = mediaStream;
             audioElement.play().catch(console.error);
+
+            // For iOS, try playing again after a short delay
+            if (isIOS) {
+              setTimeout(() => {
+                audioElement.play().catch(console.error);
+              }, 1000);
+            }
 
             setRemoteParticipants((prev) => {
               const updated = new Map(prev);
@@ -821,12 +890,36 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
     }
   }, [audioState.room, audioState.isMuted]);
 
+  // Add room mute handler
+  const handleToggleRoomMute = useCallback(() => {
+    setAudioState((prev) => ({
+      ...prev,
+      isRoomMuted: !prev.isRoomMuted,
+    }));
+
+    setRemoteParticipants((prev) => {
+      const updated = new Map(prev);
+      prev.forEach((participant, id) => {
+        if (participant.audioTrack) {
+          participant.audioTrack.mediaStreamTrack.enabled =
+            audioState.isRoomMuted;
+          updated.set(id, {
+            ...participant,
+            isMuted: !audioState.isRoomMuted,
+          });
+        }
+      });
+      return updated;
+    });
+  }, [audioState.isRoomMuted]);
+
   return (
     <div className="flex flex-col h-full">
       <ChatHeader
         audioState={audioState}
         onToggleAudio={handleToggleAudio}
         onToggleMute={handleToggleMute}
+        onToggleRoomMute={handleToggleRoomMute}
         remoteParticipants={remoteParticipants}
         onToggleParticipantMute={handleToggleParticipantMute}
       />
