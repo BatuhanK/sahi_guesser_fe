@@ -477,9 +477,13 @@ export const GameBoard: React.FC = () => {
               </div>
             </div>
             <div className="p-3">
-              {lastGuesses?.map((guess) => (
+              {lastGuesses?.map((guess, idx) => (
                 <div
-                  key={guess.id}
+                  key={
+                    String(guess.playerId) +
+                    String(guess.isCorrect) +
+                    String(idx)
+                  }
                   className="flex items-center justify-between p-2 rounded-lg bg-gray-50 mb-2"
                 >
                   <span className="font-medium truncate">{guess.username}</span>
