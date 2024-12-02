@@ -27,3 +27,5 @@ dist-ssr
 # Docker
 .docker
 docker-compose.override.yml
+
+.env
