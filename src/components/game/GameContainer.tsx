@@ -29,7 +29,7 @@ export const GameContainer: React.FC = () => {
     };
 
     fetchCategories();
-  }, []);
+  }, [roomId]);
 
   useEffect(() => {
     socketService.connect();
