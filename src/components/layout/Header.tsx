@@ -61,7 +61,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { currentListing, roundStartTime, roundDuration, roomId } =
+  const { status, currentListing, roundStartTime, roundDuration, roomId } =
     useGameStore();
   const [timeLeft, setTimeLeft] = useState<number>(roundDuration);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
@@ -110,7 +110,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
   return (
     <>
       <header className="bg-yellow-400 p-4 shadow-md relative">
-        <div className="mx-auto flex items-center justify-between" style={{ maxWidth: '95rem' }}>
+        <div
+          className="mx-auto flex items-center justify-between"
+          style={{ maxWidth: "95rem" }}
+        >
           <div
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => handleLeaveRoom()}
@@ -132,7 +135,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
 
           {isMobile ? (
             <div className="flex items-center gap-2">
-              {currentListing && roundStartTime && (
+              {currentListing && roundStartTime && status === "PLAYING" && (
                 <div className="mr-2">
                   <Timer timeLeft={timeLeft} />
                 </div>
@@ -192,7 +195,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              {currentListing && roundStartTime && (
+              {currentListing && roundStartTime && status === "PLAYING" && (
                 <Timer timeLeft={timeLeft} />
               )}
               {user && <ScoreBoard totalScore={user.score} />}

@@ -21,8 +21,12 @@ class SocketService {
       };
     }
 
-    const isLocal = window.location.origin.includes("local");
-    this.socket = io(import.meta.env.VITE_SOCKET_URL ?? "/", {
+    const isLocal = import.meta.env.VITE_SOCKET_URL.includes("local");
+    const socketUrl = import.meta.env.VITE_SOCKET_URL ?? "/";
+    console.log("socketUrl", socketUrl);
+    console.log("isLocal", isLocal);
+
+    this.socket = io(socketUrl, {
       path: isLocal ? "/socket.io/" : "/ws/socket.io/",
       autoConnect: false,
       extraHeaders,
@@ -76,6 +80,7 @@ class SocketService {
 
     this.socket.on("intermissionStart", ({ duration }) => {
       useGameStore.getState().setIntermissionDuration(duration);
+      useGameStore.getState().setGameStatus("INTERMISSION");
       soundService.scheduleCountdown(duration);
     });
 
@@ -87,7 +92,7 @@ class SocketService {
       const state = useGameStore.getState();
 
       state.setGuessCount(0);
-      state.setGameStatus("playing");
+      state.setGameStatus("PLAYING");
       state.setFeedback(null);
       state.setHasCorrectGuess(false);
       state.setCurrentListing(listing);

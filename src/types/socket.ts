@@ -1,4 +1,4 @@
-export type GameStatus = "waiting" | "playing" | "intermission" | "finished";
+export type GameStatus = "WAITING" | "PLAYING" | "INTERMISSION" | "FINISHED";
 
 export type CarListingDetails = {
   type: "car";
