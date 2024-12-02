@@ -1,8 +1,14 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Medal } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-import { Listing, RoundEndScore } from "../types/socket";
 import { useAuth } from "../hooks/useAuth";
+import {
+  CarListingDetails,
+  HouseForRentListingDetails,
+  LetgoListingDetails,
+  Listing,
+  RoundEndScore,
+} from "../types/socket";
 
 interface RoundResultsProps {
   scores: RoundEndScore[];
@@ -63,7 +69,6 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
     return () => clearInterval(interval);
   }, [intermissionDuration]);
 
-
   const sortedScores = useMemo(() => {
     return [...scoresWithAccuracy]
       .filter((score) => score.roundScore)
@@ -98,7 +103,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
 
   const { user } = useAuth();
 
-  const renderScoreRow = (score: typeof sortedScores[0], index: number) => (
+  const renderScoreRow = (score: (typeof sortedScores)[0], index: number) => (
     <motion.div
       initial={{ opacity: 0, x: -20 }}
       animate={{ opacity: 1, x: 0 }}
@@ -116,16 +121,21 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
             transition={{ type: "spring", stiffness: 200, delay: index * 0.1 }}
             className="shrink-0"
           >
-            <Medal className={`${getMedalColor(index)} drop-shadow-md`} size={24} />
+            <Medal
+              className={`${getMedalColor(index)} drop-shadow-md`}
+              size={24}
+            />
           </motion.div>
         ) : (
           <span className="w-6 text-center font-medium text-gray-500 shrink-0">
             {index + 1}
           </span>
         )}
-        <span className="font-medium text-base sm:text-lg truncate">{score.username}</span>
+        <span className="font-medium text-base sm:text-lg truncate">
+          {score.username}
+        </span>
       </div>
-      
+
       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
         <span className="text-gray-700 font-medium text-sm sm:text-base whitespace-nowrap">
           ₺{score.guess.toLocaleString("tr-TR")}
@@ -160,8 +170,26 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
 
   const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
 
+  const carListingInfo = useMemo(() => {
+    if (listing.details.type !== "car") return null;
+    const details = listing.details as CarListingDetails;
+    return `${details.brand} ${details.model}`;
+  }, [listing.details]);
+
+  const houseListingInfo = useMemo(() => {
+    if (listing.details.type !== "house-for-rent") return null;
+    const details = listing.details as HouseForRentListingDetails;
+    return `${details.rooms} oda ${details.squareMeters} m² ${details.city} ${details.district}`;
+  }, [listing.details]);
+
+  const letgoListingInfo = useMemo(() => {
+    if (listing.details.type !== "letgo") return null;
+    const details = listing.details as LetgoListingDetails;
+    return `${details.title}`;
+  }, [listing.details]);
+
   return (
-    <div className="h-full lg:p-6 rounded-xl" style={{padding: 0}}>
+    <div className="h-full lg:p-6 rounded-xl" style={{ padding: 0 }}>
       <AnimatePresence>
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -176,7 +204,9 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 <div className="text-center">
                   <h2 className="text-3xl font-bold mb-3">Tur Sonuçları</h2>
                   <div className="flex flex-col gap-2">
-                    <p className="text-gray-600 text-lg">{listing.details.type === "car" ? `${listing.details.brand} ${listing.details.model}` : `${listing.details.rooms} oda ${listing.details.squareMeters} m² ${listing.details.city} ${listing.details.district}`}</p>
+                    <p className="text-gray-600 text-lg">
+                      {carListingInfo || houseListingInfo || letgoListingInfo}
+                    </p>
                     <p className="text-2xl font-semibold text-green-600">
                       Gerçek Fiyat: ₺{correctPrice.toLocaleString("tr-TR")}
                     </p>
@@ -184,8 +214,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 </div>
 
                 <div className="space-y-4">
-                  {sortedScores.slice(0, 3).map((score, index) => renderScoreRow(score, index))}
-                  
+                  {sortedScores
+                    .slice(0, 3)
+                    .map((score, index) => renderScoreRow(score, index))}
+
                   {userRank > 3 && (
                     <div className="flex justify-center py-1">
                       <div className="flex flex-col items-center gap-[2px]">
@@ -193,11 +225,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                         <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
                       </div>
-                    </div>)}
+                    </div>
+                  )}
                   {userRank > 2 && (
-                    <>
-                      {renderScoreRow(sortedScores[userRank], userRank)}
-                    </>
+                    <>{renderScoreRow(sortedScores[userRank], userRank)}</>
                   )}
                 </div>
               </div>

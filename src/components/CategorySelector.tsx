@@ -1,4 +1,4 @@
-import { Car, Home, LucideIcon } from "lucide-react";
+import { Car, Home, LucideIcon, ShoppingBag } from "lucide-react";
 import React from "react";
 import { Category } from "../services/api";
 
@@ -10,6 +10,7 @@ interface CategorySelectorProps {
 const iconMap: Record<string, LucideIcon> = {
   home: Home,
   car: Car,
+  letgo: ShoppingBag,
 };
 
 export const CategorySelector: React.FC<CategorySelectorProps> = ({

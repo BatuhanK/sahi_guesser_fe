@@ -22,10 +22,20 @@ export type HouseForRentListingDetails = {
   imageUrls: string[];
 };
 
+export type LetgoListingDetails = {
+  type: "letgo";
+  title: string;
+  description: string;
+  imageUrls: string[];
+  city: string;
+  brand: string;
+  keyValues: Record<string, string>;
+};
+
 export interface Listing {
   id: number;
   title: string;
-  details: CarListingDetails | HouseForRentListingDetails;
+  details: CarListingDetails | HouseForRentListingDetails | LetgoListingDetails;
 }
 
 export interface Player {

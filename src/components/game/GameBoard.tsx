@@ -21,10 +21,12 @@ import { useGameStore } from "../../store/gameStore";
 import {
   CarListingDetails,
   HouseForRentListingDetails,
+  LetgoListingDetails,
 } from "../../types/socket";
 import { Chat } from "../Chat";
 import { GuessStatus } from "../GuessStatus";
 import { PlayersList } from "../PlayersList";
+import { Popover } from "../Popover";
 import { PriceInput } from "../PriceInput";
 import { RoundResults } from "../RoundResults";
 
@@ -173,6 +175,30 @@ export const GameBoard: React.FC = () => {
     );
   }, [currentListing?.details]);
 
+  const letgoDetails = useMemo(() => {
+    if (currentListing?.details.type !== "letgo") return null;
+    const details = currentListing.details as LetgoListingDetails;
+
+    return (
+      <div className="flex flex-wrap gap-2 lg:gap-3 text-sm lg:text-base">
+        <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
+          <MapPin className="h-4 w-4 lg:h-5 lg:w-5 mr-1.5" />
+          <span>{details.city}</span>
+        </div>
+
+        {Object.entries(details.keyValues).map(([key, value], index) => (
+          <div
+            key={index}
+            className="inline-flex items-center bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full"
+          >
+            <span className="text-white/80 mr-1.5">{key}:</span>
+            <span className="font-medium">{value}</span>
+          </div>
+        ))}
+      </div>
+    );
+  }, [currentListing?.details]);
+
   // Memoize image navigation handlers
   const imageHandlers = useMemo(
     () => ({
@@ -292,13 +318,32 @@ export const GameBoard: React.FC = () => {
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
                   <div className="text-white space-y-2 lg:space-y-3">
-                    <h2 className="text-xl lg:text-2xl font-bold">
-                      {currentListing.title}
-                    </h2>
+                    {currentListing.details.type === "letgo" ? (
+                      <Popover
+                        key={currentListing.id}
+                        content={currentListing.details.description}
+                      >
+                        <h2 className="text-xl lg:text-2xl font-bold">
+                          {currentListing.title}
+                        </h2>
+                      </Popover>
+                    ) : (
+                      <h2 className="text-xl lg:text-2xl font-bold">
+                        {currentListing.title}
+                      </h2>
+                    )}
                     <div className="text-sm lg:text-base">
+                      {currentListing.details.type === "letgo"
+                        ? letgoDetails
+                        : null}
+
+                      {currentListing.details.type === "house-for-rent"
+                        ? propertyDetails
+                        : null}
+
                       {currentListing.details.type === "car"
                         ? carDetails
-                        : propertyDetails}
+                        : null}
                     </div>
                   </div>
                 </div>
