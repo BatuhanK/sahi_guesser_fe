@@ -8,17 +8,16 @@ spec:
   selector:
     matchLabels:
       app: frontend
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1 # Number of pods that can be unavailable during the update
+      maxSurge: 1
   template:
     metadata:
       labels:
         app: frontend
     spec:
-    strategy:
-    type: RollingUpdate
-
-    rollingUpdate:
-      maxUnavailable: 1 # Number of pods that can be unavailable during the update
-      maxSurge: 1
       containers:
         - name: frontend
           image: sjc.vultrcr.com/sahiguessercs/sahi-guesser-frontend:latest
