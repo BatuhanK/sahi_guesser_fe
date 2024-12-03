@@ -200,6 +200,13 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                 value={Number(value.replace(/[^0-9]/g, ""))}
                 onChange={(e) => setValue(formatNumber(e.target.value))}
                 className="w-full h-12 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400 mt-4"
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  document.body.style.overflow = "hidden";
+                }}
+                onTouchEnd={() => {
+                  document.body.style.overflow = "auto";
+                }}
                 style={{
                   WebkitAppearance: "none",
                   MozAppearance: "none",
@@ -220,30 +227,36 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                   #price-range::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
-                    width: 12px;
+                    width: 24px;
                     height: 48px;
                     background-color: #0f172a;
                     border-radius: 6px;
                     cursor: pointer;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                     border: 2px solid #facc15;
+                    touch-action: none;
                   }
                   #price-range::-moz-range-thumb {
-                    width: 12px;
+                    width: 24px;
                     height: 48px;
                     background-color: #0f172a;
                     border-radius: 6px;
                     cursor: pointer;
                     border: 2px solid #facc15;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                    touch-action: none;
                   }
                   #price-range:active::-webkit-slider-thumb {
-                    width: 16px;
+                    width: 32px;
                     background-color: #1e293b;
                   }
                   #price-range:active::-moz-range-thumb {
-                    width: 16px;
+                    width: 32px;
                     background-color: #1e293b;
+                  }
+                  #price-range {
+                    touch-action: none;
+                    -webkit-tap-highlight-color: transparent;
                   }
                 `}
               </style>
