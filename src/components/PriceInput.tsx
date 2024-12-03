@@ -200,13 +200,6 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                 value={Number(value.replace(/[^0-9]/g, ""))}
                 onChange={(e) => setValue(formatNumber(e.target.value))}
                 className="w-full h-12 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400 mt-4"
-                onTouchStart={(e) => {
-                  e.preventDefault();
-                  document.body.style.overflow = "hidden";
-                }}
-                onTouchEnd={() => {
-                  document.body.style.overflow = "auto";
-                }}
                 style={{
                   WebkitAppearance: "none",
                   MozAppearance: "none",
