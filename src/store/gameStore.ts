@@ -1,4 +1,6 @@
 import { create } from "zustand";
+import { devtools } from "zustand/middleware";
+
 import { Room } from "../services/api";
 import { ChatMessage, GuessResult } from "../types";
 import type {
@@ -51,70 +53,72 @@ interface GameState {
   setIntermissionDuration: (intermissionDuration: number) => void;
 }
 
-export const useGameStore = create<GameState>((set) => ({
-  status: "waiting",
-  currentListing: null,
-  roundStartTime: null,
-  roundDuration: 0,
-  players: [],
-  roomId: null,
-  room: null,
-  feedback: null,
-  guessCount: 0,
-  hasCorrectGuess: false,
-  correctGuesses: [],
-  incorrectGuesses: [],
-  lastGuesses: [],
-  chatMessages: [],
-  onlinePlayers: [],
-  correctPrice: null,
-  roundEndScores: [],
-  showResults: false,
-  intermissionDuration: 0,
-  setGameStatus: (status) =>
-    set({
-      status,
-      hasCorrectGuess: false,
-      feedback: null,
-      correctGuesses: [],
-      incorrectGuesses: [],
-    }),
-  setCurrentListing: (listing) =>
-    set({
-      currentListing: listing,
-      correctGuesses: [],
-      incorrectGuesses: [],
-      showResults: false,
-      roundEndScores: [],
-      correctPrice: null,
-    }),
-  setRoundInfo: (startTime, duration) =>
-    set({ roundStartTime: startTime, roundDuration: duration }),
-  setPlayers: (players) => set({ players }),
-  setRoomId: (roomId) => set({ roomId, chatMessages: [] }),
-  setGuessCount: (guessCount) => set({ guessCount }),
-  setRoom: (room) => set({ room }),
-  setFeedback: (feedback) => set({ feedback }),
-  setHasCorrectGuess: (hasCorrectGuess) => set({ hasCorrectGuess }),
-  setChatMessages: (chatMessages) => set({ chatMessages }),
-  setOnlinePlayers: (onlinePlayers) => set({ onlinePlayers }),
-  addCorrectGuess: (guess) =>
-    set((state) => ({
-      correctGuesses: [...state.correctGuesses, guess],
-      lastGuesses: [guess, ...state.lastGuesses].slice(0, 5),
-    })),
-  addIncorrectGuess: (guess) =>
-    set((state) => ({
-      incorrectGuesses: [...state.incorrectGuesses, guess],
-      lastGuesses: [guess, ...state.lastGuesses].slice(0, 5),
-    })),
+export const useGameStore = create<GameState>()(
+  devtools((set) => ({
+    status: "WAITING",
+    currentListing: null,
+    roundStartTime: null,
+    roundDuration: 0,
+    players: [],
+    roomId: null,
+    room: null,
+    feedback: null,
+    guessCount: 0,
+    hasCorrectGuess: false,
+    correctGuesses: [],
+    incorrectGuesses: [],
+    lastGuesses: [],
+    chatMessages: [],
+    onlinePlayers: [],
+    correctPrice: null,
+    roundEndScores: [],
+    showResults: false,
+    intermissionDuration: 0,
+    setGameStatus: (status) =>
+      set({
+        status,
+        hasCorrectGuess: false,
+        feedback: null,
+        correctGuesses: [],
+        incorrectGuesses: [],
+      }),
+    setCurrentListing: (listing) =>
+      set({
+        currentListing: listing,
+        correctGuesses: [],
+        incorrectGuesses: [],
+        showResults: false,
+        roundEndScores: [],
+        correctPrice: null,
+      }),
+    setRoundInfo: (startTime, duration) =>
+      set({ roundStartTime: startTime, roundDuration: duration }),
+    setPlayers: (players) => set({ players }),
+    setRoomId: (roomId) => set({ roomId, chatMessages: [] }),
+    setGuessCount: (guessCount) => set({ guessCount }),
+    setRoom: (room) => set({ room }),
+    setFeedback: (feedback) => set({ feedback }),
+    setHasCorrectGuess: (hasCorrectGuess) => set({ hasCorrectGuess }),
+    setChatMessages: (chatMessages) => set({ chatMessages }),
+    setOnlinePlayers: (onlinePlayers) => set({ onlinePlayers }),
+    addCorrectGuess: (guess) =>
+      set((state) => ({
+        correctGuesses: [...state.correctGuesses, guess],
+        lastGuesses: [guess, ...state.lastGuesses].slice(0, 5),
+      })),
+    addIncorrectGuess: (guess) =>
+      set((state) => ({
+        incorrectGuesses: [...state.incorrectGuesses, guess],
+        lastGuesses: [guess, ...state.lastGuesses].slice(0, 5),
+      })),
 
-  setCorrectGuesses: (correctGuesses) => set({ correctGuesses }),
-  setIncorrectGuesses: (incorrectGuesses) => set({ incorrectGuesses }),
-  setLastGuesses: (lastGuesses) => set({ lastGuesses }),
-  setCorrectPrice: (correctPrice) => set({ correctPrice }),
-  setRoundEndScores: (roundEndScores) => set({ roundEndScores }),
-  setShowResults: (showResults) => set({ showResults }),
-  setIntermissionDuration: (intermissionDuration) =>
-    set({ intermissionDuration }),
-}));
+    setCorrectGuesses: (correctGuesses) => set({ correctGuesses }),
+    setIncorrectGuesses: (incorrectGuesses) => set({ incorrectGuesses }),
+    setLastGuesses: (lastGuesses) => set({ lastGuesses }),
+    setCorrectPrice: (correctPrice) => set({ correctPrice }),
+    setRoundEndScores: (roundEndScores) => set({ roundEndScores }),
+    setShowResults: (showResults) => set({ showResults }),
+    setIntermissionDuration: (intermissionDuration) =>
+      set({ intermissionDuration }),
+  }))
+);

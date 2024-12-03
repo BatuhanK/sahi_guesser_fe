@@ -26,9 +26,6 @@ class SocketService {
     const socketUrl = import.meta.env.VITE_SOCKET_URL ?? "/";
     const isLocal = socketUrl.includes("local");
 
-    console.log("socketUrl", socketUrl);
-    console.log("isLocal", isLocal);
-
     this.socket = io(socketUrl, {
       path: isLocal ? "/socket.io/" : "/ws/socket.io/",
       autoConnect: false,

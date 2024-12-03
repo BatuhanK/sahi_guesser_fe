@@ -25,7 +25,6 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
   let minPrice = 0;
-  console.log("listingType", listingType);
   if (listingType === "car") minPrice = 500000;
   if (listingType === "letgo") minPrice = 500;
   if (listingType === "house-for-rent") minPrice = 5000;
@@ -200,14 +199,55 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                 step={listingType === "car" ? 10000 : 500}
                 value={Number(value.replace(/[^0-9]/g, ""))}
                 onChange={(e) => setValue(formatNumber(e.target.value))}
-                className="w-full h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400"
+                className="w-full h-12 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400 mt-4"
                 style={{
                   WebkitAppearance: "none",
                   MozAppearance: "none",
                   appearance: "none",
+                  background: `linear-gradient(to right, #facc15 0%, #facc15 ${
+                    ((Number(value.replace(/[^0-9]/g, "")) - minPrice) /
+                      (maxPrice - minPrice)) *
+                    100
+                  }%, #e5e7eb ${
+                    ((Number(value.replace(/[^0-9]/g, "")) - minPrice) /
+                      (maxPrice - minPrice)) *
+                    100
+                  }%, #e5e7eb 100%)`,
                 }}
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-1">
+              <style>
+                {`
+                  #price-range::-webkit-slider-thumb {
+                    -webkit-appearance: none;
+                    appearance: none;
+                    width: 12px;
+                    height: 48px;
+                    background-color: #0f172a;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                    border: 2px solid #facc15;
+                  }
+                  #price-range::-moz-range-thumb {
+                    width: 12px;
+                    height: 48px;
+                    background-color: #0f172a;
+                    border-radius: 6px;
+                    cursor: pointer;
+                    border: 2px solid #facc15;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+                  }
+                  #price-range:active::-webkit-slider-thumb {
+                    width: 16px;
+                    background-color: #1e293b;
+                  }
+                  #price-range:active::-moz-range-thumb {
+                    width: 16px;
+                    background-color: #1e293b;
+                  }
+                `}
+              </style>
+              <div className="flex justify-between text-xs text-gray-500 mt-2">
                 <span>₺{formatNumber(minPrice.toString())}</span>
                 <span>₺{formatNumber(maxPrice.toString())}</span>
               </div>

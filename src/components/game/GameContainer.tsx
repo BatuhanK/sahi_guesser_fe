@@ -48,7 +48,6 @@ export const GameContainer: React.FC = () => {
     let mounted = true;
 
     const initializeRoom = async () => {
-      console.log("we are in initializeRoom slug: ", slug, "room:", room?.id);
       if (slug && !room && mounted) {
         try {
           const roomDetailsResponse = await roomApi.getDetails(slug);

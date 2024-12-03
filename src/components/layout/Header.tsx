@@ -101,8 +101,15 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const { status, currentListing, roundStartTime, roundDuration, roomId } =
-    useGameStore();
+  const {
+    status,
+    currentListing,
+    roundStartTime,
+    roundDuration,
+    roomId,
+    setRoom,
+    setRoomId,
+  } = useGameStore();
   const [timeLeft, setTimeLeft] = useState<number>(roundDuration);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
@@ -164,6 +171,8 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     if (roomId) {
       socketService.leaveRoom(roomId);
     }
+    setRoom(null);
+    setRoomId(null);
     navigate("/");
   };
 

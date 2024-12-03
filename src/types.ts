@@ -56,9 +56,3 @@ export interface ChatMention {
   username: string;
   indices: [number, number];
 }
-
-export interface OnlinePlayer {
-  id: string | number;
-  username: string;
-  // ... other properties
-}

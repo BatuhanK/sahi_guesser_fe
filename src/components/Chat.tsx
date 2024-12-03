@@ -19,6 +19,7 @@ import {
   Smile,
   Volume2,
   VolumeX,
+  X,
 } from "lucide-react";
 import React, {
   useCallback,
@@ -36,6 +37,7 @@ import { soundService } from "../services/soundService";
 import { useGameStore } from "../store/gameStore";
 import type { ChatMention, ChatMessage } from "../types";
 import type { User } from "../types/auth";
+import { OnlinePlayer } from "../types/socket";
 
 interface ChatProps {
   messages: ChatMessage[];
@@ -527,6 +529,43 @@ const ParticipantsList: React.FC<{
   );
 };
 
+const OnlinePlayersList: React.FC<{
+  players: OnlinePlayer[];
+  isOpen: boolean;
+  onClose: () => void;
+}> = ({ players, isOpen, onClose }) => {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
+      <div className="bg-white rounded-lg shadow-xl w-full max-w-sm">
+        <div className="flex items-center justify-between p-4 border-b">
+          <h3 className="font-medium">Online Oyuncular ({players.length})</h3>
+          <button
+            onClick={onClose}
+            className="p-1 rounded-full hover:bg-gray-100 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+        <div className="p-2 max-h-[60vh] overflow-y-auto">
+          {players.map((player) => (
+            <div
+              key={player.username}
+              className="flex items-center gap-3 p-3 hover:bg-gray-50 rounded-lg"
+            >
+              <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-700 font-medium">
+                {player.username.charAt(0).toUpperCase()}
+              </div>
+              <span className="flex-1">{player.username}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const ChatHeader: React.FC<{
   audioState: AudioState;
   onToggleAudio: () => void;
@@ -534,6 +573,7 @@ const ChatHeader: React.FC<{
   onToggleRoomMute: () => void;
   remoteParticipants: Map<string, RemoteParticipantState>;
   onToggleParticipantMute: (participantId: string) => void;
+  onlinePlayers: OnlinePlayer[];
 }> = ({
   audioState,
   onToggleAudio,
@@ -541,92 +581,113 @@ const ChatHeader: React.FC<{
   onToggleRoomMute,
   remoteParticipants,
   onToggleParticipantMute,
-}) => (
-  <div className="flex-none border-b border-gray-100 p-4">
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-2">
-        <MessageCircle className="w-5 h-5 text-yellow-500" />
-        <h2 className="font-medium text-gray-900">Sohbet</h2>
-      </div>
-      <div className="flex items-center gap-2">
-        {audioState.isConnected && (
-          <>
+  onlinePlayers,
+}) => {
+  const [showOnlinePlayers, setShowOnlinePlayers] = useState(false);
+
+  return (
+    <>
+      <div className="flex-none border-b border-gray-100 p-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <MessageCircle className="w-5 h-5 text-yellow-500" />
+            <h2 className="font-medium text-gray-900">
+              Sohbet
+              <span
+                className="text-gray-500 block md:hidden mobileOnlinePlayersCount cursor-pointer hover:text-gray-700 transition-colors"
+                onClick={() => setShowOnlinePlayers(true)}
+              >
+                {" "}
+                ({onlinePlayers.length} kişi online)
+              </span>
+            </h2>
+          </div>
+          <div className="flex items-center gap-2">
+            {audioState.isConnected && (
+              <>
+                <button
+                  onClick={onToggleRoomMute}
+                  className={cn(
+                    "p-2 rounded-full transition-colors",
+                    audioState.isRoomMuted
+                      ? "bg-gray-100 text-gray-500"
+                      : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                  )}
+                  title={
+                    audioState.isRoomMuted
+                      ? "Odanın Sesini Aç"
+                      : "Odanın Sesini Kapat"
+                  }
+                >
+                  {audioState.isRoomMuted ? (
+                    <VolumeX className="w-5 h-5" />
+                  ) : (
+                    <Volume2 className="w-5 h-5" />
+                  )}
+                </button>
+                <button
+                  onClick={onToggleMute}
+                  className={cn(
+                    "p-2 rounded-full transition-colors",
+                    audioState.isMuted
+                      ? "bg-gray-100 text-gray-500"
+                      : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                  )}
+                  title={
+                    audioState.isMuted ? "Mikrofonunu Aç" : "Mikrofonunu Kapat"
+                  }
+                >
+                  {audioState.isMuted ? (
+                    <MicOff className="w-5 h-5" />
+                  ) : (
+                    <Mic className="w-5 h-5" />
+                  )}
+                </button>
+              </>
+            )}
             <button
-              onClick={onToggleRoomMute}
+              onClick={onToggleAudio}
+              disabled={audioState.isConnecting}
               className={cn(
                 "p-2 rounded-full transition-colors",
-                audioState.isRoomMuted
-                  ? "bg-gray-100 text-gray-500"
-                  : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                audioState.isConnected
+                  ? "bg-red-100 text-red-600 hover:bg-red-200"
+                  : "hover:bg-gray-100"
               )}
               title={
-                audioState.isRoomMuted
-                  ? "Odanın Sesini Aç"
-                  : "Odanın Sesini Kapat"
+                audioState.isConnected
+                  ? "Sesli Sohbetten Ayrıl"
+                  : "Sesli Sohbete Katıl"
               }
             >
-              {audioState.isRoomMuted ? (
-                <VolumeX className="w-5 h-5" />
+              {audioState.isConnecting ? (
+                <div className="w-5 h-5 animate-spin rounded-full border-2 border-yellow-500 border-t-transparent" />
+              ) : audioState.isConnected ? (
+                <PhoneOff className="w-5 h-5" />
               ) : (
-                <Volume2 className="w-5 h-5" />
+                <Phone className="w-5 h-5" />
               )}
             </button>
-            <button
-              onClick={onToggleMute}
-              className={cn(
-                "p-2 rounded-full transition-colors",
-                audioState.isMuted
-                  ? "bg-gray-100 text-gray-500"
-                  : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
-              )}
-              title={
-                audioState.isMuted ? "Mikrofonunu Aç" : "Mikrofonunu Kapat"
-              }
-            >
-              {audioState.isMuted ? (
-                <MicOff className="w-5 h-5" />
-              ) : (
-                <Mic className="w-5 h-5" />
-              )}
-            </button>
-          </>
+          </div>
+        </div>
+        {audioState.error && (
+          <div className="mt-2 text-sm text-red-500">{audioState.error}</div>
         )}
-        <button
-          onClick={onToggleAudio}
-          disabled={audioState.isConnecting}
-          className={cn(
-            "p-2 rounded-full transition-colors",
-            audioState.isConnected
-              ? "bg-red-100 text-red-600 hover:bg-red-200"
-              : "hover:bg-gray-100"
-          )}
-          title={
-            audioState.isConnected
-              ? "Sesli Sohbetten Ayrıl"
-              : "Sesli Sohbete Katıl"
-          }
-        >
-          {audioState.isConnecting ? (
-            <div className="w-5 h-5 animate-spin rounded-full border-2 border-yellow-500 border-t-transparent" />
-          ) : audioState.isConnected ? (
-            <PhoneOff className="w-5 h-5" />
-          ) : (
-            <Phone className="w-5 h-5" />
-          )}
-        </button>
+        {audioState.isConnected && (
+          <ParticipantsList
+            remoteParticipants={remoteParticipants}
+            onToggleMute={onToggleParticipantMute}
+          />
+        )}
       </div>
-    </div>
-    {audioState.error && (
-      <div className="mt-2 text-sm text-red-500">{audioState.error}</div>
-    )}
-    {audioState.isConnected && (
-      <ParticipantsList
-        remoteParticipants={remoteParticipants}
-        onToggleMute={onToggleParticipantMute}
+      <OnlinePlayersList
+        players={onlinePlayers}
+        isOpen={showOnlinePlayers}
+        onClose={() => setShowOnlinePlayers(false)}
       />
-    )}
-  </div>
-);
+    </>
+  );
+};
 
 // Add this helper at the top of the file
 const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
@@ -667,6 +728,10 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   const [remoteParticipants, setRemoteParticipants] = useState<
     Map<string, RemoteParticipantState>
   >(new Map());
+
+  const onlinePlayers = useGameStore((state) => state.onlinePlayers);
+
+  let livekitRoom: Room | null = null;
 
   const roomId = useGameStore((state) => state.roomId);
 
@@ -714,12 +779,12 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
 
       const token = await authApi.getLiveKitToken(roomId.toString());
 
-      const room = new Room({
+      livekitRoom = new Room({
         adaptiveStream: true,
         dynacast: true,
       });
 
-      room.on(RoomEvent.Disconnected, () => {
+      livekitRoom.on(RoomEvent.Disconnected, () => {
         setAudioState((prev) => ({
           ...prev,
           isConnected: false,
@@ -727,11 +792,11 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         }));
       });
 
-      room.on(RoomEvent.ParticipantConnected, (participant) => {
+      livekitRoom.on(RoomEvent.ParticipantConnected, (participant) => {
         console.log("Participant connected:", participant.identity);
       });
 
-      room.on(
+      livekitRoom.on(
         RoomEvent.TrackSubscribed,
         (track: RemoteTrack, _publication, participant) => {
           if (track.kind === Track.Kind.Audio) {
@@ -768,16 +833,16 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         }
       );
 
-      room.on(RoomEvent.TrackUnsubscribed, (track: RemoteTrack) => {
+      livekitRoom.on(RoomEvent.TrackUnsubscribed, (track: RemoteTrack) => {
         if (track.kind === Track.Kind.Audio) {
           track.detach();
         }
       });
 
-      await room.connect("https://livekit.sahikaca.com", token);
+      await livekitRoom.connect("https://livekit.sahikaca.com", token);
 
       const audioTrack = await createLocalAudioTrack();
-      await room.localParticipant.publishTrack(audioTrack);
+      await livekitRoom.localParticipant.publishTrack(audioTrack);
 
       // Lower game sounds when voice chat is active
       soundService.setVolume(0.1);
@@ -786,7 +851,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         ...prev,
         isConnected: true,
         isConnecting: false,
-        room,
+        room: livekitRoom,
       }));
     } catch (error) {
       console.error("Failed to connect to LiveKit:", error);
@@ -799,6 +864,8 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   };
 
   const disconnectFromLiveKit = async () => {
+    console.log("disconnectFromLiveKit");
+
     if (audioState.room) {
       const localParticipant = audioState.room.localParticipant;
       const tracks = Array.from(localParticipant.trackPublications.values());
@@ -812,12 +879,14 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
       // Restore normal volume when voice chat ends
       soundService.setVolume(1);
 
-      await audioState.room.disconnect();
+      await audioState.room.disconnect(true);
       setAudioState((prev) => ({
         ...prev,
         isConnected: false,
         room: null,
       }));
+    } else if (livekitRoom) {
+      await livekitRoom.disconnect(true);
     }
   };
 
@@ -922,6 +991,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         onToggleRoomMute={handleToggleRoomMute}
         remoteParticipants={remoteParticipants}
         onToggleParticipantMute={handleToggleParticipantMute}
+        onlinePlayers={onlinePlayers}
       />
       <div className="flex-1 overflow-y-auto no-scrollbar p-4">
         {messages?.map((msg, index) => (
