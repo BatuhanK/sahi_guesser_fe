@@ -112,6 +112,12 @@ export interface ServerToClientEvents {
     playerId: number;
     username: string;
   }) => void;
+
+  livekitRoomUpdate: (data: {
+    roomId: number;
+    participants: string[];
+    onlineCount: number;
+  }) => void;
 }
 
 export interface ClientToServerEvents {

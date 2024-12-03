@@ -165,7 +165,6 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               </span>
             </div>
             <input
-              autoFocus
               ref={inputRef}
               type="text"
               value={value}
