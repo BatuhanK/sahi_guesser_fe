@@ -12,6 +12,8 @@ class SocketService {
   private socket: Socket<ServerToClientEvents, ClientToServerEvents> | null =
     null;
 
+  private roomId: number | null = null;
+
   connect(): void {
     const token = localStorage.getItem("token");
     let extraHeaders: Record<string, string> = {};
@@ -276,8 +278,12 @@ class SocketService {
   }
 
   joinRoom(roomId: number): void {
-    this.socket?.emit("joinRoom", { roomId });
-    useGameStore.getState().setRoomId(roomId);
+    if (this.roomId !== roomId) {
+      this.socket?.emit("joinRoom", { roomId });
+      useGameStore.getState().setRoomId(roomId);
+    } else {
+      console.log("Room already joined", roomId);
+    }
   }
 
   sendMessage(roomId: number, message: string) {

@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { AuthModal } from "./components/auth/AuthModals";
 import { GameContainer } from "./components/game/GameContainer";
 import { Header } from "./components/layout/Header";
 import { useAuth } from "./hooks/useAuth";
 
 function App() {
-  const [authModalType, setAuthModalType] = useState<"login" | "register" | null>(null);
+  const [authModalType, setAuthModalType] = useState<
+    "login" | "register" | null
+  >(null);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const { login, register } = useAuth();
 
@@ -46,7 +49,7 @@ function App() {
   };
 
   return (
-    <>
+    <BrowserRouter>
       <Toaster
         position="top-right"
         toastOptions={{
@@ -65,9 +68,11 @@ function App() {
       />
       <div className="min-h-screen bg-gray-100">
         <Header onOpenAuth={handleOpenAuthModal} />
-
-        <main className="mx-auto p-4" style={{ maxWidth: '95rem' }}>
-          <GameContainer />
+        <main className="mx-auto p-4" style={{ maxWidth: "95rem" }}>
+          <Routes>
+            <Route path="/" element={<GameContainer />} />
+            <Route path="/oda/:slug" element={<GameContainer />} />
+          </Routes>
         </main>
         <AuthModal
           isOpen={isAuthModalOpen}
@@ -76,7 +81,7 @@ function App() {
           onAuth={handleAuth}
         />
       </div>
-    </>
+    </BrowserRouter>
   );
 }
 

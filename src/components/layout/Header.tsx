@@ -10,6 +10,7 @@ import {
   UserPlus,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { socketService } from "../../services/socket";
@@ -63,6 +64,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     useGameStore();
   const [timeLeft, setTimeLeft] = useState<number>(roundDuration);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     let intervalId: number;
@@ -97,6 +99,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     if (roomId) {
       socketService.leaveRoom(roomId);
     }
+    navigate("/");
   };
 
   const handleLogout = () => {

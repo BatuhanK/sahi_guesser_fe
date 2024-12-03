@@ -82,8 +82,19 @@ export const categoryApi = {
 };
 
 export const roomApi = {
-  getDetails: async (id: number) => {
-    const response = await api.get(`/rooms/${id}`);
+  getDetails: async (slug: string) => {
+    const response = await api.get(`/rooms/${slug}`);
+    return response.data;
+  },
+
+  getLivekitRoom: async (
+    id: number
+  ): Promise<{
+    name: string;
+    onlineCount: number;
+    participants: string[];
+  }> => {
+    const response = await api.get(`/livekit-rooms/${id}`);
     return response.data;
   },
 };
