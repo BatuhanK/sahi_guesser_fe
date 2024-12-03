@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { Category, categoryApi, roomApi } from "../../services/api";
 import { socketService } from "../../services/socket";
 import { useAnnouncementStore } from "../../store/announcementStore";
+import { useAuthStore } from "../../store/authStore";
 import { useGameStore } from "../../store/gameStore";
 import { CategorySelector } from "../CategorySelector";
 import { LeaderboardTable } from "../LeaderboardTable";
@@ -14,6 +15,7 @@ import { GameBoard } from "./GameBoard";
 
 export const GameContainer: React.FC = () => {
   const { currentListing, roomId, room } = useGameStore();
+  const { user } = useAuthStore();
   const navigate = useNavigate();
   const { slug } = useParams<{ slug?: string }>();
 
@@ -96,7 +98,11 @@ export const GameContainer: React.FC = () => {
   }
 
   if (!currentListing && roomId) {
-    return <Loader text="Oyuna bağlanılıyor..." />;
+    if (user) {
+      return <Loader text="Oyuna bağlanılıyor..." />;
+    } else {
+      return <Loader text="Bu oda boş, üye olarak oyun oynayabilirsiniz." />;
+    }
   }
 
   if (!roomId) {
