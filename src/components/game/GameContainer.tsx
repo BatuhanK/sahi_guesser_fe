@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { X } from "lucide-react";
 import { Category, categoryApi, roomApi } from "../../services/api";
 import { socketService } from "../../services/socket";
+import { useAnnouncementStore } from "../../store/announcementStore";
 import { useGameStore } from "../../store/gameStore";
 import { CategorySelector } from "../CategorySelector";
 import { LeaderboardTable } from "../LeaderboardTable";
@@ -18,6 +20,14 @@ export const GameContainer: React.FC = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [, setSelectedCategory] = useState<string | null>(null);
+
+  const { announcements, markAsRead, readAnnouncementIds } =
+    useAnnouncementStore();
+
+  const latestAnnouncement = announcements[0];
+  const isLatestRead = latestAnnouncement
+    ? readAnnouncementIds.includes(latestAnnouncement.id)
+    : true;
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -93,6 +103,20 @@ export const GameContainer: React.FC = () => {
   if (!roomId) {
     return (
       <div className="space-y-6">
+        {latestAnnouncement && !isLatestRead && (
+          <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 relative">
+            <button
+              onClick={() => markAsRead(latestAnnouncement.id)}
+              className="absolute top-2 right-2 hover:bg-yellow-200 p-1 rounded"
+            >
+              <X size={16} />
+            </button>
+            <h4 className="font-medium text-yellow-800 mb-1">
+              {latestAnnouncement.title}
+            </h4>
+            <p className="text-yellow-700">{latestAnnouncement.content}</p>
+          </div>
+        )}
         <CategorySelector
           categories={categories}
           onSelect={handleCategorySelect}
@@ -104,6 +128,20 @@ export const GameContainer: React.FC = () => {
 
   return (
     <div className="h-full">
+      {latestAnnouncement && !isLatestRead && (
+        <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-4 relative">
+          <button
+            onClick={() => markAsRead(latestAnnouncement.id)}
+            className="absolute top-2 right-2 hover:bg-yellow-200 p-1 rounded"
+          >
+            <X size={16} />
+          </button>
+          <h4 className="font-medium text-yellow-800 mb-1">
+            {latestAnnouncement.title}
+          </h4>
+          <p className="text-yellow-700">{latestAnnouncement.content}</p>
+        </div>
+      )}
       <GameBoard />
     </div>
   );

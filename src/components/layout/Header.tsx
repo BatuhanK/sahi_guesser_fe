@@ -1,8 +1,12 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  AlertOctagon,
+  AlertTriangle,
+  Bell,
   Car,
   HelpCircle,
   Home,
+  Info,
   LogIn,
   LogOut,
   Menu,
@@ -11,9 +15,12 @@ import {
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../hooks/useAuth";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
+import { announcementApi } from "../../services/api";
 import { socketService } from "../../services/socket";
+import { useAnnouncementStore } from "../../store/announcementStore";
 import { useGameStore } from "../../store/gameStore";
 import { ScoreBoard } from "../ScoreBoard";
 import { Timer } from "../Timer";
@@ -56,6 +63,40 @@ interface HeaderProps {
   onOpenAuth: (type: "login" | "register") => void;
 }
 
+const getAnnouncementIcon = (type: "info" | "warning" | "error") => {
+  switch (type) {
+    case "warning":
+      return <AlertTriangle className="text-yellow-500" size={20} />;
+    case "error":
+      return <AlertOctagon className="text-red-500" size={20} />;
+    default:
+      return <Info className="text-blue-500" size={20} />;
+  }
+};
+
+const getAnnouncementColors = (type: "info" | "warning" | "error") => {
+  switch (type) {
+    case "warning":
+      return {
+        bg: "bg-yellow-50",
+        border: "border-yellow-200",
+        hover: "hover:bg-yellow-100",
+      };
+    case "error":
+      return {
+        bg: "bg-red-50",
+        border: "border-red-200",
+        hover: "hover:bg-red-100",
+      };
+    default:
+      return {
+        bg: "bg-blue-50",
+        border: "border-blue-200",
+        hover: "hover:bg-blue-100",
+      };
+  }
+};
+
 export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
   const { isAuthenticated, user, logout } = useAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
@@ -65,6 +106,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
   const [timeLeft, setTimeLeft] = useState<number>(roundDuration);
   const [showMobileMenu, setShowMobileMenu] = useState(false);
   const navigate = useNavigate();
+  const [showAnnouncements, setShowAnnouncements] = useState(false);
+  const { announcements, readAnnouncementIds, markAsRead, getUnreadCount } =
+    useAnnouncementStore();
 
   useEffect(() => {
     let intervalId: number;
@@ -95,6 +139,27 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     };
   }, [currentListing, roundStartTime, roundDuration]);
 
+  useEffect(() => {
+    const fetchAnnouncements = async () => {
+      try {
+        const announcements = await announcementApi.getAll();
+        useAnnouncementStore.getState().setAnnouncements(
+          announcements.map((announcement) => ({
+            id: announcement.id.toString(),
+            title: announcement.title,
+            content: announcement.content,
+            type: announcement.type,
+            createdAt: new Date(announcement.createdAt),
+          }))
+        );
+      } catch (error) {
+        console.error("Failed to fetch announcements:", error);
+      }
+    };
+
+    fetchAnnouncements();
+  }, []);
+
   const handleLeaveRoom = () => {
     if (roomId) {
       socketService.leaveRoom(roomId);
@@ -107,6 +172,68 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     setShowUserMenu(false);
     window.location.reload();
   };
+
+  const renderAnnouncementDropdown = () => (
+    <div className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
+      <div className="px-4 py-2 border-b border-gray-200">
+        <h3 className="font-semibold text-gray-700">Announcements</h3>
+      </div>
+      {announcements.length > 0 ? (
+        announcements.map((announcement) => {
+          const colors = getAnnouncementColors(announcement.type);
+          const isRead = readAnnouncementIds.includes(announcement.id);
+
+          return (
+            <div
+              key={announcement.id}
+              className={`p-4 border-b last:border-b-0 ${
+                isRead ? "opacity-75" : ""
+              } ${colors.bg} ${colors.border} transition-colors`}
+            >
+              <div className="flex items-start gap-3">
+                {getAnnouncementIcon(announcement.type)}
+                <div className="flex-1">
+                  <h4 className="font-medium text-gray-900 mb-1">
+                    {announcement.title}
+                  </h4>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
+                    {announcement.content}
+                  </p>
+                  <div className="flex justify-between items-center mt-3">
+                    <span className="text-xs text-gray-500">
+                      {new Date(announcement.createdAt).toLocaleDateString(
+                        "tr-TR",
+                        {
+                          year: "numeric",
+                          month: "long",
+                          day: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
+                    </span>
+                    {!isRead && (
+                      <button
+                        onClick={() => markAsRead(announcement.id)}
+                        className="text-xs text-blue-500 hover:text-blue-700 font-medium"
+                      >
+                        Mark as read
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })
+      ) : (
+        <div className="p-8 text-center text-gray-500">
+          <Bell className="mx-auto mb-2 text-gray-400" size={24} />
+          <p>No announcements yet</p>
+        </div>
+      )}
+    </div>
+  );
 
   return (
     <>
@@ -190,6 +317,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                         </button>
                       </div>
                     )}
+                    <div className="relative">
+                      <button
+                        onClick={() => setShowAnnouncements(!showAnnouncements)}
+                        className="relative p-2 hover:bg-yellow-500 rounded transition-colors"
+                      >
+                        <Bell className="text-white" size={24} />
+                        {getUnreadCount() > 0 && (
+                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                            {getUnreadCount()}
+                          </span>
+                        )}
+                      </button>
+                      {showAnnouncements && renderAnnouncementDropdown()}
+                    </div>
                   </div>
                 </div>
               )}
@@ -241,6 +382,20 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                   </button>
                 </div>
               )}
+              <div className="relative">
+                <button
+                  onClick={() => setShowAnnouncements(!showAnnouncements)}
+                  className="relative p-2 hover:bg-yellow-500 rounded transition-colors"
+                >
+                  <Bell className="text-white" size={24} />
+                  {getUnreadCount() > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                      {getUnreadCount()}
+                    </span>
+                  )}
+                </button>
+                {showAnnouncements && renderAnnouncementDropdown()}
+              </div>
             </div>
           )}
         </div>

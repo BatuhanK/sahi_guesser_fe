@@ -67,6 +67,15 @@ export type Room = {
   };
 };
 
+export type Announcement = {
+  id: number;
+  title: string;
+  content: string;
+  type: "info" | "warning" | "error";
+  createdAt: string;
+  updatedAt: string;
+};
+
 export const categoryApi = {
   getAll: async () => {
     const response = await api.get<{ categories: Category[] }>("/categories");
@@ -96,6 +105,15 @@ export const roomApi = {
   }> => {
     const response = await api.get(`/livekit-rooms/${id}`);
     return response.data;
+  },
+};
+
+export const announcementApi = {
+  getAll: async () => {
+    const response = await api.get<{ announcements: Announcement[] }>(
+      "/announcements"
+    );
+    return response.data.announcements;
   },
 };
 
