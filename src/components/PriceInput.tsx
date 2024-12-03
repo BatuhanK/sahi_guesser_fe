@@ -224,6 +224,22 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               />
               <style>
                 {`
+                  #price-range {
+                    touch-action: none;
+                    -webkit-tap-highlight-color: transparent;
+                    position: relative;
+                  }
+
+                  #price-range::-webkit-slider-runnable-track {
+                    height: 100%;
+                    cursor: pointer;
+                  }
+
+                  #price-range::-moz-range-track {
+                    height: 100%;
+                    cursor: pointer;
+                  }
+
                   #price-range::-webkit-slider-thumb {
                     -webkit-appearance: none;
                     appearance: none;
@@ -235,6 +251,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                     border: 2px solid #facc15;
                     touch-action: none;
+                    margin-top: -18px;
                   }
                   #price-range::-moz-range-thumb {
                     width: 24px;
@@ -245,6 +262,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                     border: 2px solid #facc15;
                     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
                     touch-action: none;
+                    margin-top: -18px;
                   }
                   #price-range:active::-webkit-slider-thumb {
                     width: 32px;
@@ -253,10 +271,6 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                   #price-range:active::-moz-range-thumb {
                     width: 32px;
                     background-color: #1e293b;
-                  }
-                  #price-range {
-                    touch-action: none;
-                    -webkit-tap-highlight-color: transparent;
                   }
                 `}
               </style>
