@@ -20,7 +20,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: sjc.vultrcr.com/sahiguessercs/sahi-guesser-frontend:latest
+          image: 180294204321.dkr.ecr.eu-central-1.amazonaws.com/sahikaca/frontend:latest
           resources:
             limits:
               cpu: "200m"
