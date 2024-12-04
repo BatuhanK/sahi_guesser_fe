@@ -839,7 +839,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         }
       });
 
-      await livekitRoom.connect("https://livekit.sahikaca.com", token);
+      await livekitRoom.connect("https://aws-livekit.sahikaca.com", token);
 
       const audioTrack = await createLocalAudioTrack();
       await livekitRoom.localParticipant.publishTrack(audioTrack);
