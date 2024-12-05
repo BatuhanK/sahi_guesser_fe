@@ -1,4 +1,4 @@
-import { Car, Home, LucideIcon, ShoppingBag } from "lucide-react";
+import { Bike, Car, Home, LucideIcon, ShoppingBag } from "lucide-react";
 import React from "react";
 import { Category } from "../services/api";
 
@@ -11,6 +11,7 @@ const iconMap: Record<string, LucideIcon> = {
   home: Home,
   car: Car,
   letgo: ShoppingBag,
+  motocycle: Bike,
 };
 
 export const CategorySelector: React.FC<CategorySelectorProps> = ({
