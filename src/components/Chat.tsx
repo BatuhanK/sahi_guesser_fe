@@ -60,9 +60,12 @@ const shouldShowTimestamp = (messages: ChatMessage[], index: number) => {
 };
 
 const maskNumbers = (text: string): string => {
-  // Replace any number (including those with k/K suffix, e/E prefix, and Turkish number words) with a single *
-  return text.replace(
-    /\b(\d+[kK]?|[eE]\d+|bir|iki|üç|uc|dort|dört|bes|beş|alti|altı|yedi|sekiz|dokuz|on|yirmi|otuz|kırk|kirk|elli|altmış|altmis|yetmiş|yetmis|seksen|doksan|yüz|yuz|bin|milyon|milyar)\b/gi,
+  // First replace numeric values (including k, m, b suffixes and underscores)
+  const masked = text.replace(/\d+[kKmMbB_]?\d*/g, "*");
+
+  // Then replace Turkish number words
+  return masked.replace(
+    /(bir|iki|üç|uc|dort|dört|bes|beş|alti|altı|yedi|sekiz|dokuz|on|yirmi|otuz|kırk|kirk|elli|altmış|altmis|yetmiş|yetmis|seksen|doksan|yüz|yuz|bin|milyon|milyar)/gi,
     "*"
   );
 };
