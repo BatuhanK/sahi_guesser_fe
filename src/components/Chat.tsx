@@ -59,12 +59,20 @@ const shouldShowTimestamp = (messages: ChatMessage[], index: number) => {
   );
 };
 
+const maskNumbers = (text: string): string => {
+  // Matches any sequence of digits
+  return text.replace(/\b\d+\b/g, (match) => "*".repeat(match.length));
+};
+
 const renderMessageWithMentions = (
   message: string,
   mentions?: ChatMention[],
   currentUsername?: string | null
 ) => {
-  if (!mentions?.length) return message;
+  if (!mentions?.length) {
+    // If there are no mentions, just mask the numbers and return
+    return maskNumbers(message);
+  }
 
   const result = [];
   let lastIndex = 0;
@@ -78,9 +86,10 @@ const renderMessageWithMentions = (
       const [start, end] = mention.indices;
       const isSelfMention = mention.username === currentUsername;
 
-      // Add text before mention
+      // Add masked text before mention
       if (start > lastIndex) {
-        result.push(message.slice(lastIndex, start));
+        const textBeforeMention = message.slice(lastIndex, start);
+        result.push(maskNumbers(textBeforeMention));
       }
 
       // Add mention with enhanced styling
@@ -102,9 +111,10 @@ const renderMessageWithMentions = (
       lastIndex = end;
     });
 
-  // Add remaining text
+  // Add remaining masked text
   if (lastIndex < message.length) {
-    result.push(message.slice(lastIndex));
+    const remainingText = message.slice(lastIndex);
+    result.push(maskNumbers(remainingText));
   }
 
   return (
