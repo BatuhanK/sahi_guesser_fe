@@ -65,7 +65,7 @@ const maskNumbers = (text: string): string => {
 
   // Then replace Turkish number words
   return masked.replace(
-    /(bir|iki|üç|uc|dort|dört|bes|beş|alti|altı|yedi|sekiz|dokuz|on|yirmi|otuz|kırk|kirk|elli|altmış|altmis|yetmiş|yetmis|seksen|doksan|yüz|yuz|bin|milyon|milyar)/gi,
+    /(bir|üç|dort|dört|beş|alti|altı|yedi|sekiz|dokuz|yirmi|otuz|kırk|kirk|elli|altmış|altmis|yetmiş|yetmis|seksen|doksan|milyon|milyar)/gi,
     "*"
   );
 };
