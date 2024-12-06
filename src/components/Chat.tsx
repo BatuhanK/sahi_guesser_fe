@@ -74,6 +74,11 @@ const maskNumbers = (text: string): string => {
     "*".repeat(match.length)
   );
 
+  // Replace numbers with e/E prefix (e.g., e250, E3500)
+  maskedText = maskedText.replace(/\b[eE]\d+\b/g, (match) =>
+    "*".repeat(match.length)
+  );
+
   // Finally replace regular numbers
   return maskedText.replace(/\b\d+\b/g, (match) => "*".repeat(match.length));
 };
