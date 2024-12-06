@@ -555,7 +555,7 @@ const OnlinePlayersList: React.FC<{
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-2 max-h-[60vh] overflow-y-auto">
+        <div className="p-2 max-h-[60vh] overflow-y-auto no-scrollbar">
           {players.map((player) => (
             <div
               key={player.username}
