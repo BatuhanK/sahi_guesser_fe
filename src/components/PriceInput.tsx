@@ -33,7 +33,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   if (listingType === "house-for-rent") minPrice = 5000;
 
   let maxPrice = 0;
-  if (listingType === "car") maxPrice = 20_000_000;
+  if (listingType === "car") maxPrice = 15_000_000;
   if (listingType === "letgo") maxPrice = 50_000;
   if (listingType === "house-for-rent") maxPrice = 50_000;
 
@@ -146,7 +146,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
 
   const quickActionAmounts = useMemo(() => {
     let baseAmounts: number[] = [1000, 10000, 100000, 5000];
-    if (listingType === "car") baseAmounts = [1000, 10000, 100000, 5000];
+    // 0-ust 1-orta 2-alt 3-mobil
+    if (listingType === "car") baseAmounts = [1000, 10000, 100000, 100000];
     if (listingType === "letgo") baseAmounts = [500, 1000, 10000, 500];
 
     return baseAmounts.map((amount) => ({
@@ -225,58 +226,6 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                   }%, #e5e7eb 100%)`,
                 }}
               />
-              <style>
-                {`
-                  #price-range {
-                    touch-action: none;
-                    -webkit-tap-highlight-color: transparent;
-                    position: relative;
-                  }
-
-                  #price-range::-webkit-slider-runnable-track {
-                    height: 100%;
-                    cursor: pointer;
-                  }
-
-                  #price-range::-moz-range-track {
-                    height: 100%;
-                    cursor: pointer;
-                  }
-
-                  #price-range::-webkit-slider-thumb {
-                    -webkit-appearance: none;
-                    appearance: none;
-                    width: 24px;
-                    height: 48px;
-                    background-color: #0f172a;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                    border: 2px solid #facc15;
-                    touch-action: none;
-                    margin-top: -18px;
-                  }
-                  #price-range::-moz-range-thumb {
-                    width: 24px;
-                    height: 48px;
-                    background-color: #0f172a;
-                    border-radius: 6px;
-                    cursor: pointer;
-                    border: 2px solid #facc15;
-                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-                    touch-action: none;
-                    margin-top: -18px;
-                  }
-                  #price-range:active::-webkit-slider-thumb {
-                    width: 32px;
-                    background-color: #1e293b;
-                  }
-                  #price-range:active::-moz-range-thumb {
-                    width: 32px;
-                    background-color: #1e293b;
-                  }
-                `}
-              </style>
               <div className="flex justify-between text-xs text-gray-500 mt-2">
                 <span>₺{formatNumber(minPrice.toString())}</span>
                 <span>₺{formatNumber(maxPrice.toString())}</span>
