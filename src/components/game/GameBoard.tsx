@@ -23,12 +23,12 @@ import {
   HouseForRentListingDetails,
   LetgoListingDetails,
 } from "../../types/socket";
-import { Chat } from "../Chat";
 import { GuessStatus } from "../GuessStatus";
 import { PlayersList } from "../PlayersList";
 import { Popover } from "../Popover";
 import { PriceInput } from "../PriceInput";
 import { RoundResults } from "../RoundResults";
+import { Chat } from "../Chat";
 
 export const GameBoard: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
