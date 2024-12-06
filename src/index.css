@@ -64,7 +64,6 @@
   animation: shine 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-
 #price-range::-webkit-slider-thumb {
   width: 20px; /* Tutamacın genişliği */
   height: 20px; /* Tutamacın yüksekliği */
@@ -81,4 +80,44 @@
   background: #facc15;
   border-radius: 50%;
   cursor: pointer;
+}
+
+/* Hide scrollbars for Chrome, Safari and Opera */
+*::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Hide scrollbars for IE, Edge and Firefox */
+* {
+  -ms-overflow-style: none !important; /* IE and Edge */
+  scrollbar-width: none !important; /* Firefox */
+}
+
+/* Ensure scroll functionality is preserved */
+* {
+  -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
+  overflow-y: auto !important; /* Enable vertical scrolling */
+  overflow-x: auto !important; /* Enable horizontal scrolling */
+}
+
+/* Optional: Maintain scroll behavior for specific cases */
+.force-scrollbar {
+  -ms-overflow-style: auto !important;
+  scrollbar-width: auto !important;
+}
+
+/* Ensure scroll functionality on all scrollable elements */
+html,
+body,
+div,
+textarea,
+input,
+select,
+button,
+iframe,
+pre,
+code,
+.scrollable {
+  overflow-y: auto !important;
+  overflow-x: auto !important;
 }
