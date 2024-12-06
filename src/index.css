@@ -121,3 +121,45 @@ code,
   overflow-y: auto !important;
   overflow-x: auto !important;
 }
+
+/* Base scrollbar hiding utility class */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Only hide scrollbars on specific containers */
+.chat-container,
+.messages-container,
+.game-container {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+
+.chat-container::-webkit-scrollbar,
+.messages-container::-webkit-scrollbar,
+.game-container::-webkit-scrollbar {
+  display: none;
+}
+
+/* Preserve scrolling functionality */
+.scroll-enabled {
+  overflow: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Force show scrollbar when needed */
+.force-scrollbar {
+  -ms-overflow-style: auto !important;
+  scrollbar-width: auto !important;
+}
+
+.force-scrollbar::-webkit-scrollbar {
+  display: initial !important;
+}

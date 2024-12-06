@@ -401,7 +401,7 @@ const ChatInput: React.FC<{
   return (
     <div className="relative">
       {showEmojiPicker && (
-        <div className="absolute bottom-full right-0 mb-2">
+        <div className="absolute bottom-full right-0 mb-2 scroll-enabled">
           <Picker data={data} onEmojiSelect={handleEmojiSelect} />
         </div>
       )}
@@ -555,7 +555,7 @@ const OnlinePlayersList: React.FC<{
             <X className="w-5 h-5" />
           </button>
         </div>
-        <div className="p-2 max-h-[60vh] overflow-y-auto no-scrollbar">
+        <div className="p-2 max-h-[60vh] overflow-y-auto scroll-enabled">
           {players.map((player) => (
             <div
               key={player.username}
