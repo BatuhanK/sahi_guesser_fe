@@ -60,27 +60,11 @@ const shouldShowTimestamp = (messages: ChatMessage[], index: number) => {
 };
 
 const maskNumbers = (text: string): string => {
-  // Turkish number words (case-insensitive)
-  const turkishNumbers =
-    /\b(bir|iki|üç|uc|dort|dört|bes|beş|alti|altı|yedi|sekiz|dokuz)\b/gi;
-
-  // First replace Turkish number words
-  let maskedText = text.replace(turkishNumbers, (match) =>
-    "*".repeat(match.length)
+  // Replace any number (including those with k/K suffix, e/E prefix, and Turkish number words) with a single *
+  return text.replace(
+    /\b(\d+[kK]?|[eE]\d+|bir|iki|üç|uc|dort|dört|bes|beş|alti|altı|yedi|sekiz|dokuz|on|yirmi|otuz|kırk|kirk|elli|altmış|altmis|yetmiş|yetmis|seksen|doksan|yüz|yuz|bin|milyon|milyar)\b/gi,
+    "*"
   );
-
-  // Then replace numbers with k/K suffix (e.g., 300k, 500K)
-  maskedText = maskedText.replace(/\b\d+[kK]\b/g, (match) =>
-    "*".repeat(match.length)
-  );
-
-  // Replace numbers with e/E prefix (e.g., e250, E3500)
-  maskedText = maskedText.replace(/\b[eE]\d+\b/g, (match) =>
-    "*".repeat(match.length)
-  );
-
-  // Finally replace regular numbers
-  return maskedText.replace(/\b\d+\b/g, (match) => "*".repeat(match.length));
 };
 
 const renderMessageWithMentions = (
