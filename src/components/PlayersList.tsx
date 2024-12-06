@@ -87,8 +87,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                 key={player.playerId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                layout
+                exit={{ opacity: 0, y: 20 }}
                 className="flex items-center justify-between bg-green-50 p-2 rounded-lg hover:bg-green-100 transition-colors mb-2"
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -109,8 +108,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                 key={player.playerId}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                layout
+                exit={{ opacity: 0, y: 20 }}
                 className="flex items-center justify-between bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors mb-2"
               >
                 <span className="font-medium truncate flex-1 min-w-0">
@@ -146,8 +144,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                   key={guessId}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, x: -20 }}
-                  layout
+                  exit={{ opacity: 0, y: 20 }}
                   onAnimationComplete={() => {
                     setAnimatingGuesses((prev) => {
                       const newSet = new Set(prev);
@@ -172,7 +169,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                     animate={
                       guess.isCorrect && animatingGuesses.has(guessId)
                         ? {
-                            x: [0, -10, 10, -10, 10, 0],
+                            scale: [1, 1.05, 1],
                             transition: { duration: 0.5, delay: 0.3 },
                           }
                         : {}

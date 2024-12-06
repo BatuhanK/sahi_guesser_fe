@@ -423,8 +423,8 @@ export const GameBoard: React.FC = () => {
                               className={`${
                                 shake ? "animate-shake" : ""
                               } w-full flex justify-center`}
-                              initial={{ scale: 0.8, opacity: 0 }}
-                              animate={{ scale: 1, opacity: 1 }}
+                              initial={{ opacity: 0, y: -10 }}
+                              animate={{ opacity: 1, y: 0 }}
                               transition={{
                                 type: "spring",
                                 stiffness: 200,
