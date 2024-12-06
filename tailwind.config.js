@@ -23,6 +23,14 @@ export default {
           "50%": { opacity: "0.7" },
           "100%": { opacity: "1" },
         },
+        "sound-wave": {
+          "0%, 100%": {
+            height: "0.75rem",
+          },
+          "50%": {
+            height: "0.25rem",
+          },
+        },
       },
       animation: {
         shake: "shake 0.5s cubic-bezier(.36,.07,.19,.97) both",
@@ -30,8 +38,14 @@ export default {
         "pulse-subtle": "pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "pulse-once": "pulse-once 1s ease-in-out",
         "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+        "sound-wave": "sound-wave 1s ease-in-out infinite",
       },
     },
   },
   plugins: [require("tailwindcss-animate"), require("tailwind-scrollbar")],
+  variants: {
+    extend: {
+      animation: ["responsive", "motion-safe", "motion-reduce"],
+    },
+  },
 };

@@ -499,7 +499,25 @@ interface RemoteParticipantState {
   identity: string;
   audioTrack: RemoteTrack | null;
   isMuted: boolean;
+  isSpeaking: boolean;
 }
+
+const SpeakingIndicator: React.FC = () => (
+  <div className="flex gap-1">
+    {[...Array(3)].map((_, i) => (
+      <div
+        key={i}
+        className={cn(
+          "w-1 h-3 bg-green-500 rounded-full",
+          "animate-sound-wave",
+          i === 0 && "animation-delay-0",
+          i === 1 && "animation-delay-150",
+          i === 2 && "animation-delay-300"
+        )}
+      />
+    ))}
+  </div>
+);
 
 const ParticipantsList: React.FC<{
   remoteParticipants: Map<string, RemoteParticipantState>;
@@ -514,7 +532,10 @@ const ParticipantsList: React.FC<{
           key={participant.identity}
           className="flex items-center justify-between text-sm"
         >
-          <span className="text-gray-700">{participant.identity}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-gray-700">{participant.identity}</span>
+            {participant.isSpeaking && <SpeakingIndicator />}
+          </div>
           <button
             onClick={() => onToggleMute(participant.identity)}
             className={cn(
@@ -829,12 +850,58 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
             audioElement.srcObject = mediaStream;
             audioElement.play().catch(console.error);
 
-            // For iOS, try playing again after a short delay
-            if (isIOS) {
-              setTimeout(() => {
-                audioElement.play().catch(console.error);
-              }, 1000);
-            }
+            // Set up audio level monitoring
+            const audioContext = new AudioContext();
+            const source = audioContext.createMediaStreamSource(mediaStream);
+            const analyser = audioContext.createAnalyser();
+            analyser.fftSize = 256;
+            source.connect(analyser);
+
+            const dataArray = new Uint8Array(analyser.frequencyBinCount);
+            let speakingTimeout: NodeJS.Timeout;
+
+            const checkAudioLevel = () => {
+              analyser.getByteFrequencyData(dataArray);
+              const average =
+                dataArray.reduce((a, b) => a + b) / dataArray.length;
+
+              setRemoteParticipants((prev) => {
+                const updated = new Map(prev);
+                const participantIdentity = participant.identity;
+                const currentParticipant = updated.get(participantIdentity);
+                if (currentParticipant) {
+                  const isSpeaking = average > 30;
+                  if (isSpeaking !== currentParticipant.isSpeaking) {
+                    clearTimeout(speakingTimeout);
+                    if (isSpeaking) {
+                      speakingTimeout = setTimeout(() => {
+                        setRemoteParticipants((prev) => {
+                          const updated = new Map(prev);
+                          const currentParticipant =
+                            updated.get(participantIdentity);
+                          if (currentParticipant) {
+                            updated.set(participantIdentity, {
+                              ...currentParticipant,
+                              isSpeaking: false,
+                            });
+                          }
+                          return updated;
+                        });
+                      }, 500);
+                    }
+                    updated.set(participantIdentity, {
+                      ...currentParticipant,
+                      isSpeaking,
+                    });
+                  }
+                }
+                return updated;
+              });
+
+              requestAnimationFrame(checkAudioLevel);
+            };
+
+            checkAudioLevel();
 
             setRemoteParticipants((prev) => {
               const updated = new Map(prev);
@@ -842,6 +909,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                 identity: participant.identity,
                 audioTrack: track,
                 isMuted: false,
+                isSpeaking: false,
               });
               return updated;
             });
