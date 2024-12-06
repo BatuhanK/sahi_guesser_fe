@@ -50,7 +50,7 @@ export const GameBoard: React.FC = () => {
     room,
     guessCount,
   } = useGameStore();
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   // Auto slideshow effect with reset capability
   useEffect(() => {
@@ -227,6 +227,16 @@ export const GameBoard: React.FC = () => {
   const handleSendMessage = useCallback(
     (message: string): void => {
       if (!isAuthenticated || !roomId) return;
+
+      try {
+        window.sa_event("chat_message", {
+          user_id: user?.id,
+          room_id: roomId,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+
       socketService.sendMessage(roomId, message);
     },
     [isAuthenticated, roomId]

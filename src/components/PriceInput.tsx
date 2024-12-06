@@ -7,6 +7,7 @@ import React, {
   useState,
 } from "react";
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { useAuthStore } from "../store/authStore";
 
 interface PriceInputProps {
   onGuess: (guess: number) => void;
@@ -24,6 +25,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   const [value, setValue] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
   const isMobile = useMediaQuery("(max-width: 768px)");
+  const user = useAuthStore((state) => state.user);
+
   let minPrice = 0;
   if (listingType === "car") minPrice = 500000;
   if (listingType === "letgo") minPrice = 500;
@@ -42,6 +45,13 @@ export const PriceInput: React.FC<PriceInputProps> = ({
     e.preventDefault();
     const numericValue = parseFloat(value.replace(/[^0-9]/g, ""));
     if (!isNaN(numericValue)) {
+      try {
+        window.sa_event("price_guess", {
+          user_id: user?.id,
+        });
+      } catch (e) {
+        console.error(e);
+      }
       onGuess(numericValue);
     }
   };

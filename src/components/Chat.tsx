@@ -770,6 +770,15 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         return;
       }
 
+      try {
+        window.sa_event("audio_chat_connect", {
+          user_id: user?.id,
+          room_id: roomId,
+        });
+      } catch (e) {
+        console.error(e);
+      }
+
       // Initialize iOS audio before connecting
       if (isIOS) {
         initializeIOSAudio();
