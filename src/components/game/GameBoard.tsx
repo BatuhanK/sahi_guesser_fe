@@ -84,10 +84,15 @@ export const GameBoard: React.FC = () => {
     };
   }, [currentListing]);
 
-  // Reset image index when listing changes
+  // Combine both effects into one that handles initial random index and listing changes
   useEffect(() => {
-    setCurrentImageIndex(0);
-  }, [currentListing?.id]);
+    if (!currentListing?.details.imageUrls.length) return;
+
+    // Set to random index when listing changes or initially loads
+    setCurrentImageIndex(
+      Math.floor(Math.random() * currentListing.details.imageUrls.length)
+    );
+  }, [currentListing?.id, currentListing?.details.imageUrls.length]);
 
   useEffect(() => {
     if (feedback === "correct") {
