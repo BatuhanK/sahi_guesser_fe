@@ -29,6 +29,7 @@ export default {
         highlight: "highlight 2s ease-in-out 1",
         "pulse-subtle": "pulse-subtle 2s cubic-bezier(0.4, 0, 0.6, 1) infinite",
         "pulse-once": "pulse-once 1s ease-in-out",
+        "pulse-slow": "pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite",
       },
     },
   },

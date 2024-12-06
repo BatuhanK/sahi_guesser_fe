@@ -124,6 +124,7 @@ const ChatMessage: React.FC<{
   const isMentioned = message.mentions?.some(
     (mention) => mention.username === currentUsername
   );
+  const isAdmin = message.username === "batuhan";
 
   return (
     <div
@@ -138,7 +139,11 @@ const ChatMessage: React.FC<{
           <span
             className={cn(
               "font-medium text-sm cursor-pointer",
-              isOwn ? "text-yellow-600" : "text-gray-700",
+              isAdmin
+                ? "text-red-600 font-bold"
+                : isOwn
+                ? "text-yellow-600"
+                : "text-gray-700",
               "opacity-80 hover:opacity-100 transition-opacity",
               !isOwn && "group-hover:underline"
             )}
@@ -146,7 +151,7 @@ const ChatMessage: React.FC<{
             role="button"
             tabIndex={0}
           >
-            {message.username}
+            {isAdmin ? `${message.username} 👑` : message.username}
           </span>
           <span className="text-xs text-gray-500">
             {formatDistanceToNow(message.timestamp, {
@@ -159,14 +164,16 @@ const ChatMessage: React.FC<{
       <div
         className={cn(
           "max-w-[80%] rounded-2xl px-4 py-2 shadow-sm transition-colors",
-          isOwn
+          isAdmin
+            ? "bg-gradient-to-r from-red-500 via-yellow-500 to-red-500 text-white rounded-tr-none animate-pulse-slow"
+            : isOwn
             ? "bg-yellow-400 text-white rounded-tr-none"
             : isMentioned
             ? "bg-yellow-50 text-gray-800 rounded-tl-none border-2 border-yellow-200 animate-pulse-subtle"
             : "bg-gray-100 text-gray-800 rounded-tl-none"
         )}
       >
-        <p className="break-words text-sm">
+        <p className={cn("break-words text-sm", isAdmin && "font-medium")}>
           {renderMessageWithMentions(
             message.message,
             message.mentions,
