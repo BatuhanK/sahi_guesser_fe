@@ -262,7 +262,7 @@ export const GameBoard: React.FC = () => {
         {/* Sol Taraf - Oyuncu Listesi */}
         <div className="hidden xl:block xl:col-span-3 order-2 xl:order-1">
           <div className="xl:sticky xl:top-6">
-            <div className="bg-white rounded-xl shadow-lg overflow-auto h-[calc(100vh-15rem)]">
+            <div className="bg-white rounded-xl shadow-lg overflow-auto h-[calc(100vh-15rem)] scrollbar-hide">
               <PlayersList
                 onlinePlayers={onlinePlayers}
                 lastGuesses={lastGuesses}

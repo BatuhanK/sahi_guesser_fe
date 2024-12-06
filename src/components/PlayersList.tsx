@@ -69,19 +69,17 @@ export const PlayersList: React.FC<PlayersListProps> = ({
   return (
     <div className="flex flex-col h-full">
       {/* Çevrimiçi Oyuncular Bölümü - 50% */}
-      <div className="h-1/2 border-b border-gray-200">
+      <div className="h-1/2 border-b border-gray-200 ">
         <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white p-3">
           <div className="flex items-center gap-1.5 lg:gap-2">
             <Users size={18} className="text-blue-500 lg:w-5 lg:h-5" />
-            <h3 className="text-base lg:text-lg font-semibold">
-              Çevrimiçi
-            </h3>
+            <h3 className="text-base lg:text-lg font-semibold">Çevrimiçi</h3>
           </div>
           <span className="text-xs lg:text-sm px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
             {onlinePlayers.length}
           </span>
         </div>
-        <div className="overflow-y-auto h-[calc(100%-48px)] p-3">
+        <div className="overflow-y-auto h-[calc(100%-48px)] p-3 scrollbar-hide">
           <AnimatePresence mode="popLayout">
             {/* Correct guesses group */}
             {groupedPlayers.correct.map((player) => (
@@ -95,7 +93,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
                   <Check size={16} className="text-green-600 shrink-0" />
-                  <span className="font-medium truncate">{player.username}</span>
+                  <span className="font-medium truncate">
+                    {player.username}
+                  </span>
                 </div>
                 <span className="text-sm px-2 py-1 bg-green-100 text-green-700 rounded-full shrink-0 ml-2">
                   {player.roomScore} puan
@@ -113,7 +113,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                 layout
                 className="flex items-center justify-between bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors mb-2"
               >
-                <span className="font-medium truncate flex-1 min-w-0">{player.username}</span>
+                <span className="font-medium truncate flex-1 min-w-0">
+                  {player.username}
+                </span>
                 <span className="text-sm px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full shrink-0 ml-2">
                   {player.roomScore} puan
                 </span>
@@ -133,7 +135,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             </h3>
           </div>
         </div>
-        <div className="overflow-y-auto h-[calc(100%-48px)] p-3">
+        <div className="overflow-y-auto h-[calc(100%-48px)] p-3 scrollbar-hide">
           <AnimatePresence mode="popLayout">
             {lastGuesses?.map((guess, index) => {
               const guessId =
@@ -182,7 +184,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                         : "bg-red-50 hover:bg-red-100"
                     )}
                   >
-                    <span className="font-medium truncate flex-1 mr-2">{guess.username}</span>
+                    <span className="font-medium truncate flex-1 mr-2">
+                      {guess.username}
+                    </span>
                     <span
                       className={cn(
                         "text-sm px-2 py-1 rounded-full shrink-0",
