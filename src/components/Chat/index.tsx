@@ -14,13 +14,14 @@ import { cn } from "../../lib/utils";
 
 export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   const { user } = useAuth();
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const messageContainer = useRef<HTMLDivElement>(null);
   const mentionHandlerRef = useRef<(username: string) => void>();
   const onlinePlayers = useGameStore((state) => state.onlinePlayers);
   const roomId = useGameStore((state) => state.roomId);
   const [isMinimized, setIsMinimized] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const [isVoiceControlsMinimized, setIsVoiceControlsMinimized] = useState(false);
+  const lastScrollPosition = useRef<number>(0);
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
@@ -48,30 +49,51 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
     mentionHandlerRef.current?.(username);
   }, []);
 
-  const scrollToBottom = useCallback(() => {
-    requestAnimationFrame(() => {
-      const chatContainer = messagesEndRef.current?.parentElement;
-      if (chatContainer) {
-        chatContainer.scrollTop = chatContainer.scrollHeight;
-      }
-    });
-  }, []);
+
 
   useEffect(() => {
     if (isMinimized) {
       setUnreadCount(prev => prev + 1);
     } else {
       setUnreadCount(0);
-      scrollToBottom();
     }
-  }, [messages, isMinimized, scrollToBottom]);
+  }, [messages, isMinimized]);
 
   useEffect(() => {
-    if (!isMinimized) {
-      setUnreadCount(0);
-      scrollToBottom();
+    if (isMinimized && messageContainer.current) {
+      lastScrollPosition.current = messageContainer.current.scrollTop;
     }
-  }, [isMinimized, scrollToBottom]);
+  }, [isMinimized]);
+
+  useEffect(() => {
+    if (!isMinimized && messageContainer.current) {
+      if (lastScrollPosition.current) {
+        messageContainer.current.scrollTop = lastScrollPosition.current;
+      } else {
+        messageContainer.current.scrollTop = messageContainer.current.scrollHeight;
+      }
+    }
+  }, [isMinimized]);
+
+  useEffect(() => {
+    if (!isMinimized && messageContainer.current) {
+      const container = messageContainer.current;
+      const previousHeight = container.scrollHeight;
+      
+      requestAnimationFrame(() => {
+        const newHeight = container.scrollHeight;
+        const heightDifference = newHeight - previousHeight;
+        
+        const isNearBottom = container.scrollHeight - container.clientHeight <= container.scrollTop + 100;
+        
+        if (!isNearBottom) {
+          container.scrollTop += heightDifference;
+        } else {
+          container.scrollTop = container.scrollHeight;
+        }
+      });
+    }
+  }, [messages, isMinimized]);
 
   return (
     <div className={cn(
@@ -117,7 +139,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
 
         {!isMinimized && (
           <>
-            <div className="flex-1 overflow-y-auto no-scrollbar p-4">
+            <div className="flex-1 overflow-y-auto no-scrollbar p-4" ref={messageContainer}>
               {messages?.map((msg, index) => (
                 <ChatMessage
                   key={msg.id}
@@ -128,7 +150,6 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                   onMentionClick={handleMentionClick}
                 />
               ))}
-              <div ref={messagesEndRef} />
             </div>
             <div className="border-t border-gray-100">
               <div className="px-4 py-2 bg-gray-50/80">
