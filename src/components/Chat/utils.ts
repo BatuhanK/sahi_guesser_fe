@@ -19,12 +19,12 @@ export const shouldShowTimestamp = (messages: ChatMessage[], index: number) => {
 export const maskNumbers = (text: string): string => {
   // First replace numeric values (including k, m, b suffixes and underscores)
   const masked = text.replace(/\d+[kKmMbB_]?\d*/g, "*");
-
-  // Then replace Turkish number words
-  return masked.replace(
+  masked.replace(
     /(bir|üç|dort|dört|beş|alti|altı|yedi|sekiz|dokuz|yirmi|otuz|kırk|kirk|elli|altmış|altmis|yetmiş|yetmis|seksen|doksan|milyon|milyar)/gi,
     "*"
   );
+  // Then replace Turkish number words
+  return text;
 };
 
 export const EMOJI_MAP: Record<string, string> = {

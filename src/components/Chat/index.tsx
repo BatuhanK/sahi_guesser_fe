@@ -22,6 +22,11 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [isVoiceControlsMinimized, setIsVoiceControlsMinimized] = useState(false);
 
+  useEffect(() => {
+    const isMobile = window.innerWidth < 768;
+    setIsMinimized(isMobile);
+  }, []);
+
   const {
     audioState,
     remoteParticipants,
@@ -70,10 +75,10 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
 
   return (
     <div className={cn(
-      "fixed bottom-0 right-4 z-50 bg-white rounded-t-xl shadow-xl border border-gray-200",
+      "fixed bottom-0 left-1/2 -translate-x-1/2 z-50 bg-white rounded-t-xl shadow-xl border border-gray-200",
       "transition-all duration-300 ease-in-out",
-      isMinimized ? "h-[52px]" : "h-[calc(100vh-6rem)]",
-      "w-[360px] max-w-[calc(100vw-2rem)]"
+      isMinimized ? "h-[52px]" : "h-[calc(100vh-4rem)]",
+      "w-[360px] md:w-[360px] max-w-[95vw]"
     )}>
       <div className="flex flex-col h-full">
         <div className="flex items-center justify-between px-4 py-2.5 border-b border-gray-100">
