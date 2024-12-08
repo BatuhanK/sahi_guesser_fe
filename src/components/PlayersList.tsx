@@ -67,15 +67,20 @@ export const PlayersList: React.FC<PlayersListProps> = ({
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[var(--bg-secondary)] rounded-lg">
       {/* Çevrimiçi Oyuncular Bölümü - 50% */}
-      <div className="h-1/2 border-b border-gray-200 ">
-        <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white p-3">
+      <div className="h-1/2 border-b border-[var(--border-color)]">
+        <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2 sticky top-0 bg-[var(--bg-secondary)] p-3">
           <div className="flex items-center gap-1.5 lg:gap-2">
-            <Users size={18} className="text-blue-500 lg:w-5 lg:h-5" />
-            <h3 className="text-base lg:text-lg font-semibold">Çevrimiçi</h3>
+            <Users
+              size={18}
+              className="text-[var(--accent-color)] lg:w-5 lg:h-5"
+            />
+            <h3 className="text-base lg:text-lg font-semibold text-[var(--text-primary)]">
+              Çevrimiçi
+            </h3>
           </div>
-          <span className="text-xs lg:text-sm px-2 py-1 bg-blue-100 text-blue-700 rounded-full">
+          <span className="text-xs lg:text-sm px-2 py-1 bg-[var(--accent-muted)] text-[var(--accent-color)] rounded-full">
             {onlinePlayers.length}
           </span>
         </div>
@@ -88,15 +93,18 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="flex items-center justify-between bg-green-50 p-2 rounded-lg hover:bg-green-100 transition-colors mb-2"
+                className="flex items-center justify-between bg-[var(--success-muted)] p-2 rounded-lg hover:bg-[var(--success-hover)] transition-colors mb-2"
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <Check size={16} className="text-green-600 shrink-0" />
-                  <span className="font-medium truncate">
+                  <Check
+                    size={16}
+                    className="text-[var(--success-text)] shrink-0"
+                  />
+                  <span className="font-medium truncate text-[var(--text-primary)]">
                     {player.username}
                   </span>
                 </div>
-                <span className="text-sm px-2 py-1 bg-green-100 text-green-700 rounded-full shrink-0 ml-2">
+                <span className="text-sm px-2 py-1 bg-[var(--success-bg)] text-[var(--success-text)] rounded-full shrink-0 ml-2">
                   {player.roomScore} puan
                 </span>
               </motion.div>
@@ -109,12 +117,12 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: 20 }}
-                className="flex items-center justify-between bg-gray-50 p-2 rounded-lg hover:bg-gray-100 transition-colors mb-2"
+                className="flex items-center justify-between bg-[var(--bg-tertiary)] p-2 rounded-lg hover:bg-[var(--hover-color)] transition-colors mb-2"
               >
-                <span className="font-medium truncate flex-1 min-w-0">
+                <span className="font-medium truncate flex-1 min-w-0 text-[var(--text-primary)]">
                   {player.username}
                 </span>
-                <span className="text-sm px-2 py-1 bg-yellow-100 text-yellow-700 rounded-full shrink-0 ml-2">
+                <span className="text-sm px-2 py-1 bg-[var(--accent-muted)] text-[var(--accent-color)] rounded-full shrink-0 ml-2">
                   {player.roomScore} puan
                 </span>
               </motion.div>
@@ -125,10 +133,13 @@ export const PlayersList: React.FC<PlayersListProps> = ({
 
       {/* Son Tahminler Bölümü - 50% */}
       <div className="h-1/2">
-        <div className="flex items-center justify-between border-b pb-2 sticky top-0 bg-white p-3">
+        <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2 sticky top-0 bg-[var(--bg-secondary)] p-3">
           <div className="flex items-center gap-1.5 lg:gap-2">
-            <Trophy size={18} className="text-yellow-500 lg:w-5 lg:h-5" />
-            <h3 className="text-base lg:text-lg font-semibold">
+            <Trophy
+              size={18}
+              className="text-[var(--warning-text)] lg:w-5 lg:h-5"
+            />
+            <h3 className="text-base lg:text-lg font-semibold text-[var(--text-primary)]">
               Son Tahminler
             </h3>
           </div>
@@ -177,19 +188,19 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                     className={cn(
                       "flex items-center justify-between p-3 rounded-lg transition-colors",
                       guess.isCorrect
-                        ? "bg-green-50 hover:bg-green-100"
-                        : "bg-red-50 hover:bg-red-100"
+                        ? "bg-[var(--success-muted)] hover:bg-[var(--success-hover)]"
+                        : "bg-[var(--error-muted)] hover:bg-[var(--error-hover)]"
                     )}
                   >
-                    <span className="font-medium truncate flex-1 mr-2">
+                    <span className="font-medium truncate flex-1 mr-2 text-[var(--text-primary)]">
                       {guess.username}
                     </span>
                     <span
                       className={cn(
                         "text-sm px-2 py-1 rounded-full shrink-0",
                         guess.isCorrect
-                          ? "bg-green-100 text-green-700"
-                          : "bg-red-100 text-red-700"
+                          ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                          : "bg-[var(--error-bg)] text-[var(--error-text)]"
                       )}
                     >
                       {guess.isCorrect ? "Doğru Tahmin" : "Yanlış Tahmin"}

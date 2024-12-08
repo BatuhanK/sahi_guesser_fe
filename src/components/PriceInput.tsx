@@ -127,10 +127,10 @@ export const PriceInput: React.FC<PriceInputProps> = ({
           className={`flex items-center justify-center gap-1 px-3 lg:px-3 py-2.5 lg:py-2 rounded-lg text-xs lg:text-sm font-medium transition-all min-w-[70px] lg:min-w-auto
             ${
               disabled
-                ? "bg-gray-100 text-gray-400"
+                ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
                 : isAddition
-                ? "bg-green-100 text-green-700 hover:bg-green-200 active:scale-95"
-                : "bg-red-100 text-red-700 hover:bg-red-200 active:scale-95"
+                ? "bg-[var(--success-bg)] text-[var(--success-text)] hover:bg-[var(--success-bg)]/80 active:scale-95"
+                : "bg-[var(--error-bg)] text-[var(--error-text)] hover:bg-[var(--error-bg)]/80 active:scale-95"
             }`}
         >
           {isAddition ? (
@@ -170,7 +170,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         <form onSubmit={handleSubmit} className="flex-1">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 flex items-center pl-4 lg:pl-4 pointer-events-none">
-              <span className="text-gray-500 text-base lg:text-lg font-medium">
+              <span className="text-[var(--text-secondary)] text-base lg:text-lg font-medium">
                 ₺
               </span>
             </div>
@@ -179,10 +179,14 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               type="text"
               value={value}
               onChange={handleInputChange}
-              className={`w-full pl-10 lg:pl-10 pr-20 lg:pr-20 py-4 lg:py-4 text-lg lg:text-xl bg-white border-2 
-                ${disabled ? "border-gray-200 bg-gray-50" : "border-yellow-400"}
-                rounded-xl focus:outline-none focus:border-yellow-500 transition-colors
-                font-medium placeholder:text-gray-400`}
+              className={`w-full pl-10 lg:pl-10 pr-20 lg:pr-20 py-4 lg:py-4 text-lg lg:text-xl bg-[var(--bg-secondary)] border-2 
+                ${
+                  disabled
+                    ? "border-[var(--border-color)] bg-[var(--bg-tertiary)]"
+                    : "border-[var(--accent-color)]"
+                }
+                rounded-xl focus:outline-none focus:border-[var(--accent-hover)] transition-colors
+                font-medium text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]`}
               placeholder="Tahmin et..."
               disabled={disabled}
             />
@@ -192,10 +196,10 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               className={`absolute right-2 top-1/2 -translate-y-1/2 
                 ${
                   disabled || !value
-                    ? "bg-gray-300"
-                    : "bg-yellow-400 hover:bg-yellow-500 active:scale-95"
+                    ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
+                    : "bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] active:scale-95 text-white"
                 }
-                text-white p-3 lg:p-2 rounded-lg transition-all touch-manipulation`}
+                p-3 lg:p-2 rounded-lg transition-all touch-manipulation`}
             >
               <ArrowRight size={24} className="lg:w-6 lg:h-6" />
             </button>
@@ -210,23 +214,23 @@ export const PriceInput: React.FC<PriceInputProps> = ({
                 step={listingType === "car" ? 10000 : 500}
                 value={Number(value.replace(/[^0-9]/g, ""))}
                 onChange={(e) => setValue(formatNumber(e.target.value))}
-                className="w-full h-12 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-yellow-400 mt-4"
+                className="w-full h-12 bg-[var(--bg-tertiary)] rounded-lg appearance-none cursor-pointer accent-[var(--accent-color)] mt-4"
                 style={{
                   WebkitAppearance: "none",
                   MozAppearance: "none",
                   appearance: "none",
-                  background: `linear-gradient(to right, #facc15 0%, #facc15 ${
+                  background: `linear-gradient(to right, var(--accent-color) 0%, var(--accent-color) ${
                     ((Number(value.replace(/[^0-9]/g, "")) - minPrice) /
                       (maxPrice - minPrice)) *
                     100
-                  }%, #e5e7eb ${
+                  }%, var(--bg-tertiary) ${
                     ((Number(value.replace(/[^0-9]/g, "")) - minPrice) /
                       (maxPrice - minPrice)) *
                     100
-                  }%, #e5e7eb 100%)`,
+                  }%, var(--bg-tertiary) 100%)`,
                 }}
               />
-              <div className="flex justify-between text-xs text-gray-500 mt-2">
+              <div className="flex justify-between text-xs text-[var(--text-secondary)] mt-2">
                 <span>₺{formatNumber(minPrice.toString())}</span>
                 <span>₺{formatNumber(maxPrice.toString())}</span>
               </div>

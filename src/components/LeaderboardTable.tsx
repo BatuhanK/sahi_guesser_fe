@@ -31,26 +31,31 @@ export function LeaderboardTable() {
   const getRankIcon = (index: number) => {
     switch (index) {
       case 0:
-        return <Crown className="text-yellow-400" size={20} />;
+        return <Crown className="text-[var(--accent-color)]" size={20} />;
       case 1:
-        return <Medal className="text-gray-400" size={20} />;
+        return <Medal className="text-[var(--text-tertiary)]" size={20} />;
       case 2:
-        return <Medal className="text-amber-600" size={20} />;
+        return <Medal className="text-[var(--warning-text)]" size={20} />;
       default:
-        return <Trophy className="text-gray-400 opacity-50" size={20} />;
+        return (
+          <Trophy
+            className="text-[var(--text-tertiary)] opacity-50"
+            size={20}
+          />
+        );
     }
   };
 
   const getRowStyle = (index: number): string => {
     switch (index) {
       case 0:
-        return "bg-yellow-50 border-2 border-yellow-400";
+        return "bg-[var(--warning-bg)] border-2 border-[var(--accent-color)]";
       case 1:
-        return "bg-gray-50 border-2 border-gray-400";
+        return "bg-[var(--bg-tertiary)] border-2 border-[var(--text-tertiary)]";
       case 2:
-        return "bg-amber-50 border-2 border-amber-600";
+        return "bg-[var(--warning-bg)] border-2 border-[var(--warning-text)]";
       default:
-        return "bg-white border border-gray-200";
+        return "bg-[var(--bg-secondary)] border border-[var(--border-color)]";
     }
   };
 
@@ -66,7 +71,7 @@ export function LeaderboardTable() {
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-24">
-        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-gray-900"></div>
+        <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-[var(--text-primary)]"></div>
       </div>
     );
   }
@@ -74,7 +79,7 @@ export function LeaderboardTable() {
   const displayedLeaderboard = showAll ? leaderboard : leaderboard.slice(0, 5);
 
   return (
-    <div className="border-2 border-yellow-400 rounded-lg shadow-md p-4">
+    <div className="border-2 border-[var(--accent-color)] rounded-lg shadow-md p-4 bg-[var(--bg-secondary)]">
       <div className="space-y-2">
         {displayedLeaderboard.map((entry, index) => (
           <div
@@ -87,13 +92,15 @@ export function LeaderboardTable() {
               <div className="w-7 flex justify-center">
                 {getRankIcon(index)}
               </div>
-              <span className="font-medium">{entry.username}</span>
+              <span className="font-medium text-[var(--text-primary)]">
+                {entry.username}
+              </span>
             </div>
             <div className="flex items-center gap-4">
-              <span className="text-xs text-gray-500 hidden sm:inline">
+              <span className="text-xs text-[var(--text-tertiary)] hidden sm:inline">
                 {getDaysAgo(entry.createdAt)}
               </span>
-              <span className="font-bold text-green-600 text-sm">
+              <span className="font-bold text-[var(--success-text)] text-sm">
                 {entry.score.toLocaleString("tr-TR")} puan
               </span>
             </div>
@@ -104,7 +111,7 @@ export function LeaderboardTable() {
       {leaderboard.length > 5 && (
         <button
           onClick={() => setShowAll(!showAll)}
-          className="w-full mt-2 flex items-center justify-center gap-1 text-sm text-gray-600 hover:text-gray-800 transition-colors"
+          className="w-full mt-2 flex items-center justify-center gap-1 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
         >
           {showAll ? (
             <>

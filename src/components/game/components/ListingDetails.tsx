@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   ArrowDown,
   Building2,
@@ -11,80 +10,114 @@ import {
   Move,
   Zap,
 } from "lucide-react";
+import React from "react";
 import {
   CarListingDetails,
   HouseForRentListingDetails,
   LetgoListingDetails,
 } from "../../../types/socket";
 
-export const CarDetails: React.FC<{ details: CarListingDetails }> = ({ details }) => (
-  <div className="flex flex-wrap gap-2 lg:gap-4 text-sm lg:text-base">
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Car className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>
-        {details.brand} {details.model}
+const DetailPill: React.FC<{
+  icon: React.ReactNode;
+  text: React.ReactNode;
+  label?: string;
+}> = ({ icon, text, label }) => (
+  <div className="inline-flex items-center shrink-0 bg-[var(--bg-primary)] px-3 py-1.5 rounded-full border border-[var(--border-color)] shadow-md whitespace-nowrap">
+    <span className="text-[var(--accent-color)] shrink-0">{icon}</span>
+    {label ? (
+      <>
+        <span className="text-[var(--text-secondary)] mr-1.5 ml-1.5 text-xs lg:text-sm">
+          {label}:
+        </span>
+        <span className="font-semibold text-[var(--text-primary)] text-xs lg:text-sm">
+          {text}
+        </span>
+      </>
+    ) : (
+      <span className="font-semibold text-[var(--text-primary)] ml-1.5 text-xs lg:text-sm">
+        {text}
       </span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Calendar className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>{details.year}</span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Zap className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>{details.mileage} km</span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Filter className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>{details.fuelType}</span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Move className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>{details.transmission}</span>
-    </div>
+    )}
   </div>
 );
 
-export const PropertyDetails: React.FC<{ details: HouseForRentListingDetails }> = ({ details }) => (
-  <div className="flex flex-wrap gap-2 lg:gap-4 text-sm lg:text-base">
-    <div className="flex items-center gap-1 lg:gap-2">
-      <MapPin className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>
-        {details.city}, {details.district}
-      </span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Home className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>{details.rooms} oda</span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Maximize className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>{details.squareMeters} m²</span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <Building2 className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>{details.buildingAge} yaşında</span>
-    </div>
-    <div className="flex items-center gap-1 lg:gap-2">
-      <ArrowDown className="h-4 w-4 lg:h-5 lg:w-5" />
-      <span>Kat: {details.floor}</span>
-    </div>
-  </div>
-);
-
-export const LetgoDetails: React.FC<{ details: LetgoListingDetails }> = ({ details }) => (
-  <div className="flex flex-wrap gap-2 lg:gap-3 text-sm lg:text-base">
-    <div className="inline-flex items-center bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full">
-      <MapPin className="h-4 w-4 lg:h-5 lg:w-5 mr-1.5" />
-      <span>{details.city}</span>
-    </div>
-    {Object.entries(details.keyValues).map(([key, value], index) => (
-      <div
-        key={`${key}-${index}`}
-        className="inline-flex items-center bg-white/20 backdrop-blur-sm px-3 py-1.5 rounded-full"
-      >
-        <span className="text-white/80 mr-1.5">{key}:</span>
-        <span className="font-medium">{value}</span>
-      </div>
+export const CarDetails: React.FC<{ details: CarListingDetails }> = ({
+  details,
+}) => (
+  <div className="flex flex-wrap gap-2 text-sm lg:text-base">
+    {[
+      {
+        icon: <Car className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `${details.brand} ${details.model}`,
+      },
+      {
+        icon: <Calendar className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `${details.year}`,
+      },
+      {
+        icon: <Zap className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `${details.mileage} km`,
+      },
+      {
+        icon: <Filter className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: details.fuelType,
+      },
+      {
+        icon: <Move className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: details.transmission,
+      },
+    ].map((item, index) => (
+      <DetailPill key={index} icon={item.icon} text={item.text} />
     ))}
   </div>
-); 
+);
+
+export const PropertyDetails: React.FC<{
+  details: HouseForRentListingDetails;
+}> = ({ details }) => (
+  <div className="flex flex-wrap gap-2 text-sm lg:text-base">
+    {[
+      {
+        icon: <MapPin className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `${details.city}, ${details.district}`,
+      },
+      {
+        icon: <Home className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `${details.rooms} oda`,
+      },
+      {
+        icon: <Maximize className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `${details.squareMeters} m²`,
+      },
+      {
+        icon: <Building2 className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `${details.buildingAge} yaşında`,
+      },
+      {
+        icon: <ArrowDown className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+        text: `Kat: ${details.floor}`,
+      },
+    ].map((item, index) => (
+      <DetailPill key={index} icon={item.icon} text={item.text} />
+    ))}
+  </div>
+);
+
+export const LetgoDetails: React.FC<{ details: LetgoListingDetails }> = ({
+  details,
+}) => (
+  <div className="flex flex-wrap gap-2 text-sm lg:text-base">
+    <DetailPill
+      icon={<MapPin className="h-3.5 w-3.5 lg:h-4 lg:w-4" />}
+      text={details.city}
+    />
+    {Object.entries(details.keyValues).map(([key, value], index) => (
+      <DetailPill
+        key={`${key}-${index}`}
+        icon={<></>}
+        text={value}
+        label={key}
+      />
+    ))}
+  </div>
+);

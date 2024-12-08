@@ -10,7 +10,9 @@ import {
   LogIn,
   LogOut,
   Menu,
+  Moon,
   ShoppingBag,
+  Sun,
   UserPlus,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -36,7 +38,7 @@ const AnimatedIcons = () => {
   React.useEffect(() => {
     const interval = setInterval(() => {
       setCurrentIcon((prev) => (prev + 1) % icons.length);
-    }, 1500); // Switch every 2 seconds
+    }, 1500); // Switch every 1.5 seconds
 
     return () => clearInterval(interval);
   }, [icons.length]);
@@ -51,7 +53,7 @@ const AnimatedIcons = () => {
         transition={{ duration: 0.3 }}
       >
         {React.createElement(icons[currentIcon].component, {
-          className: "text-yellow-100",
+          className: "text-[var(--bg-secondary)]",
           size: 32,
         })}
       </motion.div>
@@ -59,18 +61,39 @@ const AnimatedIcons = () => {
   );
 };
 
+const ThemeToggle: React.FC<{
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
+}> = React.memo(({ isDarkMode, onToggleTheme }) => (
+  <button
+    onClick={onToggleTheme}
+    className="p-2 rounded-lg transition-colors hover:bg-[var(--accent-hover)]"
+    aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
+  >
+    {isDarkMode ? (
+      <Sun className="text-[var(--bg-secondary)]" size={24} />
+    ) : (
+      <Moon className="text-[var(--bg-secondary)]" size={24} />
+    )}
+  </button>
+));
+
+ThemeToggle.displayName = "ThemeToggle";
+
 interface HeaderProps {
   onOpenAuth: (type: "login" | "register") => void;
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
 }
 
 const getAnnouncementIcon = (type: "info" | "warning" | "error") => {
   switch (type) {
     case "warning":
-      return <AlertTriangle className="text-yellow-500" size={20} />;
+      return <AlertTriangle className="text-[var(--warning-text)]" size={20} />;
     case "error":
-      return <AlertOctagon className="text-red-500" size={20} />;
+      return <AlertOctagon className="text-[var(--error-text)]" size={20} />;
     default:
-      return <Info className="text-blue-500" size={20} />;
+      return <Info className="text-[var(--info-text)]" size={20} />;
   }
 };
 
@@ -78,26 +101,30 @@ const getAnnouncementColors = (type: "info" | "warning" | "error") => {
   switch (type) {
     case "warning":
       return {
-        bg: "bg-yellow-50",
-        border: "border-yellow-200",
-        hover: "hover:bg-yellow-100",
+        bg: "bg-[var(--warning-bg)]",
+        border: "border-[var(--warning-text)]",
+        hover: "hover:bg-[var(--warning-hover)]",
       };
     case "error":
       return {
-        bg: "bg-red-50",
-        border: "border-red-200",
-        hover: "hover:bg-red-100",
+        bg: "bg-[var(--error-bg)]",
+        border: "border-[var(--error-text)]",
+        hover: "hover:bg-[var(--error-hover)]",
       };
     default:
       return {
-        bg: "bg-blue-50",
-        border: "border-blue-200",
-        hover: "hover:bg-blue-100",
+        bg: "bg-[var(--info-bg)]",
+        border: "border-[var(--info-text)]",
+        hover: "hover:bg-[var(--info-hover)]",
       };
   }
 };
 
-export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
+export const Header: React.FC<HeaderProps> = ({
+  onOpenAuth,
+  isDarkMode,
+  onToggleTheme,
+}) => {
   const { isAuthenticated, user, logout } = useAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -182,71 +209,9 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
     window.location.reload();
   };
 
-  const renderAnnouncementDropdown = () => (
-    <div className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
-      <div className="px-4 py-2 border-b border-gray-200">
-        <h3 className="font-semibold text-gray-700">Duyurular</h3>
-      </div>
-      {announcements.length > 0 ? (
-        announcements.map((announcement) => {
-          const colors = getAnnouncementColors(announcement.type);
-          const isRead = readAnnouncementIds.includes(announcement.id);
-
-          return (
-            <div
-              key={announcement.id}
-              className={`p-4 border-b last:border-b-0 ${
-                isRead ? "opacity-75" : ""
-              } ${colors.bg} ${colors.border} transition-colors`}
-            >
-              <div className="flex items-start gap-3">
-                {getAnnouncementIcon(announcement.type)}
-                <div className="flex-1">
-                  <h4 className="font-medium text-gray-900 mb-1">
-                    {announcement.title}
-                  </h4>
-                  <p className="text-sm text-gray-700 whitespace-pre-wrap">
-                    {announcement.content}
-                  </p>
-                  <div className="flex justify-between items-center mt-3">
-                    <span className="text-xs text-gray-500">
-                      {new Date(announcement.createdAt).toLocaleDateString(
-                        "tr-TR",
-                        {
-                          year: "numeric",
-                          month: "long",
-                          day: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                        }
-                      )}
-                    </span>
-                    {!isRead && (
-                      <button
-                        onClick={() => markAsRead(announcement.id)}
-                        className="text-xs text-blue-500 hover:text-blue-700 font-medium"
-                      >
-                        Okundu işaretle
-                      </button>
-                    )}
-                  </div>
-                </div>
-              </div>
-            </div>
-          );
-        })
-      ) : (
-        <div className="p-8 text-center text-gray-500">
-          <Bell className="mx-auto mb-2 text-gray-400" size={24} />
-          <p>Henüz duyuru yok</p>
-        </div>
-      )}
-    </div>
-  );
-
   return (
     <>
-      <header className="bg-yellow-400 p-4 shadow-md relative">
+      <header className="bg-[var(--accent-color)] p-4 shadow-md relative transition-colors">
         <div
           className="mx-auto flex items-center justify-between"
           style={{ maxWidth: "95rem" }}
@@ -261,7 +226,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
             <h1
               className={`${
                 isMobile ? "text-xl" : "text-2xl"
-              } font-bold text-white`}
+              } font-bold text-[var(--bg-secondary)]`}
               style={{
                 textShadow: "0 0 3px rgba(255, 255, 255, 0.3)",
               }}
@@ -277,14 +242,18 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                   <Timer timeLeft={timeLeft} />
                 </div>
               )}
+              <ThemeToggle
+                isDarkMode={isDarkMode}
+                onToggleTheme={onToggleTheme}
+              />
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="text-white"
+                className="text-[var(--bg-secondary)]"
               >
                 <Menu size={24} />
               </button>
               {showMobileMenu && (
-                <div className="absolute top-full right-0 mt-2 w-full bg-white shadow-lg rounded-b-lg p-4 z-50">
+                <div className="absolute top-full right-0 mt-2 w-full bg-[var(--bg-secondary)] shadow-lg rounded-b-lg p-4 z-50">
                   <div className="flex flex-col gap-4">
                     {user && <ScoreBoard totalScore={user.score} />}
                     {user && (
@@ -312,14 +281,14 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                       <div className="flex flex-col gap-2">
                         <button
                           onClick={() => onOpenAuth("login")}
-                          className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
+                          className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
                         >
                           <LogIn size={20} />
                           <span>Giriş</span>
                         </button>
                         <button
                           onClick={() => onOpenAuth("register")}
-                          className="flex items-center gap-2 bg-yellow-400 text-white px-4 py-2 rounded-lg"
+                          className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
                         >
                           <UserPlus size={20} />
                           <span>Kayıt</span>
@@ -329,16 +298,91 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                     <div className="relative">
                       <button
                         onClick={() => setShowAnnouncements(!showAnnouncements)}
-                        className="relative p-2 hover:bg-yellow-500 rounded transition-colors"
+                        className="relative p-2 hover:bg-[var(--accent-hover)] rounded transition-colors"
                       >
-                        <Bell className="text-white" size={24} />
+                        <Bell
+                          className="text-[var(--bg-secondary)]"
+                          size={24}
+                        />
                         {getUnreadCount() > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          <span className="absolute -top-1 -right-1 bg-[var(--error-text)] text-[var(--bg-secondary)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
                             {getUnreadCount()}
                           </span>
                         )}
                       </button>
-                      {showAnnouncements && renderAnnouncementDropdown()}
+                      {showAnnouncements && (
+                        <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
+                          <div className="px-4 py-2 border-b border-[var(--border-color)]">
+                            <h3 className="font-semibold text-[var(--text-primary)]">
+                              Duyurular
+                            </h3>
+                          </div>
+                          {announcements.length > 0 ? (
+                            announcements.map((announcement) => {
+                              const colors = getAnnouncementColors(
+                                announcement.type
+                              );
+                              const isRead = readAnnouncementIds.includes(
+                                announcement.id
+                              );
+
+                              return (
+                                <div
+                                  key={announcement.id}
+                                  className={`p-4 border-b last:border-b-0 ${
+                                    isRead ? "opacity-75" : ""
+                                  } ${colors.bg} ${
+                                    colors.border
+                                  } transition-colors`}
+                                >
+                                  <div className="flex items-start gap-3">
+                                    {getAnnouncementIcon(announcement.type)}
+                                    <div className="flex-1">
+                                      <h4 className="font-medium text-[var(--text-primary)] mb-1">
+                                        {announcement.title}
+                                      </h4>
+                                      <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">
+                                        {announcement.content}
+                                      </p>
+                                      <div className="flex justify-between items-center mt-3">
+                                        <span className="text-xs text-[var(--text-tertiary)]">
+                                          {new Date(
+                                            announcement.createdAt
+                                          ).toLocaleDateString("tr-TR", {
+                                            year: "numeric",
+                                            month: "long",
+                                            day: "numeric",
+                                            hour: "2-digit",
+                                            minute: "2-digit",
+                                          })}
+                                        </span>
+                                        {!isRead && (
+                                          <button
+                                            onClick={() =>
+                                              markAsRead(announcement.id)
+                                            }
+                                            className="text-xs text-[var(--accent-color)] hover:text-[var(--accent-hover)] font-medium"
+                                          >
+                                            Okundu işaretle
+                                          </button>
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            })
+                          ) : (
+                            <div className="p-8 text-center text-[var(--text-secondary)]">
+                              <Bell
+                                className="mx-auto mb-2 text-[var(--text-secondary)]"
+                                size={24}
+                              />
+                              <p>Henüz duyuru yok</p>
+                            </div>
+                          )}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -361,10 +405,10 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                     </span>
                   </div>
                   {showUserMenu && (
-                    <div className="absolute top-full right-0 mt-2 bg-white shadow-lg rounded-lg py-2 min-w-[200px] z-50">
+                    <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 min-w-[200px] z-50">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-gray-100 text-red-500"
+                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-primary)] text-red-500"
                       >
                         <LogOut size={20} />
                         <span>Çıkış Yap</span>
@@ -377,33 +421,105 @@ export const Header: React.FC<HeaderProps> = ({ onOpenAuth }) => {
                 <div className="flex gap-2">
                   <button
                     onClick={() => onOpenAuth("login")}
-                    className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
                   >
                     <LogIn size={20} />
                     <span>Giriş</span>
                   </button>
                   <button
                     onClick={() => onOpenAuth("register")}
-                    className="flex items-center gap-2 bg-white px-4 py-2 rounded-lg hover:bg-gray-50 transition-colors"
+                    className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
                   >
                     <UserPlus size={20} />
                     <span>Kayıt</span>
                   </button>
                 </div>
               )}
+              <ThemeToggle
+                isDarkMode={isDarkMode}
+                onToggleTheme={onToggleTheme}
+              />
               <div className="relative">
                 <button
                   onClick={() => setShowAnnouncements(!showAnnouncements)}
-                  className="relative p-2 hover:bg-yellow-500 rounded transition-colors"
+                  className="relative p-2 hover:bg-[var(--accent-hover)] rounded transition-colors"
                 >
-                  <Bell className="text-white" size={24} />
+                  <Bell className="text-[var(--bg-secondary)]" size={24} />
                   {getUnreadCount() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-[var(--error-text)] text-[var(--bg-secondary)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {getUnreadCount()}
                     </span>
                   )}
                 </button>
-                {showAnnouncements && renderAnnouncementDropdown()}
+                {showAnnouncements && (
+                  <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
+                    <div className="px-4 py-2 border-b border-[var(--border-color)]">
+                      <h3 className="font-semibold text-[var(--text-primary)]">
+                        Duyurular
+                      </h3>
+                    </div>
+                    {announcements.length > 0 ? (
+                      announcements.map((announcement) => {
+                        const colors = getAnnouncementColors(announcement.type);
+                        const isRead = readAnnouncementIds.includes(
+                          announcement.id
+                        );
+
+                        return (
+                          <div
+                            key={announcement.id}
+                            className={`p-4 border-b last:border-b-0 ${
+                              isRead ? "opacity-75" : ""
+                            } ${colors.bg} ${colors.border} transition-colors`}
+                          >
+                            <div className="flex items-start gap-3">
+                              {getAnnouncementIcon(announcement.type)}
+                              <div className="flex-1">
+                                <h4 className="font-medium text-[var(--text-primary)] mb-1">
+                                  {announcement.title}
+                                </h4>
+                                <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">
+                                  {announcement.content}
+                                </p>
+                                <div className="flex justify-between items-center mt-3">
+                                  <span className="text-xs text-[var(--text-tertiary)]">
+                                    {new Date(
+                                      announcement.createdAt
+                                    ).toLocaleDateString("tr-TR", {
+                                      year: "numeric",
+                                      month: "long",
+                                      day: "numeric",
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+                                  {!isRead && (
+                                    <button
+                                      onClick={() =>
+                                        markAsRead(announcement.id)
+                                      }
+                                      className="text-xs text-[var(--accent-color)] hover:text-[var(--accent-hover)] font-medium"
+                                    >
+                                      Okundu işaretle
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })
+                    ) : (
+                      <div className="p-8 text-center text-[var(--text-secondary)]">
+                        <Bell
+                          className="mx-auto mb-2 text-[var(--text-secondary)]"
+                          size={24}
+                        />
+                        <p>Henüz duyuru yok</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
           )}

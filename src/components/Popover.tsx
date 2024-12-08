@@ -51,9 +51,9 @@ export const Popover: React.FC<PopoverProps> = ({ content, children }) => {
               left: `${position.x + 10}px`,
               top: `${position.y + 10}px`,
             }}
-            className="z-50 w-64 p-4 text-sm bg-white border rounded-lg shadow-lg"
+            className="z-50 w-64 p-4 text-sm bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-lg transition-colors"
           >
-            <div className="text-gray-700">{content}</div>
+            <div className="text-[var(--text-primary)]">{content}</div>
           </motion.div>
         )}
       </AnimatePresence>

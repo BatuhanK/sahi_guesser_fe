@@ -8,15 +8,15 @@ interface GuessStatusProps {
 
 export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
   const icons = {
-    success: <CheckCircle className="text-green-500" size={24} />,
-    error: <AlertCircle className="text-red-500" size={24} />,
-    info: <Info className="text-blue-500" size={24} />,
+    success: <CheckCircle className="text-[var(--success-text)]" size={24} />,
+    error: <AlertCircle className="text-[var(--error-text)]" size={24} />,
+    info: <Info className="text-[var(--info-text)]" size={24} />,
   };
 
   const backgrounds = {
-    success: "bg-green-50 border-green-200",
-    error: "bg-red-50 border-red-200",
-    info: "bg-blue-50 border-blue-200",
+    success: "bg-[var(--success-bg)] border-[var(--success-text)]",
+    error: "bg-[var(--error-bg)] border-[var(--error-text)]",
+    info: "bg-[var(--info-bg)] border-[var(--info-text)]",
   };
 
   return (
@@ -25,16 +25,18 @@ export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
     >
       <div className="flex items-center gap-1.5 lg:gap-2">
         <div className="w-5 h-5 lg:w-6 lg:h-6">{icons[type]}</div>
-        <span className="text-sm lg:text-base font-medium">
+        <span className="text-sm lg:text-base font-medium text-[var(--text-primary)]">
           {feedback === "correct" && "Doğru tahmin ettin!"}
           {feedback === "go_higher" && (
             <span>
-              Daha <b className="text-red-500">yüksek</b> bir tahmin deneyin
+              Daha <b className="text-[var(--error-text)]">yüksek</b> bir tahmin
+              deneyin
             </span>
           )}
           {feedback === "go_lower" && (
             <span>
-              Daha <b className="text-red-500">düşük</b> bir tahmin deneyin
+              Daha <b className="text-[var(--error-text)]">düşük</b> bir tahmin
+              deneyin
             </span>
           )}
         </span>
