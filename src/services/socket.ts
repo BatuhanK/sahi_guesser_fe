@@ -261,6 +261,14 @@ class SocketService {
       state.setCurrentListing(null);
     });
 
+    this.socket.on("userBanned", ({ userId, roomId }) => {
+      console.log("User banned", userId, roomId);
+      if (userId === useAuthStore.getState().user?.id) {
+        this.disconnect();
+        window.location.href = "https://nolur.com";
+      }
+    });
+
     this.socket?.io.on("reconnect", () => {
       try {
         const state = useGameStore.getState();

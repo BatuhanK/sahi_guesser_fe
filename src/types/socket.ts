@@ -118,6 +118,8 @@ export interface ServerToClientEvents {
     participants: string[];
     onlineCount: number;
   }) => void;
+
+  userBanned: (data: { userId: number; roomId: number }) => void;
 }
 
 export interface ClientToServerEvents {
