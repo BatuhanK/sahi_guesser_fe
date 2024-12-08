@@ -156,6 +156,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                   <ParticipantsList
                     remoteParticipants={remoteParticipants}
                     onToggleMute={toggleParticipantMute}
+                    listeners={audioState.listeners}
                   />
                 )}
               </div>
