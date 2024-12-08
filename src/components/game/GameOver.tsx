@@ -1,8 +1,7 @@
 import React from "react";
-import { useGameStore } from "../../store/gameStore";
 
 export const GameOver: React.FC = () => {
-  const { score } = useGameStore();
+  const score = 0;
 
   const handleRestart = () => {
     window.location.reload();
