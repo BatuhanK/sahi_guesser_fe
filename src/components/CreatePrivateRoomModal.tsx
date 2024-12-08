@@ -6,7 +6,14 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion } from "framer-motion";
-import { Bike, Car, Home, LucideIcon, ShoppingBasket } from "lucide-react";
+import {
+  BedDouble,
+  Bike,
+  Car,
+  Home,
+  LucideIcon,
+  ShoppingBasket,
+} from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -25,6 +32,7 @@ const iconMap: Record<string, LucideIcon> = {
   car: Car,
   letgo: ShoppingBasket,
   motocycle: Bike,
+  hotel: BedDouble,
 };
 
 interface CreatePrivateRoomModalProps {
@@ -60,7 +68,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
           onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -69,38 +77,42 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            className="bg-white rounded-xl p-6 w-full max-w-md relative"
+            className="bg-[var(--bg-secondary)] rounded-xl p-6 w-full max-w-md relative"
           >
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-4 top-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               <XMarkIcon className="w-6 h-6" />
             </button>
 
             <div className="text-center space-y-6">
-              <h2 className="text-2xl font-bold text-gray-800">
+              <h2 className="text-2xl font-bold text-[var(--text-primary)]">
                 Oda Oluşturuldu!
               </h2>
 
               <div className="flex justify-center">
-                <QRCodeSVG value={roomUrl} size={180} />
+                <div className="p-4 bg-[var(--bg-primary)] rounded-lg">
+                  <QRCodeSVG value={roomUrl} size={180} />
+                </div>
               </div>
 
               <div className="space-y-2">
-                <p className="text-sm text-gray-600">Oda bağlantısı:</p>
+                <p className="text-sm text-[var(--text-secondary)]">
+                  Oda bağlantısı:
+                </p>
                 <div className="flex items-center justify-center space-x-2">
                   <input
                     type="text"
                     value={roomUrl}
                     readOnly
-                    className="bg-gray-50 px-4 py-2 rounded-lg text-sm w-full"
+                    className="bg-[var(--bg-tertiary)] text-[var(--text-primary)] px-4 py-2 rounded-lg text-sm w-full border border-[var(--border-color)]"
                   />
                   <button
                     onClick={copyToClipboard}
-                    className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    className="p-2 hover:bg-[var(--hover-color)] rounded-lg transition-colors text-[var(--text-secondary)]"
                   >
-                    <LinkIcon className="w-5 h-5 text-gray-600" />
+                    <LinkIcon className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -110,7 +122,7 @@ const SuccessModal: React.FC<SuccessModalProps> = ({
                   onClick={onPlay}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-8 py-3 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 font-medium shadow-lg shadow-yellow-200"
+                  className="px-8 py-3 bg-[var(--accent-color)] text-white rounded-lg hover:bg-[var(--accent-hover)] font-medium shadow-lg"
                 >
                   Oyuna Başla
                 </motion.button>
@@ -179,16 +191,6 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
     return null;
   };
 
-  const redirectToRoom = (roomData: Room) => {
-    useGameStore.getState().setRoom(roomData);
-    useGameStore.getState().setRoomId(roomData.id);
-    navigate(`/oda/${roomData.slug}`);
-
-    setTimeout(() => {
-      socketService.joinRoom(roomData.id);
-    }, 100);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -210,7 +212,14 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
 
   const handlePlayClick = () => {
     if (createdRoom) {
-      redirectToRoom(createdRoom);
+      useGameStore.getState().setRoom(createdRoom);
+      useGameStore.getState().setRoomId(createdRoom.id);
+      navigate(`/oda/${createdRoom.slug}`);
+
+      setTimeout(() => {
+        socketService.joinRoom(createdRoom.id);
+      }, 100);
+
       setShowSuccessModal(false);
       onClose();
     }
@@ -234,7 +243,7 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+          className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
           onClick={(e) => {
             if (e.target === e.currentTarget) onClose();
           }}
@@ -243,192 +252,168 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.9, opacity: 0 }}
-            transition={{ type: "spring", duration: 0.5 }}
-            className="bg-white rounded-xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto relative"
+            className="bg-[var(--bg-secondary)] rounded-xl p-6 w-full max-w-2xl relative overflow-y-auto max-h-[90vh]"
           >
             <button
               onClick={onClose}
-              className="absolute right-4 top-4 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute right-4 top-4 text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
             >
               <XMarkIcon className="w-6 h-6" />
             </button>
 
-            <h2 className="text-3xl font-bold mb-8 text-gray-800">
+            <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)]">
               Özel Oda Oluştur
             </h2>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
+            <form onSubmit={handleSubmit} className="space-y-6">
               <div>
-                <label className="block text-lg font-medium mb-4 text-gray-700">
+                <label className="block mb-2 font-medium text-[var(--text-primary)]">
                   Kategoriler
                 </label>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                   {categories.map((category) => {
-                    const IconComponent = category.icon
-                      ? iconMap[category.icon.toLowerCase()] || Home
-                      : Home;
-
+                    const Icon = category.icon && iconMap[category.icon];
                     return (
-                      <motion.label
+                      <button
                         key={category.id}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        className={`flex items-center space-x-3 p-3 border-2 rounded-lg cursor-pointer transition-colors ${
+                        type="button"
+                        onClick={() => {
+                          const newCategoryIds = formData.categoryIds.includes(
+                            category.id
+                          )
+                            ? formData.categoryIds.filter(
+                                (id) => id !== category.id
+                              )
+                            : [...formData.categoryIds, category.id];
+
+                          setFormData({
+                            ...formData,
+                            categoryIds: newCategoryIds,
+                            minPrice:
+                              newCategoryIds.length !== 1
+                                ? undefined
+                                : formData.minPrice,
+                            maxPrice:
+                              newCategoryIds.length !== 1
+                                ? undefined
+                                : formData.maxPrice,
+                          });
+                        }}
+                        className={`flex items-center gap-2 p-3 rounded-xl border ${
                           formData.categoryIds.includes(category.id)
-                            ? "border-yellow-400 bg-yellow-50"
-                            : "border-gray-200 hover:border-gray-300"
-                        }`}
+                            ? "border-[var(--accent-color)] bg-[var(--accent-muted)] text-[var(--accent-color)]"
+                            : "border-[var(--border-color)] text-[var(--text-secondary)] hover:bg-[var(--hover-color)]"
+                        } transition-colors`}
                       >
-                        <input
-                          type="checkbox"
-                          checked={formData.categoryIds.includes(category.id)}
-                          onChange={(e) => {
-                            setFormData((prev) => ({
-                              ...prev,
-                              categoryIds: e.target.checked
-                                ? [...prev.categoryIds, category.id]
-                                : prev.categoryIds.filter(
-                                    (id) => id !== category.id
-                                  ),
-                              minPrice: undefined,
-                              maxPrice: undefined,
-                            }));
-                          }}
-                          className="hidden"
-                        />
-                        <IconComponent size={24} className="text-yellow-400" />
-                        <span className="font-medium text-gray-700">
-                          {category.name}
-                        </span>
-                      </motion.label>
+                        {Icon && <Icon className="w-5 h-5" />}
+                        <span>{category.name}</span>
+                      </button>
                     );
                   })}
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-2 text-gray-700 font-medium">
-                    <ClockIcon className="w-5 h-5 text-yellow-500" />
-                    <span>Tur Süresi (saniye)</span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div>
+                  <label className="block mb-2 font-medium text-[var(--text-primary)]">
+                    Tur Süresi
                   </label>
-                  <input
-                    type="number"
-                    min={10}
-                    max={120}
-                    value={formData.roundDurationSeconds}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        roundDurationSeconds: parseInt(e.target.value),
-                      }))
-                    }
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 outline-none transition-all"
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={formData.roundDurationSeconds}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          roundDurationSeconds: parseInt(e.target.value),
+                        })
+                      }
+                      className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
+                      min={10}
+                      max={120}
+                    />
+                    <ClockIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                  </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="flex items-center space-x-2 text-gray-700 font-medium">
-                    <LightBulbIcon className="w-5 h-5 text-yellow-500" />
-                    <span>Tur Başına Maksimum Tahmin</span>
+                <div>
+                  <label className="block mb-2 font-medium text-[var(--text-primary)]">
+                    Tur Başına Tahmin Sayısı
                   </label>
-                  <input
-                    type="number"
-                    min={1}
-                    max={50}
-                    value={formData.maxGuessesPerRound}
-                    onChange={(e) =>
-                      setFormData((prev) => ({
-                        ...prev,
-                        maxGuessesPerRound: parseInt(e.target.value),
-                      }))
-                    }
-                    className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 outline-none transition-all"
-                  />
+                  <div className="relative">
+                    <input
+                      type="number"
+                      value={formData.maxGuessesPerRound}
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          maxGuessesPerRound: parseInt(e.target.value),
+                        })
+                      }
+                      className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
+                      min={1}
+                      max={50}
+                    />
+                    <LightBulbIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                  </div>
                 </div>
 
-                <AnimatePresence>
-                  {formData.categoryIds.length === 1 && (
-                    <>
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        className="space-y-2"
-                      >
-                        <label className="flex items-center space-x-2 text-gray-700 font-medium">
-                          <CurrencyDollarIcon className="w-5 h-5 text-yellow-500" />
-                          <span>Minimum Fiyat</span>
-                        </label>
+                {formData.categoryIds.length === 1 && (
+                  <>
+                    <div>
+                      <label className="block mb-2 font-medium text-[var(--text-primary)]">
+                        Minimum Fiyat
+                      </label>
+                      <div className="relative">
                         <input
                           type="number"
-                          min={0}
-                          value={formData.minPrice ?? ""}
+                          value={formData.minPrice}
                           onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              minPrice:
-                                e.target.value === ""
-                                  ? undefined
-                                  : parseInt(e.target.value),
-                            }))
+                            setFormData({
+                              ...formData,
+                              minPrice: parseInt(e.target.value),
+                            })
                           }
-                          className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 outline-none transition-all"
-                          required
+                          className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
+                          min={0}
                         />
-                      </motion.div>
+                        <CurrencyDollarIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      </div>
+                    </div>
 
-                      <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 20 }}
-                        className="space-y-2"
-                      >
-                        <label className="flex items-center space-x-2 text-gray-700 font-medium">
-                          <CurrencyDollarIcon className="w-5 h-5 text-yellow-500" />
-                          <span>Maksimum Fiyat</span>
-                        </label>
+                    <div>
+                      <label className="block mb-2 font-medium text-[var(--text-primary)]">
+                        Maximum Fiyat
+                      </label>
+                      <div className="relative">
                         <input
                           type="number"
-                          min={0}
-                          value={formData.maxPrice ?? ""}
+                          value={formData.maxPrice}
                           onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              maxPrice:
-                                e.target.value === ""
-                                  ? undefined
-                                  : parseInt(e.target.value),
-                            }))
+                            setFormData({
+                              ...formData,
+                              maxPrice: parseInt(e.target.value),
+                            })
                           }
-                          className="w-full p-3 border-2 border-gray-200 rounded-lg focus:border-yellow-400 focus:ring-2 focus:ring-yellow-200 outline-none transition-all"
-                          required
+                          className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
+                          min={0}
                         />
-                      </motion.div>
-                    </>
-                  )}
-                </AnimatePresence>
+                        <CurrencyDollarIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
 
-              <div className="flex justify-end space-x-4 pt-4">
-                <motion.button
-                  type="button"
-                  onClick={onClose}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 text-gray-600 hover:text-gray-800 font-medium rounded-lg"
-                  disabled={loading}
-                >
-                  İptal
-                </motion.button>
+              <div className="flex justify-end pt-4">
                 <motion.button
                   type="submit"
+                  disabled={loading}
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  className="px-6 py-3 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 disabled:opacity-50 font-medium shadow-lg shadow-yellow-200"
-                  disabled={loading}
+                  className="px-8 py-3 bg-[var(--accent-color)] text-white rounded-lg hover:bg-[var(--accent-hover)] font-medium shadow-lg disabled:opacity-50"
                 >
-                  {loading ? "Oluşturuluyor..." : "Oluştur"}
+                  {loading ? "Oluşturuluyor..." : "Oda Oluştur"}
                 </motion.button>
               </div>
             </form>

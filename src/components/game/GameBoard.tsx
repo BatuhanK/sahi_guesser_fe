@@ -1,16 +1,30 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import ReactConfetti from "react-confetti";
 import { useAuth } from "../../hooks/useAuth";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
+import { Chat } from "../Chat";
 import { PlayersList } from "../PlayersList";
 import { Popover } from "../Popover";
 import { PriceInput } from "../PriceInput";
 import { RoundResults } from "../RoundResults";
-import { Chat } from "../Chat";
+import {
+  FeedbackMessage,
+  GuessMessage,
+  GuessProgressBar,
+} from "./components/GuessComponents";
 import ImageNavigation from "./components/ImageNavigation";
-import { CarDetails, PropertyDetails, LetgoDetails } from "./components/ListingDetails";
-import { GuessProgressBar, GuessMessage, FeedbackMessage } from "./components/GuessComponents";
+import {
+  CarDetails,
+  LetgoDetails,
+  PropertyDetails,
+} from "./components/ListingDetails";
 
 // Constants
 const SLIDESHOW_INTERVAL = 3000;
@@ -48,7 +62,9 @@ export const GameBoard: React.FC = () => {
 
     slideshowTimerRef.current = setInterval(() => {
       setCurrentImageIndex((prevIndex) =>
-        prevIndex === currentListing.details.imageUrls.length - 1 ? 0 : prevIndex + 1
+        prevIndex === currentListing.details.imageUrls.length - 1
+          ? 0
+          : prevIndex + 1
       );
     }, SLIDESHOW_INTERVAL);
   }, [currentListing]);
@@ -142,7 +158,8 @@ export const GameBoard: React.FC = () => {
 
   if (!currentListing) return null;
 
-  const maxGuessExceeded = guessCount >= (room?.roomSettings.maxGuessesPerRound ?? 20);
+  const maxGuessExceeded =
+    guessCount >= (room?.roomSettings.maxGuessesPerRound ?? 20);
 
   return (
     <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-screen flex flex-col">
@@ -161,10 +178,10 @@ export const GameBoard: React.FC = () => {
               intermissionDuration={intermissionDuration}
             />
           ) : (
-            <div className="bg-white rounded-xl shadow-lg">
+            <div className="bg-[var(--bg-secondary)] rounded-xl shadow-lg transition-colors">
               {/* Image Section */}
               <div className="relative">
-                <div className="relative aspect-[4/3] w-full">
+                <div className="relative aspect-[16/10] w-full max-h-[500px]">
                   <img
                     src={currentListing.details.imageUrls[currentImageIndex]}
                     onContextMenu={(e) => e.preventDefault()}
@@ -178,31 +195,31 @@ export const GameBoard: React.FC = () => {
                     onNext={imageHandlers.handleNextImage}
                   />
                 </div>
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-4 lg:p-6">
-                  <div className="text-white space-y-2 lg:space-y-3">
-                    {currentListing.details.type === "letgo" ? (
-                      <Popover
-                        key={currentListing.id}
-                        content={currentListing.details.description}
-                      >
-                        <h2 className="text-xl lg:text-2xl font-bold">
-                          {currentListing.title}
-                        </h2>
-                      </Popover>
-                    ) : (
-                      <h2 className="text-xl lg:text-2xl font-bold">
+              </div>
+              {/* Details Section - Moved outside of image container */}
+              <div className="p-3 lg:p-4 space-y-2">
+                {currentListing.title &&
+                  (currentListing.details.type === "letgo" ? (
+                    <Popover
+                      key={currentListing.id}
+                      content={currentListing.details.description}
+                    >
+                      <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
                         {currentListing.title}
                       </h2>
-                    )}
-                    <div className="text-sm lg:text-base">
-                      {renderListingDetails()}
-                    </div>
-                  </div>
+                    </Popover>
+                  ) : (
+                    <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
+                      {currentListing.title}
+                    </h2>
+                  ))}
+                <div className="text-sm lg:text-base bg-[var(--bg-secondary)] px-3 py-2 lg:px-4 lg:py-3 rounded-lg">
+                  {renderListingDetails()}
                 </div>
               </div>
 
               {/* Price Guess Section */}
-              <div className="p-4 lg:p-6 border-t-2 border-gray-100">
+              <div className="p-4 lg:p-6 border-t-2 border-[var(--border-color)]">
                 <div className="flex flex-col items-center">
                   <PriceInput
                     onGuess={handleGuess}
@@ -231,9 +248,15 @@ export const GameBoard: React.FC = () => {
                           maxGuessExceeded={maxGuessExceeded}
                         />
                       ) : (
-                        <FeedbackMessage 
-                          feedback={feedback as "correct" | "go_higher" | "go_lower" | null} 
-                          showResults={showResults} 
+                        <FeedbackMessage
+                          feedback={
+                            feedback as
+                              | "correct"
+                              | "go_higher"
+                              | "go_lower"
+                              | null
+                          }
+                          showResults={showResults}
                         />
                       )}
                     </div>
@@ -255,9 +278,8 @@ export const GameBoard: React.FC = () => {
             </div>
           </div>
         </div>
-
       </div>
-      
+
       {/* Bottom - Chat */}
       <div>
         <Chat messages={chatMessages} onSendMessage={handleSendMessage} />

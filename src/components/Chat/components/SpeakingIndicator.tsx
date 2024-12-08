@@ -7,7 +7,7 @@ export const SpeakingIndicator: React.FC = () => (
       <div
         key={i}
         className={cn(
-          "w-1 h-3 bg-green-500 rounded-full",
+          "w-1 h-3 bg-[var(--success-text)] rounded-full",
           "animate-sound-wave",
           i === 0 && "animation-delay-0",
           i === 1 && "animation-delay-150",
@@ -16,4 +16,4 @@ export const SpeakingIndicator: React.FC = () => (
       />
     ))}
   </div>
-); 
+);

@@ -1,15 +1,16 @@
+import { Headphones, Mic, MicOff } from "lucide-react";
 import React from "react";
-import { Mic, MicOff, Headphones } from "lucide-react";
 import { cn } from "../../../lib/utils";
 import { ParticipantsListProps } from "../types";
-import { SpeakingIndicator } from ".";
+import { SpeakingIndicator } from "./SpeakingIndicator";
 
 export const ParticipantsList: React.FC<ParticipantsListProps> = ({
   remoteParticipants,
   onToggleMute,
   listeners,
 }) => {
-  if (remoteParticipants.size === 0 && (!listeners || listeners.size === 0)) return null;
+  if (remoteParticipants.size === 0 && (!listeners || listeners.size === 0))
+    return null;
 
   return (
     <div className="mt-2 max-h-[200px] overflow-y-auto scroll-enabled">
@@ -20,7 +21,9 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
             className="flex items-center justify-between text-sm"
           >
             <div className="flex items-center gap-2">
-              <span className="text-gray-700">{participant.identity}</span>
+              <span className="text-[var(--text-primary)]">
+                {participant.identity}
+              </span>
               {participant.isSpeaking && <SpeakingIndicator />}
             </div>
             <button
@@ -28,8 +31,8 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
               className={cn(
                 "p-1.5 rounded-full transition-colors",
                 participant.isMuted
-                  ? "bg-gray-100 text-gray-500"
-                  : "bg-yellow-100 text-yellow-600"
+                  ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
+                  : "bg-[var(--accent-muted)] text-[var(--accent-color)]"
               )}
             >
               {participant.isMuted ? (
@@ -40,12 +43,14 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
             </button>
           </div>
         ))}
-        
+
         {listeners && listeners.size > 0 && (
           <div className="mt-3">
             <div className="flex items-center gap-2 mb-2">
               <Headphones className="w-4 h-4 text-gray-500" />
-              <span className="text-sm text-gray-600">Dinleyeciler ({listeners.size})</span>
+              <span className="text-sm text-gray-600">
+                Dinleyeciler ({listeners.size})
+              </span>
             </div>
             {Array.from(listeners).map((listener) => (
               <div
@@ -60,4 +65,4 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
       </div>
     </div>
   );
-}; 
+};

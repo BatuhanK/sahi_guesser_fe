@@ -1,9 +1,30 @@
 import React from "react";
-import { formatDistanceToNow } from "date-fns";
-import { tr } from "date-fns/locale";
 import { cn } from "../../../lib/utils";
-import { ChatMessageProps, ChatMention } from "../types";
+import { ChatMention, ChatMessageProps } from "../types";
 import { maskNumbers } from "../utils";
+
+// Function to generate consistent color based on username
+const getUsernameColor = (username: string) => {
+  const colors = [
+    "text-[#FF6B6B]", // Red
+    "text-[#4ECDC4]", // Teal
+    "text-[#45B7D1]", // Light Blue
+    "text-[#96CEB4]", // Sage
+    "text-[#D4A5A5]", // Rose
+    "text-[#9B59B6]", // Purple
+    "text-[#3498DB]", // Blue
+    "text-[#2ECC71]", // Green
+    "text-[#F1C40F]", // Yellow
+    "text-[#E67E22]", // Orange
+  ];
+
+  // Simple hash function to get consistent index
+  const hash = username.split("").reduce((acc, char) => {
+    return char.charCodeAt(0) + ((acc << 5) - acc);
+  }, 0);
+
+  return colors[Math.abs(hash) % colors.length];
+};
 
 const renderMessageWithMentions = (
   message: string,
@@ -37,8 +58,8 @@ const renderMessageWithMentions = (
           className={cn(
             "px-1 rounded font-medium",
             isSelfMention
-              ? "bg-yellow-200 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
-              : "bg-yellow-100 text-yellow-700 dark:bg-yellow-800/50 dark:text-yellow-300",
+              ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
+              : "bg-[var(--warning-muted)] text-[var(--warning-text)]",
             "animate-highlight"
           )}
         >
@@ -63,27 +84,24 @@ const renderMessageWithMentions = (
 
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
-  isOwn,
-  showTimestamp,
   currentUsername,
   onMentionClick,
 }) => {
-  const isMentioned = message.mentions?.some(
-    (mention) => mention.username === currentUsername
-  );
   const isAdmin = message.username === "batuhan";
   const isTucik = message.username === "Tucik";
   const isSystem = message.username === "system";
 
   if (isSystem) {
     return (
-      <div className="mb-3">
-        <div className={cn(
-          "w-full rounded-lg px-4 py-2 text-sm",
-          "bg-orange-100",
-          "border-2 border-orange-200",
-          "text-gray-600 font-medium text-center"
-        )}>
+      <div className="my-2">
+        <div
+          className={cn(
+            "w-full rounded-lg px-4 py-2 text-sm",
+            "bg-[var(--warning-bg)]",
+            "border-2 border-[var(--warning-text)]",
+            "text-[var(--text-primary)] font-medium text-center"
+          )}
+        >
           {renderMessageWithMentions(
             message.message,
             message.mentions,
@@ -95,64 +113,33 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   }
 
   return (
-    <div
-      className={cn(
-        "flex flex-col mb-3",
-        isOwn ? "items-end" : "items-start",
-        "group"
-      )}
-    >
-      {showTimestamp && (
-        <div className="flex items-center gap-2 mb-1">
-          <span
-            className={cn(
-              "font-medium text-sm cursor-pointer",
-              isAdmin
-                ? "text-red-600 font-bold"
-                : isTucik
-                ? "text-purple-600 font-bold"
-                : isOwn
-                ? "text-yellow-600"
-                : "text-gray-700",
-              "opacity-80 hover:opacity-100 transition-opacity",
-              !isOwn && "group-hover:underline"
-            )}
-            onClick={() => onMentionClick?.(message.username)}
-            role="button"
-            tabIndex={0}
-          >
-            {isAdmin
-              ? `${message.username} 👑`
-              : isTucik
-              ? `${message.username} 💜`
-              : message.username}
-          </span>
-          <span className="text-xs text-gray-500">
-            {formatDistanceToNow(message.timestamp, {
-              addSuffix: true,
-              locale: tr,
-            })}
-          </span>
-        </div>
-      )}
-      <div
-        className={cn(
-          "max-w-[80%] rounded-2xl px-4 py-2 shadow-sm transition-colors",
-          isAdmin
-            ? "bg-gradient-to-r from-red-500 via-yellow-500 to-red-500 text-white rounded-tr-none animate-pulse-slow"
-            : isTucik
-            ? "bg-gradient-to-r from-purple-300 via-pink-500 to-purple-500 text-white rounded-tr-none animate-pulse-slow"
-            : isOwn
-            ? "bg-yellow-400 text-white rounded-tr-none"
-            : isMentioned
-            ? "bg-yellow-50 text-gray-800 rounded-tl-none border-2 border-yellow-200 animate-pulse-subtle"
-            : "bg-gray-100 text-gray-800 rounded-tl-none"
-        )}
-      >
-        <p
+    <div className="flex flex-col mb-1">
+      <div className="flex items-baseline gap-2">
+        <span
           className={cn(
-            "break-words text-sm",
-            (isAdmin || isTucik) && "font-medium"
+            "font-medium text-sm cursor-pointer max-w-[150px] truncate",
+            isAdmin
+              ? "text-[var(--error-text)] font-bold text-base"
+              : isTucik
+              ? "text-[var(--accent-color)] font-bold text-base"
+              : getUsernameColor(message.username),
+            "hover:opacity-80 transition-opacity"
+          )}
+          onClick={() => onMentionClick?.(message.username)}
+          role="button"
+          tabIndex={0}
+          title={message.username}
+        >
+          {isAdmin
+            ? `👑 ${message.username} 👑`
+            : isTucik
+            ? `💜 ${message.username} 💜`
+            : message.username}
+        </span>
+        <span
+          className={cn(
+            "text-[var(--text-primary)]",
+            isAdmin || isTucik ? "text-base font-medium" : "text-sm"
           )}
         >
           {renderMessageWithMentions(
@@ -160,8 +147,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
             message.mentions,
             currentUsername
           )}
-        </p>
+        </span>
       </div>
     </div>
   );
-}; 
+};

@@ -1,6 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -18,32 +18,47 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
 
+  useEffect(() => {
+    if (!isOpen) {
+      setUsername("");
+      setPassword("");
+    }
+  }, [isOpen]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onAuth(username, password);
   };
 
-  useEffect(() => {
-    setUsername("");
-    setPassword("");
-  }, [isOpen]);
-
   return (
     <Transition show={isOpen} as={React.Fragment}>
-      <Dialog onClose={onClose} className="relative z-50">
-        <Transition.Child
-          enter="ease-out duration-300"
-          enterFrom="opacity-0"
-          enterTo="opacity-100"
-          leave="ease-in duration-200"
-          leaveFrom="opacity-100"
-          leaveTo="opacity-0"
-        >
-          <div className="fixed inset-0 bg-black/30" />
-        </Transition.Child>
-
-        <div className="fixed inset-0 flex items-center justify-center p-4">
+      <Dialog
+        as="div"
+        className="fixed inset-0 z-50 overflow-y-auto"
+        onClose={onClose}
+      >
+        <div className="min-h-screen px-4 text-center">
           <Transition.Child
+            as={React.Fragment}
+            enter="ease-out duration-300"
+            enterFrom="opacity-0"
+            enterTo="opacity-100"
+            leave="ease-in duration-200"
+            leaveFrom="opacity-100"
+            leaveTo="opacity-0"
+          >
+            <Dialog.Overlay className="fixed inset-0 bg-black/50" />
+          </Transition.Child>
+
+          <span
+            className="inline-block h-screen align-middle"
+            aria-hidden="true"
+          >
+            &#8203;
+          </span>
+
+          <Transition.Child
+            as={React.Fragment}
             enter="ease-out duration-300"
             enterFrom="opacity-0 scale-95"
             enterTo="opacity-100 scale-100"
@@ -51,53 +66,67 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="w-full max-w-md bg-white rounded-xl p-6 shadow-xl">
+            <div className="inline-block w-full max-w-md p-6 my-8 overflow-hidden text-left align-middle transition-all transform bg-[var(--bg-secondary)] shadow-xl rounded-2xl">
               <div className="flex justify-between items-center mb-4">
-                <Dialog.Title className="text-xl font-bold">
+                <Dialog.Title
+                  as="h3"
+                  className="text-lg font-medium text-[var(--text-primary)]"
+                >
                   {type === "login" ? "Giriş Yap" : "Kayıt Ol"}
                 </Dialog.Title>
                 <button
                   onClick={onClose}
-                  className="text-gray-500 hover:text-gray-700"
+                  className="p-1 hover:bg-[var(--hover-color)] rounded-full transition-colors"
                 >
-                  <X size={20} />
+                  <X className="text-[var(--text-primary)]" size={20} />
                 </button>
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="username"
+                    className="block text-sm font-medium text-[var(--text-secondary)]"
+                  >
                     Kullanıcı Adı
                   </label>
                   <input
                     type="text"
+                    id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 px-4 py-2"
+                    className="mt-1 block w-full px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:border-transparent text-[var(--text-primary)]"
+                    required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label
+                    htmlFor="password"
+                    className="block text-sm font-medium text-[var(--text-secondary)]"
+                  >
                     Şifre
                   </label>
                   <input
+                    type="password"
+                    id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    type="password"
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-yellow-500 focus:ring-yellow-500 px-4 py-2"
+                    className="mt-1 block w-full px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:border-transparent text-[var(--text-primary)]"
+                    required
                   />
                 </div>
 
-                <button
-                  type="submit"
-                  disabled={username === "" || password === ""}
-                  className="w-full bg-yellow-400 text-white py-2 px-4 rounded-md hover:bg-yellow-500  disabled:bg-yellow-500  disabled:bg-opacity-50 transition-colors"
-                >
-                  {type === "login" ? "Giriş Yap" : "Kayıt Ol"}
-                </button>
+                <div className="mt-6">
+                  <button
+                    type="submit"
+                    className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent-color)] transition-colors"
+                  >
+                    {type === "login" ? "Giriş Yap" : "Kayıt Ol"}
+                  </button>
+                </div>
               </form>
-            </Dialog.Panel>
+            </div>
           </Transition.Child>
         </div>
       </Dialog>

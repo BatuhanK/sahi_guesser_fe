@@ -1,7 +1,7 @@
-import React from 'react';
 import { Mic, MicOff, Phone, PhoneOff, Volume2, VolumeX } from "lucide-react";
+import React from "react";
 import { cn } from "../../../lib/utils";
-import { AudioState } from '../types';
+import { AudioState } from "../types";
 
 interface VoiceButtonsProps {
   isCompact?: boolean;
@@ -24,22 +24,22 @@ export const VoiceButtons: React.FC<VoiceButtonsProps> = ({
     <div className={cn("flex items-center", isCompact ? "gap-1" : "gap-2")}>
       <button
         type="button"
-        onClick={() => audioState.isConnected ? onDisconnect() : onConnect()}
+        onClick={() => (audioState.isConnected ? onDisconnect() : onConnect())}
         disabled={audioState.isConnecting}
         className={cn(
           "rounded-full transition-colors",
-          isCompact 
-            ? "p-1.5" 
+          isCompact
+            ? "p-1.5"
             : "flex items-center gap-2 px-3 py-1.5 text-sm font-medium",
           audioState.isConnected
-            ? "bg-red-100 text-red-600 hover:bg-red-200"
-            : isCompact 
-              ? "hover:bg-gray-100" 
-              : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+            ? "bg-[var(--error-bg)] text-[var(--error-text)] hover:opacity-80"
+            : isCompact
+            ? "hover:bg-[var(--hover-color)]"
+            : "bg-[var(--accent-color)] text-white hover:bg-[var(--accent-hover)]"
         )}
       >
         {audioState.isConnecting ? (
-          <div className="w-4 h-4 animate-spin rounded-full border-2 border-yellow-500 border-t-transparent" />
+          <div className="w-4 h-4 animate-spin rounded-full border-2 border-[var(--accent-color)] border-t-transparent" />
         ) : audioState.isConnected ? (
           <>
             <PhoneOff className="w-4 h-4" />
@@ -61,11 +61,15 @@ export const VoiceButtons: React.FC<VoiceButtonsProps> = ({
               "rounded-full transition-colors",
               isCompact ? "p-1.5" : "p-2",
               audioState.isMuted
-                ? "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] hover:bg-[var(--hover-color)]"
+                : "bg-[var(--accent-color)] text-white hover:bg-[var(--accent-hover)]"
             )}
           >
-            {audioState.isMuted ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+            {audioState.isMuted ? (
+              <MicOff className="w-4 h-4" />
+            ) : (
+              <Mic className="w-4 h-4" />
+            )}
           </button>
           <button
             type="button"
@@ -74,14 +78,18 @@ export const VoiceButtons: React.FC<VoiceButtonsProps> = ({
               "rounded-full transition-colors",
               isCompact ? "p-1.5" : "p-2",
               audioState.isRoomMuted
-                ? "bg-gray-100 text-gray-500 hover:bg-gray-200"
-                : "bg-yellow-100 text-yellow-600 hover:bg-yellow-200"
+                ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)] hover:bg-[var(--hover-color)]"
+                : "bg-[var(--accent-color)] text-white hover:bg-[var(--accent-hover)]"
             )}
           >
-            {audioState.isRoomMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
+            {audioState.isRoomMuted ? (
+              <VolumeX className="w-4 h-4" />
+            ) : (
+              <Volume2 className="w-4 h-4" />
+            )}
           </button>
         </>
       )}
     </div>
   );
-}; 
+};

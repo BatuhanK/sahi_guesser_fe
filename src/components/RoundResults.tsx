@@ -78,11 +78,11 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   const getMedalColor = (index: number): string => {
     switch (index) {
       case 0:
-        return "text-yellow-400";
+        return "text-[var(--accent-color)]";
       case 1:
-        return "text-gray-400";
+        return "text-[var(--text-tertiary)]";
       case 2:
-        return "text-amber-600";
+        return "text-[var(--warning-text)]";
       default:
         return "text-transparent";
     }
@@ -91,13 +91,13 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   const getRowBackground = (index: number): string => {
     switch (index) {
       case 0:
-        return "bg-yellow-50 border-2 border-yellow-400";
+        return "bg-[var(--warning-bg)] border-2 border-[var(--accent-color)]";
       case 1:
-        return "bg-gray-50 border-2 border-gray-400";
+        return "bg-[var(--bg-tertiary)] border-2 border-[var(--text-tertiary)]";
       case 2:
-        return "bg-amber-50 border-2 border-amber-600";
+        return "bg-[var(--warning-bg)] border-2 border-[var(--warning-text)]";
       default:
-        return "bg-gray-50";
+        return "bg-[var(--bg-tertiary)]";
     }
   };
 
@@ -127,17 +127,17 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
             />
           </motion.div>
         ) : (
-          <span className="w-6 text-center font-medium text-gray-500 shrink-0">
+          <span className="w-6 text-center font-medium text-[var(--text-tertiary)] shrink-0">
             {index + 1}
           </span>
         )}
-        <span className="font-medium text-base sm:text-lg truncate">
+        <span className="font-medium text-base sm:text-lg truncate text-[var(--text-primary)]">
           {score.username}
         </span>
       </div>
 
       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
-        <span className="text-gray-700 font-medium text-sm sm:text-base whitespace-nowrap">
+        <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
           ₺{score.guess.toLocaleString("tr-TR")}
         </span>
         <div className="shrink-0">
@@ -147,10 +147,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
             transition={{ delay: index * 0.1 + 0.2 }}
             className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
               score.accuracy >= 90
-                ? "bg-green-100 text-green-700"
+                ? "bg-[var(--success-bg)] text-[var(--success-text)]"
                 : score.accuracy >= 70
-                ? "bg-yellow-100 text-yellow-700"
-                : "bg-red-100 text-red-700"
+                ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
+                : "bg-[var(--error-bg)] text-[var(--error-text)]"
             }`}
           >
             %{score.accuracy.toFixed(1)}
@@ -160,7 +160,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
           initial={{ x: 20, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ delay: index * 0.1 + 0.3 }}
-          className="font-bold text-green-600 text-sm sm:text-base shrink-0 min-w-[60px] text-right"
+          className="font-bold text-[var(--success-text)] text-sm sm:text-base shrink-0 min-w-[60px] text-right"
         >
           +{score.roundScore}
         </motion.span>
@@ -198,16 +198,18 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
           transition={{ duration: 0.5, ease: "easeIn" }}
           className="h-full"
         >
-          <div className="round-results-container h-full rounded-xl bg-white">
-            <div className="border-4 border-yellow-400 rounded-xl shadow-xl p-8 h-full flex flex-col">
+          <div className="round-results-container h-full rounded-xl bg-[var(--bg-secondary)]">
+            <div className="border-4 border-[var(--accent-color)] rounded-xl shadow-xl p-8 h-full flex flex-col">
               <div className="space-y-8">
                 <div className="text-center">
-                  <h2 className="text-3xl font-bold mb-3">Tur Sonuçları</h2>
+                  <h2 className="text-3xl font-bold mb-3 text-[var(--text-primary)]">
+                    Tur Sonuçları
+                  </h2>
                   <div className="flex flex-col gap-2">
-                    <p className="text-gray-600 text-lg">
+                    <p className="text-[var(--text-secondary)] text-lg">
                       {carListingInfo || houseListingInfo || letgoListingInfo}
                     </p>
-                    <p className="text-2xl font-semibold text-green-600">
+                    <p className="text-2xl font-semibold text-[var(--success-text)]">
                       Gerçek Fiyat: ₺{correctPrice.toLocaleString("tr-TR")}
                     </p>
                   </div>
@@ -221,9 +223,9 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                   {userRank > 3 && (
                     <div className="flex justify-center py-1">
                       <div className="flex flex-col items-center gap-[2px]">
-                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
-                        <div className="w-1.5 h-1.5 rounded-full bg-gray-300"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-tertiary)]"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-tertiary)]"></div>
+                        <div className="w-1.5 h-1.5 rounded-full bg-[var(--text-tertiary)]"></div>
                       </div>
                     </div>
                   )}
@@ -233,7 +235,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 </div>
               </div>
 
-              <div className="w-full bg-yellow-500 text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center mt-8">
+              <div className="w-full bg-[var(--accent-color)] text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center mt-8 hover:bg-[var(--accent-hover)]">
                 Sonraki Tur{" "}
                 {remainingSeconds > 0 && (
                   <span className="text-sm">({remainingSeconds}s)</span>

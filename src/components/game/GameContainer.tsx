@@ -109,17 +109,19 @@ export const GameContainer: React.FC = () => {
     return (
       <div className="space-y-6">
         {latestAnnouncement && !isLatestRead && (
-          <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 relative">
+          <div className="bg-[var(--warning-bg)] border-l-4 border-[var(--warning-text)] p-4 relative">
             <button
               onClick={() => markAsRead(latestAnnouncement.id)}
-              className="absolute top-2 right-2 hover:bg-yellow-200 p-1 rounded"
+              className="absolute top-2 right-2 hover:bg-[var(--warning-bg)]/80 p-1 rounded"
             >
-              <X size={16} />
+              <X size={16} className="text-[var(--warning-text)]" />
             </button>
-            <h4 className="font-medium text-yellow-800 mb-1">
+            <h4 className="font-medium text-[var(--warning-text)] mb-1">
               {latestAnnouncement.title}
             </h4>
-            <p className="text-yellow-700">{latestAnnouncement.content}</p>
+            <p className="text-[var(--warning-text)]/90">
+              {latestAnnouncement.content}
+            </p>
           </div>
         )}
         <CategorySelector
@@ -134,17 +136,19 @@ export const GameContainer: React.FC = () => {
   return (
     <div className="h-full">
       {latestAnnouncement && !isLatestRead && (
-        <div className="bg-yellow-100 border-l-4 border-yellow-400 p-4 mb-4 relative">
+        <div className="bg-[var(--warning-bg)] border-l-4 border-[var(--warning-text)] p-4 mb-4 relative">
           <button
             onClick={() => markAsRead(latestAnnouncement.id)}
-            className="absolute top-2 right-2 hover:bg-yellow-200 p-1 rounded"
+            className="absolute top-2 right-2 hover:bg-[var(--warning-bg)]/80 p-1 rounded"
           >
-            <X size={16} />
+            <X size={16} className="text-[var(--warning-text)]" />
           </button>
-          <h4 className="font-medium text-yellow-800 mb-1">
+          <h4 className="font-medium text-[var(--warning-text)] mb-1">
             {latestAnnouncement.title}
           </h4>
-          <p className="text-yellow-700">{latestAnnouncement.content}</p>
+          <p className="text-[var(--warning-text)]/90">
+            {latestAnnouncement.content}
+          </p>
         </div>
       )}
       <GameBoard />
