@@ -1,5 +1,7 @@
 import { Bike, Car, Home, LucideIcon, ShoppingBasket } from "lucide-react";
 import React, { useState } from "react";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../hooks/useAuth";
 import { Category } from "../services/api";
 import { CreatePrivateRoomModal } from "./CreatePrivateRoomModal";
 
@@ -21,6 +23,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
 }) => {
   const [isCreatePrivateRoomModalOpen, setIsCreatePrivateRoomModalOpen] =
     useState(false);
+
+  const { user } = useAuth();
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 md:gap-8">
@@ -55,7 +59,13 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       </div>
 
       <button
-        onClick={() => setIsCreatePrivateRoomModalOpen(true)}
+        onClick={() => {
+          if (user) {
+            setIsCreatePrivateRoomModalOpen(true);
+          } else {
+            toast.error("Lütfen giriş yapınız");
+          }
+        }}
         className="mt-8 px-6 py-3 bg-yellow-400 text-white rounded-lg hover:bg-yellow-500 
           transition-colors duration-200 font-medium text-lg shadow-md hover:shadow-lg"
       >
