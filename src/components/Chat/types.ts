@@ -14,6 +14,7 @@ export interface AudioState {
   error: string | null;
   isMuted: boolean;
   isRoomMuted: boolean;
+  listeners: Set<string>;
 }
 
 export interface RemoteParticipantState {
@@ -49,6 +50,7 @@ export interface ChatInputProps {
 export interface ParticipantsListProps {
   remoteParticipants: Map<string, RemoteParticipantState>;
   onToggleMute: (participantId: string) => void;
+  listeners: Set<string>;
 }
 
 export interface OnlinePlayersListProps {
