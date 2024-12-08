@@ -19,9 +19,12 @@ api.interceptors.response.use(
     const errorMessage =
       error.response?.data?.message || error.message || "An error occurred";
 
-    if (error.config?.url !== "/auth/me" || error.response?.status !== 401) {
-      toast.error(errorMessage);
+    const notShowToastUrls = ["/auth/me"];
+    if (notShowToastUrls.includes(error.config?.url || "")) {
+      return Promise.reject(error);
     }
+
+    toast.error(errorMessage);
 
     return Promise.reject(error);
   }
@@ -49,13 +52,13 @@ export const authApi = {
   },
 };
 
-export type Category = {
+export interface Category {
   id: number;
   name: string;
-  slug: string;
-  icon: string;
-  onlinePlayerCount: number;
-};
+  onlinePlayerCount?: number;
+  icon?: string;
+  slug?: string;
+}
 
 export type Room = {
   id: number;
@@ -76,6 +79,14 @@ export type Announcement = {
   updatedAt: string;
 };
 
+export type CreatePrivateRoomRequest = {
+  categoryIds: number[];
+  roundDurationSeconds: number;
+  maxGuessesPerRound: number;
+  minPrice?: number;
+  maxPrice?: number;
+};
+
 export const categoryApi = {
   getAll: async () => {
     const response = await api.get<{ categories: Category[] }>("/categories");
@@ -94,6 +105,11 @@ export const roomApi = {
   getDetails: async (slug: string) => {
     const response = await api.get(`/rooms/${slug}`);
     return response.data;
+  },
+
+  create: async (data: CreatePrivateRoomRequest) => {
+    const response = await api.post("/private-game-rooms/create", data);
+    return response.data.privateRoom;
   },
 
   getLivekitRoom: async (

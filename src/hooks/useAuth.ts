@@ -28,6 +28,8 @@ export function useAuth() {
     setUser(user);
     setToken(token.token);
 
+    window.location.reload();
+
     socketService.reconnect();
   };
 
