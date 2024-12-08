@@ -181,7 +181,7 @@ export const GameBoard: React.FC = () => {
             <div className="bg-[var(--bg-secondary)] rounded-xl shadow-lg transition-colors">
               {/* Image Section */}
               <div className="relative">
-                <div className="relative aspect-[4/3] w-full">
+                <div className="relative aspect-[16/10] w-full max-h-[500px]">
                   <img
                     src={currentListing.details.imageUrls[currentImageIndex]}
                     onContextMenu={(e) => e.preventDefault()}
