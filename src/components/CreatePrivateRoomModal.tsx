@@ -146,6 +146,7 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
     maxGuessesPerRound: 10,
     minPrice: undefined,
     maxPrice: undefined,
+    roundCount: 20,
   });
 
   const [loading, setLoading] = useState(false);
@@ -167,6 +168,10 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
 
     if (formData.maxGuessesPerRound < 1 || formData.maxGuessesPerRound > 50) {
       return "Tur başına tahmin sayısı 1-50 arasında olmalıdır";
+    }
+
+    if (formData.roundCount < 10 || formData.roundCount > 50) {
+      return "Tur sayısı 10-50 arasında olmalıdır";
     }
 
     if (formData.categoryIds.length === 1) {
@@ -313,57 +318,86 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div className="space-y-6">
                 <div>
-                  <label className="block mb-2 font-medium text-[var(--text-primary)]">
-                    Tur Süresi
+                  <label className="block mb-3 font-medium text-[var(--text-primary)]">
+                    Oyun Ayarları
                   </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={formData.roundDurationSeconds}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          roundDurationSeconds: parseInt(e.target.value),
-                        })
-                      }
-                      className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
-                      min={10}
-                      max={120}
-                    />
-                    <ClockIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
-                  </div>
-                </div>
+                  <div className="grid grid-cols-3 gap-4">
+                    <div>
+                      <div className="text-sm text-[var(--text-secondary)] mb-2">
+                        Tur Sayısı
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={formData.roundCount}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              roundCount: parseInt(e.target.value),
+                            })
+                          }
+                          className="w-full pl-9 pr-2 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-center"
+                          min={10}
+                          max={50}
+                        />
+                        <ClockIcon className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      </div>
+                    </div>
 
-                <div>
-                  <label className="block mb-2 font-medium text-[var(--text-primary)]">
-                    Tur Başına Tahmin Sayısı
-                  </label>
-                  <div className="relative">
-                    <input
-                      type="number"
-                      value={formData.maxGuessesPerRound}
-                      onChange={(e) =>
-                        setFormData({
-                          ...formData,
-                          maxGuessesPerRound: parseInt(e.target.value),
-                        })
-                      }
-                      className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
-                      min={1}
-                      max={50}
-                    />
-                    <LightBulbIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                    <div>
+                      <div className="text-sm text-[var(--text-secondary)] mb-2">
+                        Tur Süresi
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={formData.roundDurationSeconds}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              roundDurationSeconds: parseInt(e.target.value),
+                            })
+                          }
+                          className="w-full pl-9 pr-2 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-center"
+                          min={10}
+                          max={120}
+                        />
+                        <ClockIcon className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      </div>
+                    </div>
+
+                    <div>
+                      <div className="text-sm text-[var(--text-secondary)] mb-2">
+                        Tahmin Sayısı
+                      </div>
+                      <div className="relative">
+                        <input
+                          type="number"
+                          value={formData.maxGuessesPerRound}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              maxGuessesPerRound: parseInt(e.target.value),
+                            })
+                          }
+                          className="w-full pl-9 pr-2 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)] text-center"
+                          min={1}
+                          max={50}
+                        />
+                        <LightBulbIcon className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                      </div>
+                    </div>
                   </div>
                 </div>
 
                 {formData.categoryIds.length === 1 && (
-                  <>
-                    <div>
-                      <label className="block mb-2 font-medium text-[var(--text-primary)]">
-                        Minimum Fiyat
-                      </label>
+                  <div>
+                    <label className="block mb-3 font-medium text-[var(--text-primary)]">
+                      Fiyat Aralığı
+                    </label>
+                    <div className="grid grid-cols-2 gap-4">
                       <div className="relative">
                         <input
                           type="number"
@@ -374,17 +408,13 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
                               minPrice: parseInt(e.target.value),
                             })
                           }
-                          className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
+                          placeholder="Min"
+                          className="w-full pl-9 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
                           min={0}
                         />
-                        <CurrencyDollarIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                        <CurrencyDollarIcon className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                       </div>
-                    </div>
 
-                    <div>
-                      <label className="block mb-2 font-medium text-[var(--text-primary)]">
-                        Maximum Fiyat
-                      </label>
                       <div className="relative">
                         <input
                           type="number"
@@ -395,13 +425,14 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
                               maxPrice: parseInt(e.target.value),
                             })
                           }
-                          className="w-full pl-10 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
+                          placeholder="Max"
+                          className="w-full pl-9 pr-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--text-primary)]"
                           min={0}
                         />
-                        <CurrencyDollarIcon className="w-5 h-5 absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
+                        <CurrencyDollarIcon className="w-4 h-4 absolute left-2.5 top-1/2 -translate-y-1/2 text-[var(--text-secondary)]" />
                       </div>
                     </div>
-                  </>
+                  </div>
                 )}
               </div>
 

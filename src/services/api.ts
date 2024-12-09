@@ -70,6 +70,18 @@ export type Room = {
   };
 };
 
+export type RoomSummaryPlayer = {
+  playerId: string;
+  userId: string;
+  username: string;
+  score: number;
+};
+
+export type RoomSummary = {
+  room: Room;
+  players: RoomSummaryPlayer[];
+};
+
 export type Announcement = {
   id: number;
   title: string;
@@ -79,13 +91,14 @@ export type Announcement = {
   updatedAt: string;
 };
 
-export type CreatePrivateRoomRequest = {
+export interface CreatePrivateRoomRequest {
   categoryIds: number[];
   roundDurationSeconds: number;
   maxGuessesPerRound: number;
   minPrice?: number;
   maxPrice?: number;
-};
+  roundCount: number;
+}
 
 export const categoryApi = {
   getAll: async () => {
@@ -120,6 +133,11 @@ export const roomApi = {
     participants: string[];
   }> => {
     const response = await api.get(`/livekit-rooms/${id}`);
+    return response.data;
+  },
+
+  getRoomSummary: async (slug: string): Promise<RoomSummary> => {
+    const response = await api.get<RoomSummary>(`/rooms/${slug}/summary`);
     return response.data;
   },
 };

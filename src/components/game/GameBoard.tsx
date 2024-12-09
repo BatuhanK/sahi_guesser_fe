@@ -22,9 +22,11 @@ import {
 import ImageNavigation from "./components/ImageNavigation";
 import {
   CarDetails,
+  HotelsDetails,
   LetgoDetails,
   PropertyDetails,
 } from "./components/ListingDetails";
+import { GameOver } from "./GameOver";
 
 // Constants
 const SLIDESHOW_INTERVAL = 3000;
@@ -49,6 +51,7 @@ export const GameBoard: React.FC = () => {
     correctPrice,
     room,
     guessCount,
+    roomSummary,
   } = useGameStore();
   const { isAuthenticated, user } = useAuth();
 
@@ -151,6 +154,8 @@ export const GameBoard: React.FC = () => {
         return <PropertyDetails details={currentListing.details} />;
       case "letgo":
         return <LetgoDetails details={currentListing.details} />;
+      case "hotels":
+        return <HotelsDetails details={currentListing.details} />;
       default:
         return null;
     }
@@ -160,6 +165,10 @@ export const GameBoard: React.FC = () => {
 
   const maxGuessExceeded =
     guessCount >= (room?.roomSettings.maxGuessesPerRound ?? 20);
+
+  if (roomSummary) {
+    return <GameOver />;
+  }
 
   return (
     <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-screen flex flex-col">

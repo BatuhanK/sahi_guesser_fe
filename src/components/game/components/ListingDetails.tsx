@@ -13,6 +13,7 @@ import {
 import React from "react";
 import {
   CarListingDetails,
+  HotelsListingDetails,
   HouseForRentListingDetails,
   LetgoListingDetails,
 } from "../../../types/socket";
@@ -121,3 +122,34 @@ export const LetgoDetails: React.FC<{ details: LetgoListingDetails }> = ({
     ))}
   </div>
 );
+
+const hotelDetailsPropertyMap: Record<string, string> = {
+  Features: "Özellik",
+  "Hotel Rating": "Otel Puanı",
+  "Hotel Type": "Otel Tipi",
+  "Room Type": "Oda Tipi",
+  "Review Count": "Yorum Sayısı",
+};
+
+export const HotelsDetails: React.FC<{ details: HotelsListingDetails }> = ({
+  details,
+}) => {
+  return (
+    <div className="flex flex-wrap gap-2 text-sm lg:text-base">
+      <DetailPill
+        icon={<MapPin className="h-3.5 w-3.5 lg:h-4 lg:w-4" />}
+        text={`${details.city}, ${details.country}`}
+      />
+      {Object.entries(details.keyValues).map(([key, value], index) =>
+        hotelDetailsPropertyMap[key] ? (
+          <DetailPill
+            key={`${key}-${index}`}
+            icon={<></>}
+            text={value}
+            label={hotelDetailsPropertyMap[key]}
+          />
+        ) : null
+      )}
+    </div>
+  );
+};

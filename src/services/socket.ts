@@ -6,6 +6,7 @@ import type {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../types/socket";
+import { roomApi } from "./api";
 import { soundService } from "./soundService";
 
 class SocketService {
@@ -24,7 +25,7 @@ class SocketService {
     }
 
     const socketUrl = import.meta.env.VITE_SOCKET_URL ?? "/";
-    const isLocal = socketUrl.includes("local");
+    const isLocal = socketUrl.includes("local") || socketUrl.includes("192");
 
     this.socket = io(socketUrl, {
       path: isLocal ? "/socket.io/" : "/ws/socket.io/",
@@ -266,6 +267,16 @@ class SocketService {
       if (userId === useAuthStore.getState().user?.id) {
         this.disconnect();
         window.location.href = "https://nolur.com";
+      }
+    });
+
+    this.socket.on("roomCompleted", async ({ roomId }) => {
+      console.log("Room completed", roomId);
+      const state = useGameStore.getState();
+      if (state.room && state.room.id === roomId) {
+        const summary = await roomApi.getRoomSummary(state.room.slug);
+        state.setRoomSummary(summary);
+        window.history.replaceState({}, "", "/");
       }
     });
 

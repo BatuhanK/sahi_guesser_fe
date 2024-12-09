@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { devtools } from "zustand/middleware";
 
-import { Room } from "../services/api";
+import { Room, RoomSummary } from "../services/api";
 import { ChatMessage, GuessResult } from "../types";
 import type {
   GameStatus,
@@ -31,6 +31,7 @@ interface GameState {
   lastGuesses: GuessResult[];
   showResults: boolean;
   intermissionDuration: number;
+  roomSummary: RoomSummary | null;
   setGameStatus: (status: GameStatus) => void;
   setCurrentListing: (listing: Listing | null) => void;
   setRoundInfo: (startTime: Date, duration: number) => void;
@@ -51,6 +52,7 @@ interface GameState {
   setIncorrectGuesses: (incorrectGuesses: GuessResult[]) => void;
   setGuessCount: (guessCount: number) => void;
   setIntermissionDuration: (intermissionDuration: number) => void;
+  setRoomSummary: (roomSummary: RoomSummary | null) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -74,6 +76,7 @@ export const useGameStore = create<GameState>()(
     roundEndScores: [],
     showResults: false,
     intermissionDuration: 0,
+    roomSummary: null,
     setGameStatus: (status) =>
       set({
         status,
@@ -120,5 +123,6 @@ export const useGameStore = create<GameState>()(
     setShowResults: (showResults) => set({ showResults }),
     setIntermissionDuration: (intermissionDuration) =>
       set({ intermissionDuration }),
+    setRoomSummary: (roomSummary) => set({ roomSummary }),
   }))
 );

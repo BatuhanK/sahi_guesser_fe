@@ -1,5 +1,16 @@
 export type GameStatus = "WAITING" | "PLAYING" | "INTERMISSION" | "FINISHED";
 
+export type HotelsListingDetails = {
+  type: "hotels";
+  title: string;
+  description: string;
+  city: string;
+  country: string;
+  nightlyPrice: number;
+  imageUrls: string[];
+  keyValues: Record<string, string>;
+};
+
 export type CarListingDetails = {
   type: "car";
   brand: string;
@@ -35,7 +46,11 @@ export type LetgoListingDetails = {
 export interface Listing {
   id: number;
   title: string;
-  details: CarListingDetails | HouseForRentListingDetails | LetgoListingDetails;
+  details:
+    | CarListingDetails
+    | HouseForRentListingDetails
+    | LetgoListingDetails
+    | HotelsListingDetails;
 }
 
 export interface Player {
@@ -87,6 +102,7 @@ export interface ServerToClientEvents {
   }) => void;
   intermissionStart: (data: { duration: number }) => void;
   roundEnd: (data: { correctPrice: number; scores: RoundEndScore[] }) => void;
+  roomCompleted: (data: { roomId: number }) => void;
   correctGuess: (data: {
     userId: number;
     playerId: number;

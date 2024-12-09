@@ -4,6 +4,7 @@ class SoundService {
   private otherPlayerSuccessSound: HTMLAudioElement;
   private failureSound: HTMLAudioElement;
   private countdownSound: HTMLAudioElement;
+  private gameOverSound: HTMLAudioElement;
   private countdownTimeout: number | null = null;
   private volume: number = 1;
 
@@ -22,6 +23,9 @@ class SoundService {
     );
     this.countdownSound = new Audio(
       "https://cdn.freesound.org/previews/172/172967_1015240-lq.mp3"
+    );
+    this.gameOverSound = new Audio(
+      "https://cdn.freesound.org/previews/173/173859_1074082-lq.mp3"
     );
   }
 
@@ -53,6 +57,12 @@ class SoundService {
     this.countdownSound.currentTime = 0;
     this.countdownSound.volume = this.volume * 0.2;
     this.countdownSound.play();
+  }
+
+  playGameOver() {
+    this.gameOverSound.currentTime = 0;
+    this.gameOverSound.volume = this.volume;
+    this.gameOverSound.play();
   }
 
   scheduleCountdown(durationMs: number) {

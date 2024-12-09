@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import {
   CarListingDetails,
+  HotelsListingDetails,
   HouseForRentListingDetails,
   LetgoListingDetails,
   Listing,
@@ -188,6 +189,12 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
     return `${details.title}`;
   }, [listing.details]);
 
+  const hotelListingInfo = useMemo(() => {
+    if (listing.details.type !== "hotels") return null;
+    const details = listing.details as HotelsListingDetails;
+    return `${details.title} - ${details.city}, ${details.country}`;
+  }, [listing.details]);
+
   return (
     <div className="h-full lg:p-6 rounded-xl" style={{ padding: 0 }}>
       <AnimatePresence>
@@ -207,7 +214,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                   </h2>
                   <div className="flex flex-col gap-2">
                     <p className="text-[var(--text-secondary)] text-lg">
-                      {carListingInfo || houseListingInfo || letgoListingInfo}
+                      {carListingInfo ||
+                        houseListingInfo ||
+                        letgoListingInfo ||
+                        hotelListingInfo}
                     </p>
                     <p className="text-2xl font-semibold text-[var(--success-text)]">
                       Gerçek Fiyat: ₺{correctPrice.toLocaleString("tr-TR")}
@@ -236,7 +246,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
               </div>
 
               <div className="w-full bg-[var(--accent-color)] text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center mt-8 hover:bg-[var(--accent-hover)]">
-                Sonraki Tur{" "}
+                Lütfen Bekleyiniz{" "}
                 {remainingSeconds > 0 && (
                   <span className="text-sm">({remainingSeconds}s)</span>
                 )}
