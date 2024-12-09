@@ -117,7 +117,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       <div className="flex items-baseline gap-2">
         <span
           className={cn(
-            "font-medium text-sm cursor-pointer max-w-[150px] truncate",
+            "font-medium text-sm cursor-pointer",
+            "break-all",
             isAdmin
               ? "text-[var(--error-text)] font-bold text-base"
               : isTucik
@@ -138,7 +139,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         </span>
         <span
           className={cn(
-            "text-[var(--text-primary)]",
+            "text-[var(--text-primary)] break-words flex-1",
             isAdmin || isTucik ? "text-base font-medium" : "text-sm"
           )}
         >
