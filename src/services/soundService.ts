@@ -79,6 +79,10 @@ class SoundService {
     this.otherPlayerSuccessSound.volume = this.volume;
     this.countdownSound.volume = this.volume * 0.2;
   }
+
+  getVolume(): number {
+    return this.volume;
+  }
 }
 
 export const soundService = new SoundService();

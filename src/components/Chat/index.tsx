@@ -84,7 +84,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
         "transition-all duration-300 ease-in-out",
         "left-1/2 -translate-x-1/2 md:left-auto md:right-4 md:translate-x-0",
         isMinimized ? "h-[52px]" : "h-[75vh] md:h-[calc(100vh-4rem)]",
-        "w-[420px] md:w-[400px] max-w-[95vw]"
+        "w-[420px] md:w-[450px] max-w-[95vw]"
       )}
     >
       <div className="flex flex-col h-full">

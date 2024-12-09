@@ -14,6 +14,7 @@ import {
   ShoppingBag,
   Sun,
   UserPlus,
+  Volume2,
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -22,6 +23,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { useMediaQuery } from "../../hooks/useMediaQuery";
 import { announcementApi } from "../../services/api";
 import { socketService } from "../../services/socket";
+import { soundService } from "../../services/soundService";
 import { useAnnouncementStore } from "../../store/announcementStore";
 import { useGameStore } from "../../store/gameStore";
 import { ScoreBoard } from "../ScoreBoard";
@@ -143,6 +145,10 @@ export const Header: React.FC<HeaderProps> = ({
   const [showAnnouncements, setShowAnnouncements] = useState(false);
   const { announcements, readAnnouncementIds, markAsRead, getUnreadCount } =
     useAnnouncementStore();
+  const [volume, setVolume] = useState(() => {
+    const savedVolume = localStorage.getItem("app-volume");
+    return savedVolume ? parseFloat(savedVolume) : 1;
+  });
 
   useEffect(() => {
     let intervalId: number;
@@ -209,6 +215,17 @@ export const Header: React.FC<HeaderProps> = ({
     window.location.reload();
   };
 
+  const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newVolume = parseFloat(e.target.value);
+    setVolume(newVolume);
+    soundService.setVolume(newVolume);
+    localStorage.setItem("app-volume", newVolume.toString());
+  };
+
+  useEffect(() => {
+    soundService.setVolume(volume);
+  }, []); // Run once on mount
+
   return (
     <>
       <header className="bg-[var(--accent-color)] p-4 shadow-md relative transition-colors">
@@ -259,21 +276,38 @@ export const Header: React.FC<HeaderProps> = ({
                     {user && (
                       <div className="flex flex-col gap-2">
                         <div
-                          className="flex items-center justify-between cursor-pointer p-2 hover:bg-gray-100 rounded"
+                          className="flex items-center justify-between cursor-pointer p-2 hover:bg-[var(--bg-hover)] rounded transition-colors"
                           onClick={() => setShowUserMenu(!showUserMenu)}
                         >
-                          <span>
+                          <span className="text-[var(--text-primary)]">
                             Hoşgeldin, <b>{user.username}</b>
                           </span>
                         </div>
                         {showUserMenu && (
-                          <button
-                            onClick={handleLogout}
-                            className="flex items-center gap-2 text-red-500 p-2 hover:bg-gray-100 rounded"
-                          >
-                            <LogOut size={20} />
-                            <span>Çıkış Yap</span>
-                          </button>
+                          <>
+                            <button
+                              onClick={handleLogout}
+                              className="flex items-center gap-2 text-red-500 p-2 hover:bg-[var(--bg-hover)] rounded"
+                            >
+                              <LogOut size={20} />
+                              <span>Çıkış Yap</span>
+                            </button>
+                            <div className="flex items-center gap-2 p-2 hover:bg-[var(--bg-hover)] rounded">
+                              <Volume2
+                                size={20}
+                                className="text-[var(--text-primary)]"
+                              />
+                              <input
+                                type="range"
+                                min="0"
+                                max="1"
+                                step="0.1"
+                                value={volume}
+                                onChange={handleVolumeChange}
+                                className="w-full accent-[var(--accent-color)]"
+                              />
+                            </div>
+                          </>
                         )}
                       </div>
                     )}
@@ -301,7 +335,7 @@ export const Header: React.FC<HeaderProps> = ({
                         className="relative p-2 hover:bg-[var(--accent-hover)] rounded transition-colors"
                       >
                         <Bell
-                          className="text-[var(--bg-secondary)]"
+                          className="text-[var(--text-primary)]"
                           size={24}
                         />
                         {getUnreadCount() > 0 && (
@@ -397,10 +431,10 @@ export const Header: React.FC<HeaderProps> = ({
               {user && (
                 <div className="relative">
                   <div
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-yellow-500 transition-colors"
+                    className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-[var(--accent-hover)] transition-colors"
                     onClick={() => setShowUserMenu(!showUserMenu)}
                   >
-                    <span className="text-white">
+                    <span className="text-[var(--bg-secondary)]">
                       Hoşgeldin, <b>{user.username}</b>
                     </span>
                   </div>
@@ -408,11 +442,26 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 min-w-[200px] z-50">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-primary)] text-red-500"
+                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-red-500"
                       >
                         <LogOut size={20} />
                         <span>Çıkış Yap</span>
                       </button>
+                      <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
+                        <Volume2
+                          size={20}
+                          className="text-[var(--text-primary)]"
+                        />
+                        <input
+                          type="range"
+                          min="0"
+                          max="1"
+                          step="0.1"
+                          value={volume}
+                          onChange={handleVolumeChange}
+                          className="w-full accent-[var(--accent-color)]"
+                        />
+                      </div>
                     </div>
                   )}
                 </div>
