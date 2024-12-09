@@ -11,10 +11,12 @@ import { toast } from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import { Category } from "../services/api";
 import { CreatePrivateRoomModal } from "./CreatePrivateRoomModal";
+import { MaintenanceModal } from "./ui/MaintenanceModal";
 
 interface CategorySelectorProps {
   categories: Category[];
   onSelect: (categorySlug: string) => void;
+  hasError?: boolean;
 }
 
 const iconMap: Record<string, LucideIcon> = {
@@ -28,11 +30,22 @@ const iconMap: Record<string, LucideIcon> = {
 export const CategorySelector: React.FC<CategorySelectorProps> = ({
   categories,
   onSelect,
+  hasError = false,
 }) => {
   const [isCreatePrivateRoomModalOpen, setIsCreatePrivateRoomModalOpen] =
     useState(false);
+  const [showMaintenanceModal, setShowMaintenanceModal] = useState(hasError);
 
   const { user } = useAuth();
+
+  if (hasError) {
+    return (
+      <MaintenanceModal
+        isOpen={showMaintenanceModal}
+        onClose={() => setShowMaintenanceModal(false)}
+      />
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 md:gap-8">

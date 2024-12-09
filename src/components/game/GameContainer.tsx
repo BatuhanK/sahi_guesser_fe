@@ -21,6 +21,7 @@ export const GameContainer: React.FC = () => {
 
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [hasError, setHasError] = useState(false);
   const [, setSelectedCategory] = useState<string | null>(null);
 
   const { announcements, markAsRead, readAnnouncementIds } =
@@ -38,6 +39,7 @@ export const GameContainer: React.FC = () => {
         setCategories(categories);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
+        setHasError(true);
       } finally {
         setIsLoading(false);
       }
@@ -127,6 +129,7 @@ export const GameContainer: React.FC = () => {
         <CategorySelector
           categories={categories}
           onSelect={handleCategorySelect}
+          hasError={hasError}
         />
         <LeaderboardTable />
       </div>
