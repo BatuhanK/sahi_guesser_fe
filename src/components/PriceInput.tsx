@@ -28,14 +28,16 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   const user = useAuthStore((state) => state.user);
 
   let minPrice = 0;
-  if (listingType === "car") minPrice = 500000;
+  if (listingType === "car") minPrice = 500_000;
   if (listingType === "letgo") minPrice = 500;
   if (listingType === "house-for-rent") minPrice = 5000;
+  if (listingType === "hotels") minPrice = 100;
 
   let maxPrice = 0;
   if (listingType === "car") maxPrice = 15_000_000;
   if (listingType === "letgo") maxPrice = 50_000;
   if (listingType === "house-for-rent") maxPrice = 50_000;
+  if (listingType === "hotels") maxPrice = 100_000;
 
   useEffect(() => {
     setValue("");
