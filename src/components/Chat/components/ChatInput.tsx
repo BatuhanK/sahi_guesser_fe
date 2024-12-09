@@ -129,7 +129,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
             value={message}
             onChange={handleInputChange}
             onKeyDown={handleKeyDown}
-            placeholder="Mesajınızı yazın... (@ile kullanıcı etiketleyin)"
+            placeholder="Mesajınızı yazın..."
             className={cn(
               "flex-1 rounded-full bg-[var(--bg-secondary)]",
               "border border-[var(--border-color)] hover:border-[var(--text-tertiary)]",
