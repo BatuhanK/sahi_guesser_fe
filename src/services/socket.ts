@@ -39,6 +39,7 @@ class SocketService {
       query: {
         token,
       },
+      transports: ["websocket"],
     });
 
     // if (!token) {
