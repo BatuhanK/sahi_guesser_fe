@@ -1,30 +1,8 @@
 import React from "react";
 import { cn } from "../../../lib/utils";
+import { useGameStore } from "../../../store/gameStore";
 import { ChatMention, ChatMessageProps } from "../types";
 import { maskNumbers } from "../utils";
-
-// Function to generate consistent color based on username
-const getUsernameColor = (username: string) => {
-  const colors = [
-    "text-[#FF6B6B]", // Red
-    "text-[#4ECDC4]", // Teal
-    "text-[#45B7D1]", // Light Blue
-    "text-[#96CEB4]", // Sage
-    "text-[#D4A5A5]", // Rose
-    "text-[#9B59B6]", // Purple
-    "text-[#3498DB]", // Blue
-    "text-[#2ECC71]", // Green
-    "text-[#F1C40F]", // Yellow
-    "text-[#E67E22]", // Orange
-  ];
-
-  // Simple hash function to get consistent index
-  const hash = username.split("").reduce((acc, char) => {
-    return char.charCodeAt(0) + ((acc << 5) - acc);
-  }, 0);
-
-  return colors[Math.abs(hash) % colors.length];
-};
 
 const renderMessageWithMentions = (
   message: string,
@@ -82,14 +60,70 @@ const renderMessageWithMentions = (
   );
 };
 
+// Function to get score-based effects for username
+const getScoreBasedEffects = (score: number) => {
+  if (score >= 1_000_000) {
+    return {
+      className:
+        "animate-rainbow font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FF0000] via-[#00FF00] to-[#0000FF] hover:scale-110 transform transition-transform",
+      prefix: "👑",
+      suffix: "👑",
+    };
+  }
+  if (score >= 500_000) {
+    return {
+      className:
+        "font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-500 animate-shimmer hover:scale-105 transform transition-transform",
+      prefix: "⭐",
+      suffix: "⭐",
+    };
+  }
+  if (score >= 100_000) {
+    return {
+      className:
+        "font-bold text-transparent bg-clip-text animate-pulse bg-gradient-to-r from-emerald-400 to-cyan-400 hover:scale-105 transform transition-transform",
+      prefix: "💎",
+      suffix: "💎",
+    };
+  }
+  if (score >= 30_000) {
+    return {
+      className:
+        "font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 hover:scale-105 transform transition-transform",
+      prefix: "🌟",
+      suffix: "🌟",
+    };
+  }
+  if (score > 0) {
+    return {
+      className:
+        "font-medium text-transparent bg-clip-text bg-gradient-to-r from-slate-500 to-slate-700 hover:scale-105 transform transition-transform",
+      prefix: "⚡",
+      suffix: "",
+    };
+  }
+  return {
+    className: "text-[#F1C40F] hover:scale-105 transform transition-transform",
+    prefix: "🎮",
+    suffix: "",
+  };
+};
+
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   currentUsername,
   onMentionClick,
 }) => {
+  const onlinePlayers = useGameStore((state) => state.onlinePlayers);
   const isAdmin = message.username === "batuhan";
   const isTucik = message.username === "Tucik";
   const isSystem = message.username === "system";
+
+  const playerScore =
+    onlinePlayers.find((player) => player.username === message.username)
+      ?.totalScore || 0;
+
+  const scoreEffects = getScoreBasedEffects(playerScore);
 
   if (isSystem) {
     return (
@@ -117,25 +151,24 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       <div className="flex items-baseline gap-2">
         <span
           className={cn(
-            "font-medium text-sm cursor-pointer",
-            "break-all",
+            "font-medium text-sm cursor-pointer break-all",
             isAdmin
               ? "text-[var(--error-text)] font-bold text-base"
               : isTucik
               ? "text-[var(--accent-color)] font-bold text-base"
-              : getUsernameColor(message.username),
+              : scoreEffects.className,
             "hover:opacity-80 transition-opacity"
           )}
           onClick={() => onMentionClick?.(message.username)}
           role="button"
           tabIndex={0}
-          title={message.username}
+          title={`${message.username} (${playerScore.toLocaleString()} puan)`}
         >
           {isAdmin
-            ? `👑 ${message.username} 👑`
+            ? `👑👑 ${message.username}`
             : isTucik
             ? `💜 ${message.username} 💜`
-            : message.username}
+            : `${scoreEffects.prefix} ${message.username} ${scoreEffects.suffix}`}
         </span>
         <span
           className={cn(
