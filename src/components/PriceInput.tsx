@@ -30,7 +30,9 @@ export const PriceInput: React.FC<PriceInputProps> = ({
 
   const getAdjustmentAmounts = useCallback(() => {
     if (listingType === "car") {
-      return price >= 1000000 ? [100000, 50000, 25000] : [50000, 25000, 5000];
+      return price >= 1000000
+        ? [100_000, 50_000, 25_000]
+        : [100_000, 25_000, 5000];
     } else if (listingType === "letgo") {
       return [1000, 500, 100];
     } else if (listingType === "house-for-rent") {
