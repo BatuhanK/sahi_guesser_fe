@@ -140,6 +140,12 @@ export const HotelsDetails: React.FC<{ details: HotelsListingDetails }> = ({
         icon={<MapPin className="h-3.5 w-3.5 lg:h-4 lg:w-4" />}
         text={`${details.city}, ${details.country}`}
       />
+      <DetailPill
+        key={`tarih`}
+        icon={<></>}
+        text={"Tarih"}
+        label={"Mart ayı"}
+      />
       {Object.entries(details.keyValues).map(([key, value], index) =>
         hotelDetailsPropertyMap[key] ? (
           <DetailPill
