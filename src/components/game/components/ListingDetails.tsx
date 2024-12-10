@@ -143,8 +143,8 @@ export const HotelsDetails: React.FC<{ details: HotelsListingDetails }> = ({
       <DetailPill
         key={`tarih`}
         icon={<></>}
-        text={"Tarih"}
-        label={"Mart ayı"}
+        text={"Mart ayı"}
+        label={"Tarih"}
       />
       {Object.entries(details.keyValues).map(([key, value], index) =>
         hotelDetailsPropertyMap[key] ? (
