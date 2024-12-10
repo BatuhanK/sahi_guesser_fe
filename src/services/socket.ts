@@ -254,6 +254,14 @@ class SocketService {
           onlinePlayers.filter((player) => player.playerId !== playerId)
         );
     });
+    this.socket.on("roomEnded", () => {
+      const state = useGameStore.getState();
+
+      state.setRoomId(null);
+      state.setRoom(null);
+      state.setCurrentListing(null);
+    });
+
     this.socket.on("roomEnd", () => {
       const state = useGameStore.getState();
 

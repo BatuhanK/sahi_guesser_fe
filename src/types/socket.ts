@@ -88,6 +88,7 @@ export interface ServerToClientEvents {
     roundDuration: number;
   }) => void;
   roomEnd: () => void;
+  roomEnded: () => void;
   onlinePlayers: (data: { players: OnlinePlayer[] }) => void;
   roundStart: (data: { listing: Listing; duration: number }) => void;
   guessResult: (data: {
