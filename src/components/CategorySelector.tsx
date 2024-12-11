@@ -71,7 +71,9 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
               <span className="text-lg md:text-xl font-medium text-[var(--text-primary)]">
                 {category.name}
               </span>
-             
+              <span className="text-xs md:text-sm text-[var(--text-tertiary)]">
+                {category.onlinePlayerCount || 0} oyuncu
+              </span>
             </button>
           );
         })}
