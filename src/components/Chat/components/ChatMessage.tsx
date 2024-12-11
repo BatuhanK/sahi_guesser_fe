@@ -64,10 +64,15 @@ const renderMessageWithMentions = (
 const getScoreBasedEffects = (score: number) => {
   if (score >= 1_000_000) {
     return {
-      className:
-        "animate-rainbow font-black text-transparent bg-clip-text bg-gradient-to-r from-[#FF0000] via-[#00FF00] to-[#0000FF] hover:scale-110 transform transition-transform",
-      prefix: "👑",
-      suffix: "👑",
+      className: cn(
+        "font-black text-transparent bg-clip-text",
+        "bg-[linear-gradient(45deg,#FF0000,#FF4500,#FF8C00,#FFD700,#FF0000)]",
+        "bg-[length:200%_auto] animate-flow-fast",
+        "hover:scale-110 transform transition-transform",
+        "drop-shadow-[0_0_10px_rgba(255,69,0,0.5)]"
+      ),
+      prefix: "🔥",
+      suffix: "🔥",
     };
   }
   if (score >= 500_000) {

@@ -9,6 +9,14 @@ import type {
 import { roomApi } from "./api";
 import { soundService } from "./soundService";
 
+interface ChatMessage {
+  id: string;
+  userId: string;
+  username: string;
+  message: string;
+  timestamp: Date;
+}
+
 class SocketService {
   private socket: Socket<ServerToClientEvents, ClientToServerEvents> | null =
     null;
@@ -210,20 +218,30 @@ class SocketService {
       flushIncorrectGuesses();
     });
 
+    // Add message buffer and debounced flush function
+    let chatMessageBuffer: Array<ChatMessage> = [];
+
+    const flushChatMessages = debounce(() => {
+      if (chatMessageBuffer.length > 0) {
+        const state = useGameStore.getState();
+        useGameStore
+          .getState()
+          .setChatMessages(
+            [...state.chatMessages, ...chatMessageBuffer].slice(-100)
+          );
+        chatMessageBuffer = [];
+      }
+    }, 100);
+
     this.socket.on("chatMessage", ({ userId, username, message }) => {
-      const state = useGameStore.getState();
-      useGameStore.getState().setChatMessages(
-        [
-          ...state.chatMessages,
-          {
-            id: new Date().getTime().toString(),
-            userId,
-            username,
-            message,
-            timestamp: new Date(),
-          },
-        ].slice(-100)
-      );
+      chatMessageBuffer.push({
+        id: new Date().getTime().toString(),
+        userId: userId.toString(),
+        username,
+        message,
+        timestamp: new Date(),
+      });
+      flushChatMessages();
     });
 
     this.socket.on(
@@ -268,6 +286,16 @@ class SocketService {
       state.setRoomId(null);
       state.setRoom(null);
       state.setCurrentListing(null);
+    });
+
+    this.socket.on("serverShutdown", () => {
+      const state = useGameStore.getState();
+
+      state.setRoomId(null);
+      state.setRoom(null);
+      state.setCurrentListing(null);
+
+      window.location.href = "/";
     });
 
     this.socket.on("userBanned", ({ userId, roomId }) => {
