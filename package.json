@@ -24,7 +24,7 @@
     "framer-motion": "^11.13.1",
     "livekit-client": "^2.7.1",
     "lodash": "^4.17.21",
-    "lucide-react": "^0.344.0",
+    "lucide-react": "^0.396.0",
     "qrcode.react": "^4.1.0",
     "react": "^18.3.1",
     "react-confetti": "^6.1.0",

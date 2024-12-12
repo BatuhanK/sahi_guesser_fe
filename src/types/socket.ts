@@ -33,6 +33,17 @@ export type HouseForRentListingDetails = {
   imageUrls: string[];
 };
 
+export type HouseForSaleListingDetails = {
+  type: "house-for-sale";
+  rooms: number;
+  squareMeters: number;
+  buildingAge: number;
+  floor: number;
+  city: string;
+  district: string;
+  imageUrls: string[];
+};
+
 export type LetgoListingDetails = {
   type: "letgo";
   title: string;
@@ -49,6 +60,7 @@ export interface Listing {
   details:
     | CarListingDetails
     | HouseForRentListingDetails
+    | HouseForSaleListingDetails
     | LetgoListingDetails
     | HotelsListingDetails;
 }

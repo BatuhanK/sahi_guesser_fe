@@ -15,6 +15,7 @@ import {
   CarListingDetails,
   HotelsListingDetails,
   HouseForRentListingDetails,
+  HouseForSaleListingDetails,
   LetgoListingDetails,
 } from "../../../types/socket";
 
@@ -74,7 +75,7 @@ export const CarDetails: React.FC<{ details: CarListingDetails }> = ({
 );
 
 export const PropertyDetails: React.FC<{
-  details: HouseForRentListingDetails;
+  details: HouseForRentListingDetails | HouseForSaleListingDetails;
 }> = ({ details }) => (
   <div className="flex flex-wrap gap-2 text-sm lg:text-base">
     {[

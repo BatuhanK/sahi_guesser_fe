@@ -1,31 +1,17 @@
-import {
-  BedDouble,
-  Bike,
-  Car,
-  Home,
-  LucideIcon,
-  ShoppingBasket,
-} from "lucide-react";
+import { Home } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
 import { useAuth } from "../hooks/useAuth";
 import { Category } from "../services/api";
 import { CreatePrivateRoomModal } from "./CreatePrivateRoomModal";
 import { MaintenanceModal } from "./ui/MaintenanceModal";
+import { iconMap } from "./ui/iconmap";
 
 interface CategorySelectorProps {
   categories: Category[];
   onSelect: (categorySlug: string) => void;
   hasError?: boolean;
 }
-
-const iconMap: Record<string, LucideIcon> = {
-  home: Home,
-  car: Car,
-  letgo: ShoppingBasket,
-  motocycle: Bike,
-  hotel: BedDouble,
-};
 
 export const CategorySelector: React.FC<CategorySelectorProps> = ({
   categories,
@@ -71,7 +57,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
               <span className="text-lg md:text-xl font-medium text-[var(--text-primary)]">
                 {category.name}
               </span>
-             
             </button>
           );
         })}

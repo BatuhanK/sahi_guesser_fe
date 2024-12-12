@@ -152,6 +152,8 @@ export const GameBoard: React.FC = () => {
         return <CarDetails details={currentListing.details} />;
       case "house-for-rent":
         return <PropertyDetails details={currentListing.details} />;
+      case "house-for-sale":
+        return <PropertyDetails details={currentListing.details} />;
       case "letgo":
         return <LetgoDetails details={currentListing.details} />;
       case "hotels":

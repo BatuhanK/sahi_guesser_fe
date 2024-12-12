@@ -43,6 +43,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
       } else {
         return [2500, 1000, 500];
       }
+    } else if (listingType === "house-for-sale") {
+      return [500_000, 250_000, 100_000];
     } else {
       return [1000, 500, 100];
     }

@@ -6,14 +6,6 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  BedDouble,
-  Bike,
-  Car,
-  Home,
-  LucideIcon,
-  ShoppingBasket,
-} from "lucide-react";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
@@ -26,14 +18,7 @@ import {
 } from "../services/api";
 import { socketService } from "../services/socket";
 import { useGameStore } from "../store/gameStore";
-
-const iconMap: Record<string, LucideIcon> = {
-  home: Home,
-  car: Car,
-  letgo: ShoppingBasket,
-  motocycle: Bike,
-  hotel: BedDouble,
-};
+import { iconMap } from "./ui/iconmap";
 
 interface CreatePrivateRoomModalProps {
   isOpen: boolean;
