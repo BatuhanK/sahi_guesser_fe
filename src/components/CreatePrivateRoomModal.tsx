@@ -144,6 +144,20 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
       return "En az bir kategori seçmelisiniz";
     }
 
+    const selectedCategories = categories.filter((cat) =>
+      formData.categoryIds.includes(cat.id)
+    );
+    const hasRental = selectedCategories.some(
+      (cat) => cat.slug === "kiralik-evler"
+    );
+    const hasSale = selectedCategories.some(
+      (cat) => cat.slug === "satilik-evler"
+    );
+
+    if (hasRental && hasSale) {
+      return "Henüz satılık ve kiralık evler aynı anda seçilemiyor";
+    }
+
     if (
       formData.roundDurationSeconds < 10 ||
       formData.roundDurationSeconds > 120
