@@ -1,10 +1,27 @@
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { AuthModal } from "./components/auth/AuthModals";
 import { GameContainer } from "./components/game/GameContainer";
 import { Header } from "./components/layout/Header";
 import { useAuth } from "./hooks/useAuth";
+import { analyticsService } from "./services/analytics";
+
+// Initialize GA4
+analyticsService.initialize(
+  import.meta.env.VITE_GA_MEASUREMENT_ID || "G-HM92SBLYN7"
+);
+
+// Analytics wrapper component
+function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+
+  useEffect(() => {
+    analyticsService.trackPageView(location.pathname);
+  }, [location]);
+
+  return <>{children}</>;
+}
 
 // CSS variables for theming
 const setThemeColors = (isDark: boolean) => {
@@ -130,8 +147,10 @@ function App() {
     try {
       if (authModalType === "login") {
         await login(username, password);
+        analyticsService.trackLogin("regular");
       } else if (authModalType === "register") {
         await register(username, password);
+        analyticsService.trackRegistration();
       }
       setIsAuthModalOpen(false);
     } catch (error) {
@@ -145,60 +164,64 @@ function App() {
   };
 
   const toggleTheme = () => {
-    setIsDarkMode((prev) => !prev);
+    const newTheme = !isDarkMode;
+    setIsDarkMode(newTheme);
+    analyticsService.trackThemeToggle(newTheme ? "dark" : "light");
   };
 
   return (
     <BrowserRouter>
-      <Toaster
-        position="top-right"
-        toastOptions={{
-          duration: 4000,
-          style: {
-            background: isDarkMode ? "var(--bg-secondary)" : "#333",
-            color: isDarkMode ? "var(--text-primary)" : "#fff",
-          },
-          success: {
-            duration: 3000,
-            style: {
-              background: "var(--success-bg)",
-              color: "var(--success-text)",
-            },
-          },
-          error: {
+      <AnalyticsWrapper>
+        <Toaster
+          position="top-right"
+          toastOptions={{
             duration: 4000,
             style: {
-              background: "var(--error-bg)",
-              color: "var(--error-text)",
+              background: isDarkMode ? "var(--bg-secondary)" : "#333",
+              color: isDarkMode ? "var(--text-primary)" : "#fff",
             },
-          },
-        }}
-      />
-      <div
-        className="min-h-screen transition-colors duration-200"
-        style={{
-          backgroundColor: "var(--bg-primary)",
-          color: "var(--text-primary)",
-        }}
-      >
-        <Header
-          onOpenAuth={handleOpenAuthModal}
-          isDarkMode={isDarkMode}
-          onToggleTheme={toggleTheme}
+            success: {
+              duration: 3000,
+              style: {
+                background: "var(--success-bg)",
+                color: "var(--success-text)",
+              },
+            },
+            error: {
+              duration: 4000,
+              style: {
+                background: "var(--error-bg)",
+                color: "var(--error-text)",
+              },
+            },
+          }}
         />
-        <main className="mx-auto p-4" style={{ maxWidth: "95rem" }}>
-          <Routes>
-            <Route path="/" element={<GameContainer />} />
-            <Route path="/oda/:slug" element={<GameContainer />} />
-          </Routes>
-        </main>
-        <AuthModal
-          isOpen={isAuthModalOpen}
-          onClose={() => setIsAuthModalOpen(false)}
-          type={authModalType || "login"}
-          onAuth={handleAuth}
-        />
-      </div>
+        <div
+          className="min-h-screen transition-colors duration-200"
+          style={{
+            backgroundColor: "var(--bg-primary)",
+            color: "var(--text-primary)",
+          }}
+        >
+          <Header
+            onOpenAuth={handleOpenAuthModal}
+            isDarkMode={isDarkMode}
+            onToggleTheme={toggleTheme}
+          />
+          <main className="mx-auto p-4" style={{ maxWidth: "95rem" }}>
+            <Routes>
+              <Route path="/" element={<GameContainer />} />
+              <Route path="/oda/:slug" element={<GameContainer />} />
+            </Routes>
+          </main>
+          <AuthModal
+            isOpen={isAuthModalOpen}
+            onClose={() => setIsAuthModalOpen(false)}
+            type={authModalType || "login"}
+            onAuth={handleAuth}
+          />
+        </div>
+      </AnalyticsWrapper>
     </BrowserRouter>
   );
 }

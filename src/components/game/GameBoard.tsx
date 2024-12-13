@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import ReactConfetti from "react-confetti";
 import { useAuth } from "../../hooks/useAuth";
+import { analyticsService } from "../../services/analytics";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
 import { Chat } from "../Chat";
@@ -89,19 +90,52 @@ export const GameBoard: React.FC = () => {
   }, [currentListing?.id, currentListing?.details.imageUrls.length]);
 
   useEffect(() => {
+    if (currentListing && room?.id) {
+      analyticsService.trackGameStart(room.id.toString());
+    }
+  }, [currentListing?.id, room?.id]);
+
+  useEffect(() => {
     if (feedback === "correct") {
       setShowConfetti(true);
+      if (currentListing) {
+        analyticsService.trackGuess(
+          currentListing.id.toString(),
+          true,
+          guessCount
+        );
+      }
       const timer = setTimeout(() => setShowConfetti(false), CONFETTI_DURATION);
       return () => clearTimeout(timer);
     }
-  }, [feedback]);
+  }, [feedback, currentListing, guessCount]);
+
+  useEffect(() => {
+    if (showResults && correctPrice && roundEndScores.length > 0) {
+      const userScore =
+        roundEndScores.find((score) => score.playerId === user?.id)
+          ?.userScore || 0;
+      if (currentListing) {
+        analyticsService.trackRoundEnd(
+          currentListing.id.toString(),
+          correctPrice,
+          userScore
+        );
+      }
+    }
+  }, [showResults, correctPrice, roundEndScores, currentListing, user?.id]);
 
   const handleGuess = useCallback(
     (guess: number) => {
       if (!currentListing || !isAuthenticated || !roomId) return;
       socketService.submitGuess(roomId, guess);
+      analyticsService.trackGuess(
+        currentListing.id.toString(),
+        false,
+        guessCount + 1
+      );
     },
-    [currentListing, isAuthenticated, roomId]
+    [currentListing, isAuthenticated, roomId, guessCount]
   );
 
   const imageHandlers = useMemo(
@@ -112,6 +146,9 @@ export const GameBoard: React.FC = () => {
             ? (currentListing?.details.imageUrls.length ?? 1) - 1
             : prevIndex - 1
         );
+        if (currentListing) {
+          analyticsService.trackImageNavigation(currentListing.id.toString());
+        }
         startSlideshow();
       },
       handleNextImage: () => {
@@ -120,10 +157,13 @@ export const GameBoard: React.FC = () => {
             ? 0
             : prevIndex + 1
         );
+        if (currentListing) {
+          analyticsService.trackImageNavigation(currentListing.id.toString());
+        }
         startSlideshow();
       },
     }),
-    [currentListing?.details.imageUrls.length, startSlideshow]
+    [currentListing, startSlideshow]
   );
 
   const handleSendMessage = useCallback(

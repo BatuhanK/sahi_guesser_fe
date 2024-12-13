@@ -6,6 +6,7 @@ import type {
   ClientToServerEvents,
   ServerToClientEvents,
 } from "../types/socket";
+import { analyticsService } from "./analytics";
 import { roomApi } from "./api";
 import { soundService } from "./soundService";
 
@@ -84,6 +85,13 @@ class SocketService {
         useGameStore
           .getState()
           .setRoundInfo(new Date(roundStartTime), roundDuration);
+
+        if (listing) {
+          analyticsService.trackRoundStart(
+            listing.id.toString(),
+            listing.details.type
+          );
+        }
       }
     );
 
@@ -112,6 +120,13 @@ class SocketService {
       state.setLastGuesses([]);
       state.setCorrectGuesses([]);
       state.setIncorrectGuesses([]);
+
+      if (listing) {
+        analyticsService.trackRoundStart(
+          listing.id.toString(),
+          listing.details.type
+        );
+      }
 
       soundService.playRoundStart();
     });
@@ -242,6 +257,10 @@ class SocketService {
         timestamp: new Date(),
       });
       flushChatMessages();
+
+      if (this.roomId) {
+        analyticsService.trackChatMessage(this.roomId.toString());
+      }
     });
 
     this.socket.on(
