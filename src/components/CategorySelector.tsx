@@ -9,12 +9,14 @@ import { iconMap } from "./ui/iconmap";
 
 interface CategorySelectorProps {
   categories: Category[];
+  notSystemOnlinePlayerCount: number;
   onSelect: (categorySlug: string) => void;
   hasError?: boolean;
 }
 
 export const CategorySelector: React.FC<CategorySelectorProps> = ({
   categories,
+  notSystemOnlinePlayerCount,
   onSelect,
   hasError = false,
 }) => {
@@ -65,19 +67,26 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
         })}
       </div>
 
-      <button
-        onClick={() => {
-          if (user) {
-            setIsCreatePrivateRoomModalOpen(true);
-          } else {
-            toast.error("Lütfen giriş yapınız");
-          }
-        }}
-        className="mt-8 px-6 py-3 bg-[var(--accent-color)] text-white rounded-lg hover:bg-[var(--accent-hover)] 
-          transition-colors duration-200 font-medium text-lg shadow-md hover:shadow-lg"
-      >
-        Özel oda oluştur
-      </button>
+      <div className="flex flex-col items-center gap-2">
+        <button
+          onClick={() => {
+            if (user) {
+              setIsCreatePrivateRoomModalOpen(true);
+            } else {
+              toast.error("Lütfen giriş yapınız");
+            }
+          }}
+          className="px-6 py-3 bg-[var(--accent-color)] text-white rounded-lg hover:bg-[var(--accent-hover)] 
+            transition-colors duration-200 font-medium text-lg shadow-md hover:shadow-lg"
+        >
+          Özel oda oluştur
+        </button>
+        <span className="text-xs text-[var(--text-tertiary)] opacity-75">
+          {notSystemOnlinePlayerCount > 0 &&
+            `${notSystemOnlinePlayerCount} kişi özel odalarda oynuyor`}
+          {notSystemOnlinePlayerCount === 0 && ""}
+        </span>
+      </div>
 
       <CreatePrivateRoomModal
         isOpen={isCreatePrivateRoomModalOpen}

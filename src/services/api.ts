@@ -102,8 +102,11 @@ export interface CreatePrivateRoomRequest {
 
 export const categoryApi = {
   getAll: async () => {
-    const response = await api.get<{ categories: Category[] }>("/categories");
-    return response.data.categories;
+    const response = await api.get<{
+      categories: Category[];
+      notSystemOnlinePlayerCount: number;
+    }>("/categories");
+    return response.data;
   },
 
   getRooms: async (slug: string) => {

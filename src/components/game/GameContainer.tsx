@@ -23,6 +23,8 @@ export const GameContainer: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
   const [, setSelectedCategory] = useState<string | null>(null);
+  const [notSystemOnlinePlayerCount, setNotSystemOnlinePlayerCount] =
+    useState(0);
 
   const { announcements, markAsRead, readAnnouncementIds } =
     useAnnouncementStore();
@@ -35,8 +37,11 @@ export const GameContainer: React.FC = () => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const categories = await categoryApi.getAll();
-        setCategories(categories);
+        const categoryResponse = await categoryApi.getAll();
+        setCategories(categoryResponse.categories);
+        setNotSystemOnlinePlayerCount(
+          categoryResponse.notSystemOnlinePlayerCount
+        );
       } catch (error) {
         console.error("Failed to fetch categories:", error);
         setHasError(true);
@@ -130,6 +135,7 @@ export const GameContainer: React.FC = () => {
           categories={categories}
           onSelect={handleCategorySelect}
           hasError={hasError}
+          notSystemOnlinePlayerCount={notSystemOnlinePlayerCount}
         />
         <LeaderboardTable />
       </div>
