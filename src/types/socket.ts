@@ -150,6 +150,8 @@ export interface ServerToClientEvents {
   }) => void;
 
   userBanned: (data: { userId: number; roomId: number }) => void;
+
+  reconnectRequired: () => void;
 }
 
 export interface ClientToServerEvents {

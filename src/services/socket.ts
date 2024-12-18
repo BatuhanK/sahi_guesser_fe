@@ -317,6 +317,18 @@ class SocketService {
       window.location.href = "/";
     });
 
+    this.socket.on("reconnectRequired", () => {
+      try {
+        const state = useGameStore.getState();
+        const roomId = state.roomId;
+        if (roomId) {
+          this.joinRoom(roomId, true);
+        }
+      } catch (error) {
+        console.error("Error reconnecting to socket", error);
+      }
+    });
+
     this.socket.on("userBanned", ({ userId, roomId }) => {
       console.log("User banned", userId, roomId);
       if (userId === useAuthStore.getState().user?.id) {
@@ -340,7 +352,7 @@ class SocketService {
         const state = useGameStore.getState();
         const roomId = state.roomId;
         if (roomId) {
-          this.joinRoom(roomId);
+          this.joinRoom(roomId, true);
         }
       } catch (error) {
         console.error("Error reconnecting to socket", error);
@@ -348,8 +360,8 @@ class SocketService {
     });
   }
 
-  joinRoom(roomId: number): void {
-    if (this.roomId !== roomId) {
+  joinRoom(roomId: number, isReconnect: boolean = false): void {
+    if (this.roomId !== roomId || isReconnect) {
       this.socket?.emit("joinRoom", { roomId });
       useGameStore.getState().setRoomId(roomId);
     } else {
