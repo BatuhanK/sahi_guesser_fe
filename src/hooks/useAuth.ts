@@ -1,17 +1,25 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { authApi } from "../services/api";
 import { socketService } from "../services/socket";
 import { useAuthStore } from "../store/authStore";
 
 export function useAuth() {
   const { user, token, setUser, setToken, logout } = useAuthStore();
+  const isLoadingRef = useRef(false);
 
   useEffect(() => {
-    if (token && !user) {
+    if (token && !user && !isLoadingRef.current) {
+      isLoadingRef.current = true;
+
       authApi
         .getCurrentUser()
-        .then(({ user }) => setUser(user))
-        .catch(() => logout());
+        .then(({ user }) => {
+          setUser(user);
+        })
+        .catch(() => logout())
+        .finally(() => {
+          isLoadingRef.current = false;
+        });
     }
   }, [token, user, logout, setUser]);
 
