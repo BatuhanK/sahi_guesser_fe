@@ -139,7 +139,7 @@ export const GameContainer: React.FC = () => {
           hasError={hasError}
           notSystemOnlinePlayerCount={notSystemOnlinePlayerCount}
         />
-        <LeaderboardTable />
+        {isLoading ? <Loader text="Yükleniyor..." /> : <LeaderboardTable />}
       </div>
     );
   }
