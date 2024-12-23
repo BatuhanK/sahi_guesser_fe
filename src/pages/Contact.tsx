@@ -1,11 +1,26 @@
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { feedbackApi } from "../services/api";
+import { X } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 
 const MIN_MESSAGE_LENGTH = 25;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
 export const Contact = () => {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const handleClose = () => {
+    // Eğer önceki sayfa oyun sayfası ise oraya geri dön
+    if (location.state?.from === '/') {
+      navigate('/');
+    } else {
+      navigate(-1); // değilse normal geri git
+    }
+  };
+
+  const [showForm, setShowForm] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     type: "feedback" as const,
@@ -97,8 +112,20 @@ export const Contact = () => {
     !errors.message &&
     formData.message.length >= MIN_MESSAGE_LENGTH;
 
+  if (!showForm) {
+    return null;
+  }
+
   return (
-    <div className="max-w-2xl mx-auto p-6">
+    <div className="max-w-2xl mx-auto p-4 relative">
+      <button
+        onClick={handleClose}
+        className="absolute -top-2 -right-2 p-2 rounded-full bg-[var(--bg-secondary)] border border-[var(--border-color)] hover:bg-[var(--hover-color)] transition-colors duration-200"
+        title="Kapat"
+      >
+        <X size={18} className="text-[var(--text-secondary)]" />
+      </button>
+
       <h1 className="text-3xl font-bold mb-6">İletişim</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div>

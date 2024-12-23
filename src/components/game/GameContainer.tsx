@@ -12,6 +12,7 @@ import { CategorySelector } from "../CategorySelector";
 import { LeaderboardTable } from "../LeaderboardTable";
 import { Loader } from "../ui/Loader";
 import { GameBoard } from "./GameBoard";
+import { ContactForm } from "../ContactForm";
 
 export const GameContainer: React.FC = () => {
   const { currentListing, currentQuestion, roomId, room } = useGameStore();
@@ -25,6 +26,7 @@ export const GameContainer: React.FC = () => {
   const [, setSelectedCategory] = useState<string | null>(null);
   const [notSystemOnlinePlayerCount, setNotSystemOnlinePlayerCount] =
     useState(0);
+  const [showContactForm, setShowContactForm] = useState(false);
 
   const { announcements, markAsRead, readAnnouncementIds } =
     useAnnouncementStore();
@@ -159,7 +161,8 @@ export const GameContainer: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="mb-24 sm:mb-32">
+      {showContactForm && <ContactForm onClose={() => setShowContactForm(false)} />}
       {latestAnnouncement && !isLatestRead && (
         <div className="bg-[var(--warning-bg)] border-l-4 border-[var(--warning-text)] p-4 mb-4 relative">
           <button

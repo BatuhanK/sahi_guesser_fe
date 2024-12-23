@@ -214,7 +214,7 @@ export const GameBoard: React.FC = () => {
   }
 
   return (
-    <div className="max-w-[1920px] mx-auto px-4 lg:px-8 h-screen flex flex-col">
+    <div className="game-board max-w-[1920px] mx-auto px-4 lg:px-8 flex flex-col">
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-10 gap-6 lg:gap-8 mb-6">
         {showConfetti && (
           <ReactConfetti recycle={false} numberOfPieces={200} gravity={0.3} />

@@ -256,14 +256,8 @@ export function LeaderboardTable({
   const displayedLeaderboard = showAll ? leaderboard : leaderboard.slice(0, 5);
 
   return (
-    <div
-      className={`space-y-4 ${
-        isModal ? "max-h-[80vh] overflow-y-auto p-4" : ""
-      }`}
-      ref={isModal ? modalRef : null}
-    >
+    <div className="leaderboard space-y-4 mb-8">
       <CategorySelector />
-
       <div className="border-2 border-[var(--accent-color)] rounded-lg shadow-md p-4 bg-[var(--bg-secondary)]">
         {isLoading ? (
           <LeaderboardSkeleton />
