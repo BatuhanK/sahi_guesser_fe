@@ -67,7 +67,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
         })}
       </div>
 
-      <div className="flex flex-col items-center gap-2">
+      <div className="flex flex-col items-center gap-2 my-12">
         <button
           onClick={() => {
             if (user) {

@@ -116,7 +116,7 @@ export const GameContainer: React.FC = () => {
 
   if (!roomId) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 min-h-screen">
         {latestAnnouncement && !isLatestRead && (
           <div className="bg-[var(--warning-bg)] border-l-4 border-[var(--warning-text)] p-4 relative">
             <button
@@ -139,13 +139,27 @@ export const GameContainer: React.FC = () => {
           hasError={hasError}
           notSystemOnlinePlayerCount={notSystemOnlinePlayerCount}
         />
-        {isLoading ? <Loader text="Yükleniyor..." /> : <LeaderboardTable />}
+        <div className="w-full h-[1px] bg-[var(--border-color)]"></div>
+
+        {isLoading ? (
+          <Loader text="Yükleniyor..." />
+        ) : (
+          <div className="py-[12px]">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4 md:gap-8 my-8">
+              {/* //divider */}
+              <h2 className="text-2xl md:text-3xl font-bold text-[var(--text-primary)]">
+                Skor Tabloları
+              </h2>
+              <LeaderboardTable />
+            </div>
+          </div>
+        )}
       </div>
     );
   }
 
   return (
-    <div className="h-full">
+    <div className="min-h-screen">
       {latestAnnouncement && !isLatestRead && (
         <div className="bg-[var(--warning-bg)] border-l-4 border-[var(--warning-text)] p-4 mb-4 relative">
           <button

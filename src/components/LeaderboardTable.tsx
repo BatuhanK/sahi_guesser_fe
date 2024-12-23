@@ -7,7 +7,7 @@ import {
   Medal,
   Trophy,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import api from "../services/api";
 import { iconMap } from "./ui/iconmap";
 
@@ -27,15 +27,38 @@ interface Category {
 
 interface LeaderboardTableProps {
   isModal?: boolean;
+  onClose?: () => void;
 }
 
-export function LeaderboardTable({ isModal = false }: LeaderboardTableProps) {
+export function LeaderboardTable({
+  isModal = false,
+  onClose,
+}: LeaderboardTableProps) {
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [showAll, setShowAll] = useState(false);
   const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const modalRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isModal) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        modalRef.current &&
+        !modalRef.current.contains(event.target as Node)
+      ) {
+        onClose?.();
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [isModal, onClose]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -233,7 +256,12 @@ export function LeaderboardTable({ isModal = false }: LeaderboardTableProps) {
   const displayedLeaderboard = showAll ? leaderboard : leaderboard.slice(0, 5);
 
   return (
-    <div className="space-y-4">
+    <div
+      className={`space-y-4 ${
+        isModal ? "max-h-[80vh] overflow-y-auto p-4" : ""
+      }`}
+      ref={isModal ? modalRef : null}
+    >
       <CategorySelector />
 
       <div className="border-2 border-[var(--accent-color)] rounded-lg shadow-md p-4 bg-[var(--bg-secondary)]">
