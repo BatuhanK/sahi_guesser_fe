@@ -79,9 +79,14 @@ class SocketService {
 
     this.socket.on(
       "gameState",
-      ({ status, listing, roundStartTime, roundDuration }) => {
+      ({ status, listing, question, roundStartTime, roundDuration }) => {
         useGameStore.getState().setGameStatus(status);
-        useGameStore.getState().setCurrentListing(listing);
+        if (listing) {
+          useGameStore.getState().setCurrentListing(listing);
+        }
+        if (question) {
+          useGameStore.getState().setCurrentQuestion(question);
+        }
         useGameStore
           .getState()
           .setRoundInfo(new Date(roundStartTime), roundDuration);
@@ -105,14 +110,20 @@ class SocketService {
       useGameStore.getState().setOnlinePlayers(players);
     });
 
-    this.socket.on("roundStart", ({ listing, duration }) => {
+    this.socket.on("roundStart", ({ listing, question, duration }) => {
       const state = useGameStore.getState();
 
       state.setGuessCount(0);
       state.setGameStatus("PLAYING");
       state.setFeedback(null);
       state.setHasCorrectGuess(false);
-      state.setCurrentListing(listing);
+
+      if (listing) {
+        state.setCurrentListing(listing);
+      }
+      if (question) {
+        state.setCurrentQuestion(question);
+      }
       state.setRoundInfo(new Date(), duration);
       state.setShowResults(false);
       state.setRoundEndScores([]);
@@ -297,6 +308,7 @@ class SocketService {
       state.setRoomId(null);
       state.setRoom(null);
       state.setCurrentListing(null);
+      state.setCurrentQuestion(null);
     });
 
     this.socket.on("roomEnd", () => {
@@ -305,6 +317,7 @@ class SocketService {
       state.setRoomId(null);
       state.setRoom(null);
       state.setCurrentListing(null);
+      state.setCurrentQuestion(null);
     });
 
     this.socket.on("serverShutdown", () => {
@@ -313,7 +326,7 @@ class SocketService {
       state.setRoomId(null);
       state.setRoom(null);
       state.setCurrentListing(null);
-
+      state.setCurrentQuestion(null);
       window.location.href = "/";
     });
 
@@ -378,6 +391,7 @@ class SocketService {
     useGameStore.getState().setRoomId(null);
 
     useGameStore.getState().setCurrentListing(null);
+    useGameStore.getState().setCurrentQuestion(null);
     soundService.clearCountdownTimeout();
   }
 

@@ -154,4 +154,15 @@ export const announcementApi = {
   },
 };
 
+export const feedbackApi = {
+  create: async (data: {
+    email: string;
+    type: "feedback" | "advertisement" | "bug" | "other";
+    message: string;
+  }) => {
+    await api.post("/feedback", data);
+    return true;
+  },
+};
+
 export default api;

@@ -40,6 +40,7 @@ export const GameBoard: React.FC = () => {
 
   const {
     currentListing,
+    currentQuestion,
     roomId,
     hasCorrectGuess,
     feedback,
@@ -203,7 +204,7 @@ export const GameBoard: React.FC = () => {
     }
   }, [currentListing]);
 
-  if (!currentListing) return null;
+  if (!currentListing && !currentQuestion) return null;
 
   const maxGuessExceeded =
     guessCount >= (room?.roomSettings.maxGuessesPerRound ?? 20);
@@ -221,7 +222,7 @@ export const GameBoard: React.FC = () => {
 
         {/* Center - Main Content */}
         <div className="md:col-span-2 lg:col-span-2 xl:col-span-6 space-y-4 lg:space-y-6 order-1 xl:order-1">
-          {showResults && intermissionDuration ? (
+          {showResults && intermissionDuration && currentListing ? (
             <RoundResults
               scores={roundEndScores}
               correctPrice={correctPrice ?? 0}
@@ -234,55 +235,59 @@ export const GameBoard: React.FC = () => {
               <div className="relative">
                 <div className="relative aspect-[16/10] w-full max-h-[500px]">
                   <img
-                    src={currentListing.details.imageUrls[currentImageIndex]}
+                    src={currentListing?.details.imageUrls[currentImageIndex]}
                     onContextMenu={(e) => e.preventDefault()}
                     alt="Listing image"
                     className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
                   />
                   <ImageNavigation
                     currentIndex={currentImageIndex}
-                    totalImages={currentListing.details.imageUrls.length}
+                    totalImages={currentListing?.details.imageUrls.length ?? 0}
                     onPrev={imageHandlers.handlePrevImage}
                     onNext={imageHandlers.handleNextImage}
                   />
                 </div>
               </div>
               {/* Details Section - Moved outside of image container */}
-              <div className="p-3 lg:p-4 space-y-2">
-                {currentListing.title &&
-                  (currentListing.details.type === "letgo" ? (
-                    <Popover
-                      key={currentListing.id}
-                      content={currentListing.details.description}
-                    >
+              {currentListing ? (
+                <div className="p-3 lg:p-4 space-y-2">
+                  {currentListing.title &&
+                    (currentListing.details.type === "letgo" ? (
+                      <Popover
+                        key={currentListing.id}
+                        content={currentListing.details.description}
+                      >
+                        <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
+                          {currentListing.title}
+                        </h2>
+                      </Popover>
+                    ) : (
                       <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
                         {currentListing.title}
                       </h2>
-                    </Popover>
-                  ) : (
-                    <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
-                      {currentListing.title}
-                    </h2>
-                  ))}
-                <div className="text-sm lg:text-base bg-[var(--bg-secondary)] px-3 py-2 lg:px-4 lg:py-3 rounded-lg">
-                  {renderListingDetails()}
+                    ))}
+                  <div className="text-sm lg:text-base bg-[var(--bg-secondary)] px-3 py-2 lg:px-4 lg:py-3 rounded-lg">
+                    {renderListingDetails()}
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
               {/* Price Guess Section */}
               <div className="p-4 lg:p-6 border-t-2 border-[var(--border-color)]">
                 <div className="flex flex-col items-center">
-                  <PriceInput
-                    onGuess={handleGuess}
-                    disabled={
-                      !isAuthenticated ||
-                      hasCorrectGuess ||
-                      showResults ||
-                      maxGuessExceeded
-                    }
-                    listingType={currentListing.details.type}
-                    listingId={currentListing.id}
-                  />
+                  {currentListing ? (
+                    <PriceInput
+                      onGuess={handleGuess}
+                      disabled={
+                        !isAuthenticated ||
+                        hasCorrectGuess ||
+                        showResults ||
+                        maxGuessExceeded
+                      }
+                      listingType={currentListing?.details.type || "generative"}
+                      listingId={currentListing?.id || 0}
+                    />
+                  ) : null}
 
                   <div className="w-full max-w-md space-y-2 lg:space-y-4 mt-4">
                     {room?.roomSettings.maxGuessesPerRound && (

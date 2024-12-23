@@ -3,8 +3,10 @@ import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { AuthModal } from "./components/auth/AuthModals";
 import { GameContainer } from "./components/game/GameContainer";
+import { Footer } from "./components/layout/Footer";
 import { Header } from "./components/layout/Header";
 import { useAuth } from "./hooks/useAuth";
+import { Contact } from "./pages/Contact";
 import { analyticsService } from "./services/analytics";
 
 // Initialize GA4
@@ -197,7 +199,7 @@ function App() {
           }}
         />
         <div
-          className="min-h-screen transition-colors duration-200"
+          className="min-h-screen flex flex-col transition-colors duration-200"
           style={{
             backgroundColor: "var(--bg-primary)",
             color: "var(--text-primary)",
@@ -208,12 +210,17 @@ function App() {
             isDarkMode={isDarkMode}
             onToggleTheme={toggleTheme}
           />
-          <main className="mx-auto p-4" style={{ maxWidth: "95rem" }}>
+          <main
+            className="flex-1 mx-auto w-full p-4"
+            style={{ maxWidth: "95rem" }}
+          >
             <Routes>
               <Route path="/" element={<GameContainer />} />
               <Route path="/oda/:slug" element={<GameContainer />} />
+              <Route path="/iletisim" element={<Contact />} />
             </Routes>
           </main>
+          <Footer />
           <AuthModal
             isOpen={isAuthModalOpen}
             onClose={() => setIsAuthModalOpen(false)}

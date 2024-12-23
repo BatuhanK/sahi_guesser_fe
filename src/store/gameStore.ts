@@ -8,12 +8,14 @@ import type {
   Listing,
   OnlinePlayer,
   Player,
+  Question,
   RoundEndScore,
 } from "../types/socket";
 
 interface GameState {
   status: GameStatus;
   currentListing: Listing | null;
+  currentQuestion: Question | null;
   roundStartTime: Date | null;
   roundDuration: number;
   players: Player[];
@@ -34,6 +36,7 @@ interface GameState {
   roomSummary: RoomSummary | null;
   setGameStatus: (status: GameStatus) => void;
   setCurrentListing: (listing: Listing | null) => void;
+  setCurrentQuestion: (question: Question | null) => void;
   setRoundInfo: (startTime: Date, duration: number) => void;
   setPlayers: (players: Player[]) => void;
   setRoomId: (roomId: number | null) => void;
@@ -59,6 +62,7 @@ export const useGameStore = create<GameState>()(
   devtools((set) => ({
     status: "WAITING",
     currentListing: null,
+    currentQuestion: null,
     roundStartTime: null,
     roundDuration: 0,
     players: [],
@@ -85,9 +89,19 @@ export const useGameStore = create<GameState>()(
         correctGuesses: [],
         incorrectGuesses: [],
       }),
-    setCurrentListing: (listing) =>
+    setCurrentListing: (listing) => {
       set({
         currentListing: listing,
+        correctGuesses: [],
+        incorrectGuesses: [],
+        showResults: false,
+        roundEndScores: [],
+        correctPrice: null,
+      });
+    },
+    setCurrentQuestion: (question) =>
+      set({
+        currentQuestion: question,
         correctGuesses: [],
         incorrectGuesses: [],
         showResults: false,

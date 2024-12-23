@@ -14,7 +14,7 @@ import { Loader } from "../ui/Loader";
 import { GameBoard } from "./GameBoard";
 
 export const GameContainer: React.FC = () => {
-  const { currentListing, roomId, room } = useGameStore();
+  const { currentListing, currentQuestion, roomId, room } = useGameStore();
   const { user } = useAuthStore();
   const navigate = useNavigate();
   const { slug } = useParams<{ slug?: string }>();
@@ -104,11 +104,13 @@ export const GameContainer: React.FC = () => {
     return <Loader text="Kategoriler yükleniyor..." />;
   }
 
-  if (!currentListing && roomId) {
+  if (!currentListing && !currentQuestion && roomId) {
     if (user) {
       return <Loader text="Oyuna bağlanılıyor..." />;
     } else {
-      return <Loader text="Bu oda boş, üye olarak oyun oynayabilirsiniz." />;
+      return (
+        <Loader text="Yeni round bekleniyor... Üye değilseniz üye olarak oyun oynayabilirsiniz." />
+      );
     }
   }
 

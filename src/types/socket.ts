@@ -72,6 +72,14 @@ export interface Player {
   score: number;
 }
 
+export interface Question {
+  question: string;
+  options: {
+    option: string;
+    isCorrect: boolean;
+  }[];
+  imagePrompt: string;
+}
 export interface OnlinePlayer {
   playerId: number;
   userId: number;
@@ -96,6 +104,7 @@ export interface ServerToClientEvents {
   gameState: (data: {
     status: GameStatus;
     listing: Listing | null;
+    question: Question | null;
     roundStartTime: Date;
     roundDuration: number;
   }) => void;
@@ -103,7 +112,11 @@ export interface ServerToClientEvents {
   roomEnded: () => void;
   serverShutdown: () => void;
   onlinePlayers: (data: { players: OnlinePlayer[] }) => void;
-  roundStart: (data: { listing: Listing; duration: number }) => void;
+  roundStart: (data: {
+    listing: Listing | null;
+    question: Question | null;
+    duration: number;
+  }) => void;
   guessResult: (data: {
     roomId: number;
     direction: "correct" | "go_higher" | "go_lower";
