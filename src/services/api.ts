@@ -143,6 +143,11 @@ export const roomApi = {
     const response = await api.get<RoomSummary>(`/rooms/${slug}/summary`);
     return response.data;
   },
+
+  recreateRoom: async (slug: string): Promise<RoomSummary> => {
+    const response = await api.post(`/rooms/${slug}/recreate`);
+    return response.data;
+  },
 };
 
 export const announcementApi = {

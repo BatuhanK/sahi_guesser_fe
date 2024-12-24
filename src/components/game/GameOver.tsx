@@ -2,11 +2,18 @@ import { motion } from "framer-motion";
 import React from "react";
 import Confetti from "react-confetti";
 import { useWindowSize } from "react-use";
+import { roomApi } from "../../services/api";
 import { useGameStore } from "../../store/gameStore";
 
 export const GameOver: React.FC = () => {
   const { roomSummary } = useGameStore();
   const { width, height } = useWindowSize();
+
+  const recreateRoom = async () => {
+    if (!roomSummary) return;
+    const { room } = roomSummary;
+    await roomApi.recreateRoom(room.slug);
+  };
 
   const handleRestart = () => {
     window.location.href = "/";
@@ -150,6 +157,13 @@ export const GameOver: React.FC = () => {
           className="flex items-center gap-2 mx-auto bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300"
         >
           Anasayfaya Dön
+        </motion.button>
+
+        <motion.button
+          onClick={recreateRoom}
+          className="flex items-center gap-2 mx-auto bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300"
+        >
+          Oyunu Tekrar Oyna
         </motion.button>
       </motion.div>
     </>
