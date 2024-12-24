@@ -1,8 +1,8 @@
+import { X } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
+import { useLocation, useNavigate } from "react-router-dom";
 import { feedbackApi } from "../services/api";
-import { X } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
 
 const MIN_MESSAGE_LENGTH = 25;
 const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -13,14 +13,14 @@ export const Contact = () => {
 
   const handleClose = () => {
     // Eğer önceki sayfa oyun sayfası ise oraya geri dön
-    if (location.state?.from === '/') {
-      navigate('/');
+    if (location.state?.from === "/") {
+      navigate("/");
     } else {
       navigate(-1); // değilse normal geri git
     }
   };
 
-  const [showForm, setShowForm] = useState(true);
+  const [showForm] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
     type: "feedback" as const,
