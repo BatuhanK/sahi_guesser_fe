@@ -1,18 +1,29 @@
 import { motion } from "framer-motion";
 import React from "react";
 import Confetti from "react-confetti";
+import { toast } from "react-hot-toast";
 import { useWindowSize } from "react-use";
 import { roomApi } from "../../services/api";
+import { useAuthStore } from "../../store/authStore";
 import { useGameStore } from "../../store/gameStore";
 
 export const GameOver: React.FC = () => {
   const { roomSummary } = useGameStore();
+  const { user } = useAuthStore();
   const { width, height } = useWindowSize();
 
   const recreateRoom = async () => {
     if (!roomSummary) return;
+    if (!user) return;
+
     const { room } = roomSummary;
-    await roomApi.recreateRoom(room.slug);
+    const [creator] = room.name.split(" -");
+    if (creator === user.username) {
+      await roomApi.recreateRoom(room.slug);
+      window.location.replace(`/oda/${room.slug}?recreate=true`);
+    } else {
+      toast.error("Sadece oluşturan kişi oyunu tekrar başlatabilir.");
+    }
   };
 
   const handleRestart = () => {
