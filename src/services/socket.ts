@@ -91,6 +91,7 @@ class SocketService {
           .getState()
           .setRoundInfo(new Date(roundStartTime), roundDuration);
 
+        useGameStore.getState().setRoomSummary(null);
         if (listing) {
           analyticsService.trackRoundStart(
             listing.id.toString(),
@@ -113,6 +114,7 @@ class SocketService {
     this.socket.on("roundStart", ({ listing, question, duration }) => {
       const state = useGameStore.getState();
 
+      state.setRoomSummary(null);
       state.setGuessCount(0);
       state.setGameStatus("PLAYING");
       state.setFeedback(null);
@@ -356,7 +358,6 @@ class SocketService {
       if (state.room && state.room.id === roomId) {
         const summary = await roomApi.getRoomSummary(state.room.slug);
         state.setRoomSummary(summary);
-        window.history.replaceState({}, "", "/");
       }
     });
 
