@@ -9,7 +9,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import { QRCodeSVG } from "qrcode.react";
 import React, { useState } from "react";
 import toast from "react-hot-toast";
-import { useNavigate } from "react-router-dom";
 import {
   Category,
   CreatePrivateRoomRequest,
@@ -134,7 +133,6 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
   });
 
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const [createdRoom, setCreatedRoom] = useState<Room | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
 
