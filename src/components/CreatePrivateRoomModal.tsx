@@ -16,7 +16,6 @@ import {
   Room,
   roomApi,
 } from "../services/api";
-import { socketService } from "../services/socket";
 import { useGameStore } from "../store/gameStore";
 import { iconMap } from "./ui/iconmap";
 
@@ -218,14 +217,8 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
     if (createdRoom) {
       useGameStore.getState().setRoom(createdRoom);
       useGameStore.getState().setRoomId(createdRoom.id);
-      navigate(`/oda/${createdRoom.slug}`);
 
-      setTimeout(() => {
-        socketService.joinRoom(createdRoom.id);
-      }, 100);
-
-      setShowSuccessModal(false);
-      onClose();
+      window.location.href = `/oda/${createdRoom.slug}`;
     }
   };
 
