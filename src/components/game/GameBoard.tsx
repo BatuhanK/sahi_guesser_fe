@@ -54,6 +54,8 @@ export const GameBoard: React.FC = () => {
     room,
     guessCount,
     roomSummary,
+    maxRounds,
+    roundNumber,
   } = useGameStore();
   const { isAuthenticated, user } = useAuth();
 
@@ -213,6 +215,9 @@ export const GameBoard: React.FC = () => {
     return <GameOver />;
   }
 
+  const shouldShowRoundInfo =
+    Number.isSafeInteger(maxRounds) && maxRounds !== 9999999;
+
   return (
     <div className="game-board max-w-[1920px] mx-auto px-4 lg:px-8 flex flex-col">
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-10 gap-6 lg:gap-8 mb-6">
@@ -228,98 +233,126 @@ export const GameBoard: React.FC = () => {
               correctPrice={correctPrice ?? 0}
               listing={currentListing}
               intermissionDuration={intermissionDuration}
+              maxRounds={maxRounds}
+              roundNumber={roundNumber}
+              shouldShowRoundInfo={shouldShowRoundInfo}
             />
           ) : (
-            <div className="bg-[var(--bg-secondary)] rounded-xl shadow-lg transition-colors">
-              {/* Image Section */}
-              <div className="relative">
-                <div className="relative aspect-[16/10] w-full max-h-[500px]">
-                  <img
-                    src={currentListing?.details.imageUrls[currentImageIndex]}
-                    onContextMenu={(e) => e.preventDefault()}
-                    alt="Listing image"
-                    className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
-                  />
-                  <ImageNavigation
-                    currentIndex={currentImageIndex}
-                    totalImages={currentListing?.details.imageUrls.length ?? 0}
-                    onPrev={imageHandlers.handlePrevImage}
-                    onNext={imageHandlers.handleNextImage}
-                  />
+            <>
+              <div className="bg-[var(--bg-secondary)] rounded-xl shadow-lg transition-colors">
+                {/* Image Section */}
+                <div className="relative">
+                  <div className="relative aspect-[16/10] w-full max-h-[500px]">
+                    <img
+                      src={currentListing?.details.imageUrls[currentImageIndex]}
+                      onContextMenu={(e) => e.preventDefault()}
+                      alt="Listing image"
+                      className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
+                    />
+                    <ImageNavigation
+                      currentIndex={currentImageIndex}
+                      totalImages={
+                        currentListing?.details.imageUrls.length ?? 0
+                      }
+                      onPrev={imageHandlers.handlePrevImage}
+                      onNext={imageHandlers.handleNextImage}
+                    />
+                  </div>
                 </div>
-              </div>
-              {/* Details Section - Moved outside of image container */}
-              {currentListing ? (
-                <div className="p-3 lg:p-4 space-y-2">
-                  {currentListing.title &&
-                    (currentListing.details.type === "letgo" ? (
-                      <Popover
-                        key={currentListing.id}
-                        content={currentListing.details.description}
-                      >
+                {/* Details Section - Moved outside of image container */}
+                {currentListing ? (
+                  <div className="p-3 lg:p-4 space-y-2">
+                    {currentListing.title &&
+                      (currentListing.details.type === "letgo" ? (
+                        <Popover
+                          key={currentListing.id}
+                          content={currentListing.details.description}
+                        >
+                          <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
+                            {currentListing.title}
+                          </h2>
+                        </Popover>
+                      ) : (
                         <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
                           {currentListing.title}
                         </h2>
-                      </Popover>
-                    ) : (
-                      <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
-                        {currentListing.title}
-                      </h2>
-                    ))}
-                  <div className="text-sm lg:text-base bg-[var(--bg-secondary)] px-3 py-2 lg:px-4 lg:py-3 rounded-lg">
-                    {renderListingDetails()}
+                      ))}
+                    <div className="text-sm lg:text-base bg-[var(--bg-secondary)] px-3 py-2 lg:px-4 lg:py-3 rounded-lg">
+                      {renderListingDetails()}
+
+                      {shouldShowRoundInfo && (
+                        <div className="mt-3 flex items-center justify-center">
+                          <div className="inline-flex items-center bg-[var(--bg-primary)] rounded-full px-4 py-1.5 shadow-sm">
+                            <span className="text-xs lg:text-sm font-medium text-[var(--text-primary)]">
+                              Tur
+                            </span>
+                            <span className="ml-1.5 text-sm lg:text-base font-bold text-[var(--text-primary)]">
+                              {roundNumber}
+                            </span>
+                            <span className="mx-1 text-xs lg:text-sm text-[var(--text-secondary)]">
+                              /
+                            </span>
+                            <span className="text-sm lg:text-base font-bold text-[var(--text-primary)]">
+                              {maxRounds}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ) : null}
+                ) : null}
 
-              {/* Price Guess Section */}
-              <div className="p-4 lg:p-6 border-t-2 border-[var(--border-color)]">
-                <div className="flex flex-col items-center">
-                  {currentListing ? (
-                    <PriceInput
-                      onGuess={handleGuess}
-                      disabled={
-                        !isAuthenticated ||
-                        hasCorrectGuess ||
-                        showResults ||
-                        maxGuessExceeded
-                      }
-                      listingType={currentListing?.details.type || "generative"}
-                      listingId={currentListing?.id || 0}
-                    />
-                  ) : null}
-
-                  <div className="w-full max-w-md space-y-2 lg:space-y-4 mt-4">
-                    {room?.roomSettings.maxGuessesPerRound && (
-                      <GuessProgressBar
-                        current={guessCount}
-                        max={room.roomSettings.maxGuessesPerRound}
+                {/* Price Guess Section */}
+                <div className="p-4 lg:p-6 border-t-2 border-[var(--border-color)]">
+                  <div className="flex flex-col items-center">
+                    {currentListing ? (
+                      <PriceInput
+                        onGuess={handleGuess}
+                        disabled={
+                          !isAuthenticated ||
+                          hasCorrectGuess ||
+                          showResults ||
+                          maxGuessExceeded
+                        }
+                        listingType={
+                          currentListing?.details.type || "generative"
+                        }
+                        listingId={currentListing?.id || 0}
                       />
-                    )}
+                    ) : null}
 
-                    <div className="h-[32px] lg:h-[60px] flex items-center justify-center">
-                      {!isAuthenticated || maxGuessExceeded ? (
-                        <GuessMessage
-                          isAuthenticated={isAuthenticated}
-                          maxGuessExceeded={maxGuessExceeded}
-                        />
-                      ) : (
-                        <FeedbackMessage
-                          feedback={
-                            feedback as
-                              | "correct"
-                              | "go_higher"
-                              | "go_lower"
-                              | null
-                          }
-                          showResults={showResults}
+                    <div className="w-full max-w-md space-y-2 lg:space-y-4 mt-4">
+                      {room?.roomSettings.maxGuessesPerRound && (
+                        <GuessProgressBar
+                          current={guessCount}
+                          max={room.roomSettings.maxGuessesPerRound}
                         />
                       )}
+
+                      <div className="h-[32px] lg:h-[60px] flex items-center justify-center">
+                        {!isAuthenticated || maxGuessExceeded ? (
+                          <GuessMessage
+                            isAuthenticated={isAuthenticated}
+                            maxGuessExceeded={maxGuessExceeded}
+                          />
+                        ) : (
+                          <FeedbackMessage
+                            feedback={
+                              feedback as
+                                | "correct"
+                                | "go_higher"
+                                | "go_lower"
+                                | null
+                            }
+                            showResults={showResults}
+                          />
+                        )}
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
+            </>
           )}
         </div>
 

@@ -15,7 +15,6 @@ import {
   Room,
   roomApi,
 } from "../services/api";
-import { useGameStore } from "../store/gameStore";
 import { iconMap } from "./ui/iconmap";
 
 interface CreatePrivateRoomModalProps {
@@ -213,10 +212,9 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
 
   const handlePlayClick = () => {
     if (createdRoom) {
-      useGameStore.getState().setRoom(createdRoom);
-      useGameStore.getState().setRoomId(createdRoom.id);
-
-      window.location.href = `/oda/${createdRoom.slug}`;
+      setTimeout(() => {
+        window.location.replace(`/oda/${createdRoom.slug}`);
+      }, 100);
     }
   };
 

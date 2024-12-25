@@ -34,6 +34,8 @@ interface GameState {
   showResults: boolean;
   intermissionDuration: number;
   roomSummary: RoomSummary | null;
+  maxRounds: number;
+  roundNumber: number;
   setGameStatus: (status: GameStatus) => void;
   setCurrentListing: (listing: Listing | null) => void;
   setCurrentQuestion: (question: Question | null) => void;
@@ -56,6 +58,8 @@ interface GameState {
   setGuessCount: (guessCount: number) => void;
   setIntermissionDuration: (intermissionDuration: number) => void;
   setRoomSummary: (roomSummary: RoomSummary | null) => void;
+  setMaxRounds: (maxRounds: number) => void;
+  setRoundNumber: (roundNumber: number) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -81,6 +85,8 @@ export const useGameStore = create<GameState>()(
     showResults: false,
     intermissionDuration: 0,
     roomSummary: null,
+    maxRounds: 0,
+    roundNumber: 0,
     setGameStatus: (status) =>
       set({
         status,
@@ -138,5 +144,7 @@ export const useGameStore = create<GameState>()(
     setIntermissionDuration: (intermissionDuration) =>
       set({ intermissionDuration }),
     setRoomSummary: (roomSummary) => set({ roomSummary }),
+    setMaxRounds: (maxRounds) => set({ maxRounds }),
+    setRoundNumber: (roundNumber) => set({ roundNumber }),
   }))
 );

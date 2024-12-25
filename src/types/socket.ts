@@ -116,6 +116,8 @@ export interface ServerToClientEvents {
     listing: Listing | null;
     question: Question | null;
     duration: number;
+    maxRounds: number;
+    roundNumber: number;
   }) => void;
   guessResult: (data: {
     roomId: number;
@@ -127,7 +129,11 @@ export interface ServerToClientEvents {
     username: string;
     message: string;
   }) => void;
-  intermissionStart: (data: { duration: number }) => void;
+  intermissionStart: (data: {
+    duration: number;
+    maxRounds: number;
+    roundNumber: number;
+  }) => void;
   roundEnd: (data: { correctPrice: number; scores: RoundEndScore[] }) => void;
   roomCompleted: (data: { roomId: number }) => void;
   correctGuess: (data: {

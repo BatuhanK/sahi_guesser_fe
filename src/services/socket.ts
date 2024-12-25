@@ -101,48 +101,61 @@ class SocketService {
       }
     );
 
-    this.socket.on("intermissionStart", ({ duration }) => {
-      useGameStore.getState().setIntermissionDuration(duration);
-      useGameStore.getState().setGameStatus("INTERMISSION");
-      soundService.scheduleCountdown(duration);
-    });
+    this.socket.on(
+      "intermissionStart",
+      ({ duration, maxRounds, roundNumber }) => {
+        const state = useGameStore.getState();
+
+        state.setIntermissionDuration(duration);
+        state.setGameStatus("INTERMISSION");
+        soundService.scheduleCountdown(duration);
+        state.setMaxRounds(maxRounds);
+        state.setRoundNumber(roundNumber);
+      }
+    );
 
     this.socket.on("onlinePlayers", ({ players }) => {
       useGameStore.getState().setOnlinePlayers(players);
     });
 
-    this.socket.on("roundStart", ({ listing, question, duration }) => {
-      const state = useGameStore.getState();
+    this.socket.on(
+      "roundStart",
+      ({ listing, question, duration, maxRounds, roundNumber }) => {
+        const state = useGameStore.getState();
 
-      state.setRoomSummary(null);
-      state.setGuessCount(0);
-      state.setGameStatus("PLAYING");
-      state.setFeedback(null);
-      state.setHasCorrectGuess(false);
+        state.setRoomSummary(null);
+        state.setGuessCount(0);
+        state.setGameStatus("PLAYING");
+        state.setFeedback(null);
+        state.setHasCorrectGuess(false);
 
-      if (listing) {
-        state.setCurrentListing(listing);
+        if (listing) {
+          state.setCurrentListing(listing);
+        }
+        if (question) {
+          state.setCurrentQuestion(question);
+        }
+        state.setRoundInfo(new Date(), duration);
+        state.setShowResults(false);
+        state.setRoundEndScores([]);
+        state.setCorrectPrice(null);
+        state.setLastGuesses([]);
+        state.setCorrectGuesses([]);
+        state.setIncorrectGuesses([]);
+
+        state.setMaxRounds(maxRounds);
+        state.setRoundNumber(roundNumber);
+
+        if (listing) {
+          analyticsService.trackRoundStart(
+            listing.id.toString(),
+            listing.details.type
+          );
+        }
+
+        soundService.playRoundStart();
       }
-      if (question) {
-        state.setCurrentQuestion(question);
-      }
-      state.setRoundInfo(new Date(), duration);
-      state.setShowResults(false);
-      state.setRoundEndScores([]);
-      state.setCorrectPrice(null);
-      state.setLastGuesses([]);
-      state.setCorrectGuesses([]);
-      state.setIncorrectGuesses([]);
-
-      if (listing) {
-        analyticsService.trackRoundStart(
-          listing.id.toString(),
-          listing.details.type
-        );
-      }
-
-      soundService.playRoundStart();
-    });
+    );
 
     this.socket.on("roundEnd", ({ correctPrice, scores }) => {
       const state = useGameStore.getState();

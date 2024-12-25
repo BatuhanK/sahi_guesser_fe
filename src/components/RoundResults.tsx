@@ -16,6 +16,9 @@ interface RoundResultsProps {
   correctPrice: number;
   listing: Listing;
   intermissionDuration: number;
+  maxRounds: number;
+  roundNumber: number;
+  shouldShowRoundInfo: boolean;
 }
 
 export const RoundResults: React.FC<RoundResultsProps> = ({
@@ -23,6 +26,9 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   correctPrice,
   listing,
   intermissionDuration,
+  maxRounds,
+  roundNumber,
+  shouldShowRoundInfo,
 }) => {
   const scoresWithAccuracy = scores
     .filter((score) => score.roundScore)
@@ -211,6 +217,13 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 <div className="text-center">
                   <h2 className="text-3xl font-bold mb-3 text-[var(--text-primary)]">
                     Tur Sonuçları
+                    {shouldShowRoundInfo && (
+                      <div className="flex justify-center mt-2">
+                        <span className="inline-block px-3 py-1 text-sm rounded-full bg-[var(--bg-tertiary)] text-[var(--text-secondary)]">
+                          {roundNumber} / {maxRounds}
+                        </span>
+                      </div>
+                    )}
                   </h2>
                   <div className="flex flex-col gap-2">
                     <p className="text-[var(--text-secondary)] text-lg">
