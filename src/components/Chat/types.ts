@@ -51,6 +51,7 @@ export interface ParticipantsListProps {
   remoteParticipants: Map<string, RemoteParticipantState>;
   onToggleMute: (participantId: string) => void;
   listeners: Set<string>;
+  onToggleBan: (username: string) => void;
 }
 
 export interface OnlinePlayersListProps {
@@ -63,4 +64,4 @@ export interface ChatMention {
   userId: string | number;
   username: string;
   indices: [number, number];
-} 
+}

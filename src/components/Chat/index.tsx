@@ -77,6 +77,10 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
     }
   }, [isMinimized, scrollToBottom]);
 
+  const toggleBan = (username: string) => {
+    onSendMessage(`/ban ${username}`);
+  };
+
   return (
     <div
       className={cn(
@@ -175,6 +179,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                     <ParticipantsList
                       remoteParticipants={remoteParticipants}
                       onToggleMute={toggleParticipantMute}
+                      onToggleBan={toggleBan}
                       listeners={audioState.listeners}
                     />
                   )}
