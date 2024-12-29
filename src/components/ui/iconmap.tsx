@@ -2,6 +2,7 @@ import {
   BedDouble,
   Bike,
   Car,
+  Flower,
   Home,
   HousePlus,
   LucideIcon,
@@ -15,4 +16,5 @@ export const iconMap: Record<string, LucideIcon> = {
   motocycle: Bike,
   hotel: BedDouble,
   "house-plus": HousePlus,
+  flower: Flower,
 };
