@@ -16,7 +16,9 @@ export function useAuth() {
         .then(({ user }) => {
           setUser(user);
         })
-        .catch(() => logout())
+        .catch((error) => {
+          console.log("auth error", error);
+        })
         .finally(() => {
           isLoadingRef.current = false;
         });
