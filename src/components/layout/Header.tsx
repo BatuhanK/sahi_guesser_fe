@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   Moon,
+  Settings,
   ShoppingBag,
   Sun,
   UserPlus,
@@ -26,6 +27,7 @@ import { socketService } from "../../services/socket";
 import { soundService } from "../../services/soundService";
 import { useAnnouncementStore } from "../../store/announcementStore";
 import { useGameStore } from "../../store/gameStore";
+import { ProfileEditModal } from "../ProfileEditModal";
 import { ScoreBoard } from "../ScoreBoard";
 import { Timer } from "../Timer";
 
@@ -130,6 +132,7 @@ export const Header: React.FC<HeaderProps> = ({
   const { isAuthenticated, user, logout } = useAuth();
   const isMobile = useMediaQuery("(max-width: 768px)");
   const [showUserMenu, setShowUserMenu] = useState(false);
+  const [showProfileEditModal, setShowProfileEditModal] = useState(false);
   const {
     status,
     currentListing,
@@ -292,7 +295,17 @@ export const Header: React.FC<HeaderProps> = ({
                               <LogOut size={20} />
                               <span>Çıkış Yap</span>
                             </button>
-                            <div className="flex items-center gap-2 p-2 hover:bg-[var(--bg-hover)] rounded">
+                            <button
+                              onClick={() => {
+                                setShowProfileEditModal(true);
+                                setShowUserMenu(false);
+                              }}
+                              className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                            >
+                              <Settings size={20} />
+                              <span>Profil Düzenle</span>
+                            </button>
+                            <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
                               <Volume2
                                 size={20}
                                 className="text-[var(--text-primary)]"
@@ -447,6 +460,16 @@ export const Header: React.FC<HeaderProps> = ({
                         <LogOut size={20} />
                         <span>Çıkış Yap</span>
                       </button>
+                      <button
+                        onClick={() => {
+                          setShowProfileEditModal(true);
+                          setShowUserMenu(false);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                      >
+                        <Settings size={20} />
+                        <span>Profil Düzenle</span>
+                      </button>
                       <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
                         <Volume2
                           size={20}
@@ -574,6 +597,10 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
       </header>
+      <ProfileEditModal
+        isOpen={showProfileEditModal}
+        onClose={() => setShowProfileEditModal(false)}
+      />
     </>
   );
 };

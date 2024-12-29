@@ -50,6 +50,16 @@ export const authApi = {
     const response = await api.get(`/auth/livekit-token/${roomId}`);
     return response.data;
   },
+
+  changePassword: async (password: string) => {
+    const response = await api.post("/auth/change-password", { password });
+    return response.data;
+  },
+
+  changeUsername: async (username: string) => {
+    const response = await api.post("/auth/change-username", { username });
+    return response.data;
+  },
 };
 
 export interface Category {
