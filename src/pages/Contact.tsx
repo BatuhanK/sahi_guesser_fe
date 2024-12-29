@@ -10,6 +10,8 @@ const EMAIL_REGEX = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 export const Contact = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const preSelectedType = location.state?.preSelectedType || "feedback";
+  const message = location.state?.message || "";
 
   const handleClose = () => {
     // Eğer önceki sayfa oyun sayfası ise oraya geri dön
@@ -23,8 +25,8 @@ export const Contact = () => {
   const [showForm] = useState(true);
   const [formData, setFormData] = useState({
     email: "",
-    type: "feedback" as const,
-    message: "",
+    type: preSelectedType as "feedback" | "bug" | "advertisement" | "other",
+    message: message,
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState({

@@ -1,9 +1,11 @@
 import { Home } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { Category } from "../services/api";
 import { CreatePrivateRoomModal } from "./CreatePrivateRoomModal";
+import AdPlaceholder from "./game/components/AdPlaceholder";
 import { MaintenanceModal } from "./ui/MaintenanceModal";
 import { iconMap } from "./ui/iconmap";
 
@@ -20,6 +22,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   onSelect,
   hasError = false,
 }) => {
+  const navigate = useNavigate();
   const [isCreatePrivateRoomModalOpen, setIsCreatePrivateRoomModalOpen] =
     useState(false);
   const [showMaintenanceModal, setShowMaintenanceModal] = useState(hasError);
@@ -88,6 +91,24 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
         </span>
       </div>
 
+      <AdPlaceholder
+        width={728}
+        height={90}
+        identifier="anasayfa-kategori-alti"
+        onClick={() => {
+          navigate("/iletisim", {
+            state: {
+              preSelectedType: "advertisement",
+              message: "Anasayfada reklam vermek istiyorum.\n",
+            },
+          });
+        }}
+      >
+        <p className="text-center p-4">Bu alana reklam verebilirsiniz</p>
+        <button className="bg-[var(--accent-color)] text-white rounded-lg px-4 py-2">
+          Reklam ver
+        </button>
+      </AdPlaceholder>
       <CreatePrivateRoomModal
         isOpen={isCreatePrivateRoomModalOpen}
         onClose={() => setIsCreatePrivateRoomModalOpen(false)}

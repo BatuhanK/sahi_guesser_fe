@@ -1,7 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Medal } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
+import { useGameStore } from "../store/gameStore";
 import {
   CarListingDetails,
   HotelsListingDetails,
@@ -10,6 +12,7 @@ import {
   Listing,
   RoundEndScore,
 } from "../types/socket";
+import AdPlaceholder from "./game/components/AdPlaceholder";
 
 interface RoundResultsProps {
   scores: RoundEndScore[];
@@ -109,6 +112,13 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   };
 
   const { user } = useAuth();
+  const navigate = useNavigate();
+
+  const room = useGameStore((state) => state.room);
+  let adIdentifier = `tur-sonu-reklam-${room?.id}`;
+  if (!room?.isSystemRoom) {
+    adIdentifier = `tur-sonu-reklam-ozel-odalar`;
+  }
 
   const renderScoreRow = (score: (typeof sortedScores)[0], index: number) => (
     <motion.div
@@ -225,6 +235,26 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       </div>
                     )}
                   </h2>
+                  <AdPlaceholder
+                    width={728}
+                    height={90}
+                    identifier={adIdentifier}
+                    onClick={() => {
+                      navigate("/iletisim", {
+                        state: {
+                          preSelectedType: "advertisement",
+                          message: "Tur sonu reklam vermek istiyorum.\n",
+                        },
+                      });
+                    }}
+                  >
+                    <p className="text-center p-4">
+                      Bu alana reklam verebilirsiniz
+                    </p>
+                    <button className="bg-[var(--accent-color)] text-white rounded-lg px-4 py-2">
+                      Reklam ver
+                    </button>
+                  </AdPlaceholder>
                   <div className="flex flex-col gap-2">
                     <p className="text-[var(--text-secondary)] text-lg">
                       {carListingInfo ||

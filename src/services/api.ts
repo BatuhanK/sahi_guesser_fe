@@ -65,6 +65,7 @@ export type Room = {
   name: string;
   slug: string;
   status: string;
+  isSystemRoom: boolean;
   roomSettings: {
     maxGuessesPerRound: number;
   };
@@ -167,6 +168,35 @@ export const feedbackApi = {
   }) => {
     await api.post("/feedback", data);
     return true;
+  },
+};
+
+export interface HourlyStats {
+  views: Record<string, number>;
+  viewers: Record<string, number>;
+}
+
+export interface AdVisibilityResponse {
+  uniqueViewers: number;
+  totalViews: number;
+  hourlyStats: HourlyStats;
+  currentHour: {
+    views: number;
+    viewers: number;
+  };
+}
+
+export const adApi = {
+  getVisibilityCount: async (
+    identifier: string
+  ): Promise<AdVisibilityResponse | null> => {
+    try {
+      const response = await api.get(`/ad-visibility-count/${identifier}`);
+      return response.data;
+    } catch (error) {
+      console.error("Failed to fetch ad stats:", error);
+      return null;
+    }
   },
 };
 
