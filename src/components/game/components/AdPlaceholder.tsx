@@ -90,7 +90,7 @@ export default function AdPlaceholder({
       onMouseEnter={() => setShowTooltip(true)}
       onMouseLeave={() => setShowTooltip(false)}
       className={cn(
-        "group relative flex items-center justify-center bg-[#FFB800]/10 border-2 border-dashed border-[#FFB800] text-[#FFB800] font-medium transition-colors hover:bg-[#FFB800]/20 cursor-pointer p-4 max-w-full",
+        "group relative flex items-center justify-center bg-[#FFB800]/10 border-2 border-dashed border-[#FFB800] text-[#FFB800] font-medium transition-colors hover:bg-[#FFB800]/20 cursor-pointer p-4 max-w-full my-4",
         className
       )}
       style={{
