@@ -69,7 +69,7 @@ export const GameBoard: React.FC = () => {
 
     slideshowTimerRef.current = setInterval(() => {
       setCurrentImageIndex((prevIndex) =>
-        prevIndex === currentListing.details.imageUrls.length - 1
+        prevIndex === (currentListing.details.imageUrls?.length ?? 1) - 1
           ? 0
           : prevIndex + 1
       );
@@ -86,11 +86,11 @@ export const GameBoard: React.FC = () => {
   }, [startSlideshow]);
 
   useEffect(() => {
-    if (!currentListing?.details.imageUrls.length) return;
+    if (!currentListing?.details.imageUrls?.length) return;
     setCurrentImageIndex(
-      Math.floor(Math.random() * currentListing.details.imageUrls.length)
+      Math.floor(Math.random() * currentListing.details.imageUrls?.length)
     );
-  }, [currentListing?.id, currentListing?.details.imageUrls.length]);
+  }, [currentListing?.id, currentListing?.details.imageUrls?.length]);
 
   useEffect(() => {
     if (currentListing && room?.id) {
@@ -146,7 +146,7 @@ export const GameBoard: React.FC = () => {
       handlePrevImage: () => {
         setCurrentImageIndex((prevIndex) =>
           prevIndex === 0
-            ? (currentListing?.details.imageUrls.length ?? 1) - 1
+            ? (currentListing?.details.imageUrls?.length ?? 1) - 1
             : prevIndex - 1
         );
         if (currentListing) {
@@ -156,7 +156,7 @@ export const GameBoard: React.FC = () => {
       },
       handleNextImage: () => {
         setCurrentImageIndex((prevIndex) =>
-          prevIndex === (currentListing?.details.imageUrls.length ?? 1) - 1
+          prevIndex === (currentListing?.details.imageUrls?.length ?? 1) - 1
             ? 0
             : prevIndex + 1
         );
@@ -215,8 +215,13 @@ export const GameBoard: React.FC = () => {
     return <GameOver />;
   }
 
-  const shouldShowRoundInfo =
-    Number.isSafeInteger(maxRounds) && maxRounds !== 9999999;
+  const shouldShowRoundInfo = Boolean(
+    Number.isSafeInteger(maxRounds) &&
+      maxRounds !== 9999999 &&
+      maxRounds !== 0 &&
+      roundNumber &&
+      roundNumber !== 0
+  );
 
   return (
     <div className="game-board max-w-[1920px] mx-auto px-4 lg:px-8 flex flex-col">
@@ -244,7 +249,9 @@ export const GameBoard: React.FC = () => {
                 <div className="relative">
                   <div className="relative aspect-[16/10] w-full max-h-[500px]">
                     <img
-                      src={currentListing?.details.imageUrls[currentImageIndex]}
+                      src={
+                        currentListing?.details.imageUrls?.[currentImageIndex]
+                      }
                       onContextMenu={(e) => e.preventDefault()}
                       alt="Listing image"
                       className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
