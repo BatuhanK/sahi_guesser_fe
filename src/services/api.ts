@@ -15,15 +15,32 @@ api.interceptors.request.use((config) => {
 
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError<{ message?: string }>) => {
-    const errorMessage =
-      error.response?.data?.message || error.message || "An error occurred";
-
+  (
+    error: AxiosError<{
+      message?: string;
+      error?: {
+        response?: {
+          availableIn?: number;
+        };
+      };
+    }>
+  ) => {
     const notShowToastUrls = ["/auth/me"];
     if (notShowToastUrls.includes(error.config?.url || "")) {
       return Promise.reject(error);
     }
 
+    if (error.response?.status === 429) {
+      const availableIn =
+        error.response?.data?.error?.response?.availableIn || 0;
+      toast.error(
+        `Aksiyon engellendi. ${availableIn} saniye sonra tekrar deneyin`
+      );
+      return Promise.reject(error);
+    }
+
+    const errorMessage =
+      error.response?.data?.message || error.message || "An error occurred";
     toast.error(errorMessage);
 
     return Promise.reject(error);
