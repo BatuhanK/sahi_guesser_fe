@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from "react";
 import {
   createLocalAudioTrack,
+  RemoteParticipant,
   RemoteTrack,
   Room,
   RoomEvent,
   Track,
-  RemoteParticipant,
 } from "livekit-client";
+import { useCallback, useEffect, useState } from "react";
 import { authApi } from "../../../services/api";
 import { soundService } from "../../../services/soundService";
 import { AudioState, RemoteParticipantState } from "../types";
@@ -98,21 +98,25 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
 
     room.on(RoomEvent.ParticipantConnected, (participant) => {
       console.log("Participant connected:", participant.identity);
-      
-      // Add to listeners and set initial mute state if room is muted
-      setAudioState(prev => ({
+
+      // Check if participant was previously muted
+      const mutedParticipants = getMutedParticipants();
+      const wasPreviouslyMuted = mutedParticipants.has(participant.identity);
+
+      // Add to listeners and set initial mute state if room is muted or was previously muted
+      setAudioState((prev) => ({
         ...prev,
-        listeners: new Set([...prev.listeners, participant.identity])
+        listeners: new Set([...prev.listeners, participant.identity]),
       }));
 
       // Always add participant to remote participants with initial mute state
-      setRemoteParticipants(prev => {
-        setAudioState(currentState => {
+      setRemoteParticipants((prev) => {
+        setAudioState((currentState) => {
           const updated = new Map(prev);
           updated.set(participant.identity, {
             identity: participant.identity,
             audioTrack: null,
-            isMuted: currentState.isRoomMuted,
+            isMuted: currentState.isRoomMuted || wasPreviouslyMuted,
             isSpeaking: false,
           });
           return currentState;
@@ -125,21 +129,28 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
       RoomEvent.TrackSubscribed,
       (track: RemoteTrack, _publication, participant) => {
         if (track.kind === Track.Kind.Audio) {
-          // Get the current room mute state to ensure consistency
-          setAudioState(prev => {
-            // Immediately apply room mute state to the new track
-            track.mediaStreamTrack.enabled = !prev.isRoomMuted;
-            
+          // Get the current room mute state and check if participant was previously muted
+          setAudioState((prev) => {
+            const mutedParticipants = getMutedParticipants();
+            const wasPreviouslyMuted = mutedParticipants.has(
+              participant.identity
+            );
+
+            // Immediately apply room mute state or previous mute state to the new track
+            track.mediaStreamTrack.enabled = !(
+              prev.isRoomMuted || wasPreviouslyMuted
+            );
+
             const newListeners = new Set(prev.listeners);
             newListeners.delete(participant.identity);
 
             // Update remote participants with the latest mute state
-            setRemoteParticipants(participantsPrev => {
+            setRemoteParticipants((participantsPrev) => {
               const updated = new Map(participantsPrev);
               updated.set(participant.identity, {
                 identity: participant.identity,
                 audioTrack: track,
-                isMuted: prev.isRoomMuted,
+                isMuted: prev.isRoomMuted || wasPreviouslyMuted,
                 isSpeaking: false,
               });
               return updated;
@@ -178,7 +189,7 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
         updated.delete(participant.identity);
         return updated;
       });
-      setAudioState(prev => {
+      setAudioState((prev) => {
         const newListeners = new Set(prev.listeners);
         newListeners.delete(participant.identity);
         return { ...prev, listeners: newListeners };
@@ -186,7 +197,10 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
     });
   };
 
-  const setupAudioLevelMonitoring = (mediaStream: MediaStream, participant: RemoteParticipant) => {
+  const setupAudioLevelMonitoring = (
+    mediaStream: MediaStream,
+    participant: RemoteParticipant
+  ) => {
     const audioContext = new AudioContext();
     const source = audioContext.createMediaStreamSource(mediaStream);
     const analyser = audioContext.createAnalyser();
@@ -285,7 +299,8 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
 
       audioTracks.forEach((publication) => {
         if (publication.track) {
-          publication.track.mediaStreamTrack.enabled = !publication.track.mediaStreamTrack.enabled;
+          publication.track.mediaStreamTrack.enabled =
+            !publication.track.mediaStreamTrack.enabled;
         }
       });
 
@@ -298,7 +313,7 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
 
   const toggleRoomMute = useCallback(() => {
     const newRoomMutedState = !audioState.isRoomMuted;
-    
+
     // First update the state
     setAudioState((prev) => ({
       ...prev,
@@ -322,6 +337,25 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
     });
   }, [audioState.isRoomMuted]);
 
+  const MUTED_PARTICIPANTS_KEY = "muted_participants";
+
+  const getMutedParticipants = (): Set<string> => {
+    const stored = localStorage.getItem(MUTED_PARTICIPANTS_KEY);
+    return stored ? new Set(JSON.parse(stored)) : new Set();
+  };
+
+  const addMutedParticipant = (participantId: string) => {
+    const muted = getMutedParticipants();
+    muted.add(participantId);
+    localStorage.setItem(MUTED_PARTICIPANTS_KEY, JSON.stringify([...muted]));
+  };
+
+  const removeMutedParticipant = (participantId: string) => {
+    const muted = getMutedParticipants();
+    muted.delete(participantId);
+    localStorage.setItem(MUTED_PARTICIPANTS_KEY, JSON.stringify([...muted]));
+  };
+
   const toggleParticipantMute = (participantId: string) => {
     setRemoteParticipants((prev) => {
       const updated = new Map(prev);
@@ -333,6 +367,13 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
           ...participant,
           isMuted: newMutedState,
         });
+
+        // Persist mute state in local storage
+        if (newMutedState) {
+          addMutedParticipant(participantId);
+        } else {
+          removeMutedParticipant(participantId);
+        }
       }
       return updated;
     });
@@ -359,4 +400,4 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
     toggleRoomMute,
     toggleParticipantMute,
   };
-}; 
+};
