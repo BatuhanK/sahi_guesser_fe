@@ -2,11 +2,13 @@ import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { AuthModal } from "./components/auth/AuthModals";
+import { EmailVerificationModal } from "./components/auth/EmailVerificationModal";
 import { GameContainer } from "./components/game/GameContainer";
 import { Footer } from "./components/layout/Footer";
 import { Header } from "./components/layout/Header";
 import { useAuth } from "./hooks/useAuth";
 import { Contact } from "./pages/Contact";
+import { EmailVerification } from "./pages/EmailVerification";
 import { analyticsService } from "./services/analytics";
 
 // Initialize GA4
@@ -23,6 +25,45 @@ function AnalyticsWrapper({ children }: { children: React.ReactNode }) {
   }, [location]);
 
   return <>{children}</>;
+}
+
+// Email verification wrapper component
+function EmailVerificationWrapper({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const { user } = useAuth();
+  const [showEmailModal, setShowEmailModal] = useState(false);
+  const [emailModalType, setEmailModalType] = useState<"verify" | "set">(
+    "verify"
+  );
+
+  useEffect(() => {
+    // Don't show verification modal if user is on the verification page
+    if (location.pathname === "/email-dogrula") {
+      return;
+    }
+
+    if (user) {
+      if (!user.email) {
+        setEmailModalType("set");
+        setShowEmailModal(true);
+      } else if (!user.emailVerified) {
+        setEmailModalType("verify");
+        setShowEmailModal(true);
+      }
+    }
+  }, [user, location.pathname]);
+
+  return (
+    <>
+      {children}
+      <EmailVerificationModal
+        isOpen={showEmailModal}
+        onClose={() => setShowEmailModal(false)}
+        type={emailModalType}
+        currentEmail={user?.email}
+      />
+    </>
+  );
 }
 
 // CSS variables for theming
@@ -131,27 +172,20 @@ function App() {
     document.body.classList.toggle("dark", isDarkMode);
   }, [isDarkMode]);
 
-  // Listen for system theme changes
-  useEffect(() => {
-    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = (e: MediaQueryListEvent) => {
-      // Only update if there's no user preference saved
-      if (!localStorage.getItem("theme")) {
-        setIsDarkMode(e.matches);
-      }
-    };
-
-    mediaQuery.addEventListener("change", handleChange);
-    return () => mediaQuery.removeEventListener("change", handleChange);
-  }, []);
-
-  const handleAuth = async (username: string, password: string) => {
+  const handleAuth = async (
+    username: string,
+    password: string,
+    email?: string
+  ) => {
     try {
       if (authModalType === "login") {
         await login(username, password);
         analyticsService.trackLogin("regular");
       } else if (authModalType === "register") {
-        await register(username, password);
+        if (!email) {
+          throw new Error("Email is required for registration");
+        }
+        await register(username, password, email);
         analyticsService.trackRegistration();
       }
       setIsAuthModalOpen(false);
@@ -174,60 +208,63 @@ function App() {
   return (
     <BrowserRouter>
       <AnalyticsWrapper>
-        <Toaster
-          position="top-right"
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: isDarkMode ? "var(--bg-secondary)" : "#333",
-              color: isDarkMode ? "var(--text-primary)" : "#fff",
-            },
-            success: {
-              duration: 3000,
-              style: {
-                background: "var(--success-bg)",
-                color: "var(--success-text)",
-              },
-            },
-            error: {
+        <EmailVerificationWrapper>
+          <Toaster
+            position="top-right"
+            toastOptions={{
               duration: 4000,
               style: {
-                background: "var(--error-bg)",
-                color: "var(--error-text)",
+                background: isDarkMode ? "var(--bg-secondary)" : "#333",
+                color: isDarkMode ? "var(--text-primary)" : "#fff",
               },
-            },
-          }}
-        />
-        <div
-          className="min-h-screen flex flex-col transition-colors duration-200"
-          style={{
-            backgroundColor: "var(--bg-primary)",
-            color: "var(--text-primary)",
-          }}
-        >
-          <Header
-            onOpenAuth={handleOpenAuthModal}
-            isDarkMode={isDarkMode}
-            onToggleTheme={toggleTheme}
+              success: {
+                duration: 3000,
+                style: {
+                  background: "var(--success-bg)",
+                  color: "var(--success-text)",
+                },
+              },
+              error: {
+                duration: 4000,
+                style: {
+                  background: "var(--error-bg)",
+                  color: "var(--error-text)",
+                },
+              },
+            }}
           />
-          <main
-            className="flex-1 mx-auto w-full p-4"
-            style={{ maxWidth: "95rem" }}
+          <div
+            className="min-h-screen flex flex-col transition-colors duration-200"
+            style={{
+              backgroundColor: "var(--bg-primary)",
+              color: "var(--text-primary)",
+            }}
           >
-            <Routes>
-              <Route path="/" element={<GameContainer />} />
-              <Route path="/oda/:slug" element={<GameContainer />} />
-              <Route path="/iletisim" element={<Contact />} />
-            </Routes>
-          </main>
-          <Footer />
-          <AuthModal
-            isOpen={isAuthModalOpen}
-            onClose={() => setIsAuthModalOpen(false)}
-            type={authModalType || "login"}
-            onAuth={handleAuth}
-          />
-        </div>
+            <Header
+              onOpenAuth={handleOpenAuthModal}
+              isDarkMode={isDarkMode}
+              onToggleTheme={toggleTheme}
+            />
+            <main
+              className="flex-1 mx-auto w-full p-4"
+              style={{ maxWidth: "95rem" }}
+            >
+              <Routes>
+                <Route path="/" element={<GameContainer />} />
+                <Route path="/oda/:slug" element={<GameContainer />} />
+                <Route path="/iletisim" element={<Contact />} />
+                <Route path="/email-dogrula" element={<EmailVerification />} />
+              </Routes>
+            </main>
+            <Footer />
+            <AuthModal
+              isOpen={isAuthModalOpen}
+              onClose={() => setIsAuthModalOpen(false)}
+              type={authModalType || "login"}
+              onAuth={handleAuth}
+            />
+          </div>
+        </EmailVerificationWrapper>
       </AnalyticsWrapper>
     </BrowserRouter>
   );

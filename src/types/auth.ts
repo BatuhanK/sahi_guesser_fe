@@ -3,6 +3,8 @@ export interface User {
   username: string;
   score: number;
   role: string;
+  email: string;
+  emailVerified: boolean;
 }
 
 export interface LoginCredentials {

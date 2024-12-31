@@ -13,7 +13,8 @@ export function useAuth() {
 
       authApi
         .getCurrentUser()
-        .then(({ user }) => {
+        .then(({ user, email }) => {
+          user.email = email;
           setUser(user);
         })
         .catch((error) => {
@@ -33,8 +34,12 @@ export function useAuth() {
     socketService.reconnect();
   };
 
-  const register = async (username: string, password: string) => {
-    const { user, token } = await authApi.register(username, password);
+  const register = async (
+    username: string,
+    password: string,
+    email: string
+  ) => {
+    const { user, token } = await authApi.register(username, password, email);
     setUser(user);
     setToken(token.token);
 
