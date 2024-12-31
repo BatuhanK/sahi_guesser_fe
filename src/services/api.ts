@@ -86,6 +86,16 @@ export const authApi = {
     const response = await api.post("/auth/change-username", { username });
     return response.data;
   },
+
+  resendVerificationEmail: async () => {
+    const response = await api.post("/auth/resend-verification-email");
+    return response.data;
+  },
+
+  updateEmail: async (email: string) => {
+    const response = await api.post("/auth/change-email", { email });
+    return response.data;
+  },
 };
 
 export interface Category {
