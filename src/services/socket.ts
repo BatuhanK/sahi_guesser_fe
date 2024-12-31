@@ -24,6 +24,8 @@ class SocketService {
 
   private roomId: number | null = null;
 
+  private optimisticMessageIds: Set<string> = new Set();
+
   connect(): void {
     const token = localStorage.getItem("token");
     let extraHeaders: Record<string, string> = {};
@@ -275,14 +277,76 @@ class SocketService {
     }, 100);
 
     this.socket.on("chatMessage", ({ userId, username, message }) => {
-      chatMessageBuffer.push({
-        id: new Date().getTime().toString(),
-        userId: userId.toString(),
-        username,
-        message,
-        timestamp: new Date(),
-      });
-      flushChatMessages();
+      const state = useGameStore.getState();
+
+      // Handle system message rejection
+      if (username === "system" && message.startsWith("Mesajınız reddedildi")) {
+        // Find the latest optimistic message from the user
+        const latestOptimisticId = Array.from(this.optimisticMessageIds).pop();
+        if (latestOptimisticId) {
+          // Remove from tracking
+          this.optimisticMessageIds.delete(latestOptimisticId);
+
+          // Mark the message as rejected
+          const updatedMessages = state.chatMessages.map((msg) =>
+            msg.id === latestOptimisticId ? { ...msg, isRejected: true } : msg
+          );
+
+          useGameStore.getState().setChatMessages(updatedMessages);
+        }
+
+        // Add the system message
+        chatMessageBuffer.push({
+          id: new Date().getTime().toString(),
+          userId: userId.toString(),
+          username,
+          message,
+          timestamp: new Date(),
+        });
+        flushChatMessages();
+        return;
+      }
+
+      const optimisticMessageId = Array.from(this.optimisticMessageIds).find(
+        (id) => {
+          const msg = state.chatMessages.find((m) => m.id === id);
+          return (
+            msg && msg.userId === userId.toString() && msg.message === message
+          );
+        }
+      );
+
+      if (optimisticMessageId) {
+        // Remove the optimistic message ID from tracking
+        this.optimisticMessageIds.delete(optimisticMessageId);
+
+        // Filter out the optimistic message
+        const filteredMessages = state.chatMessages.filter(
+          (msg) => msg.id !== optimisticMessageId
+        );
+
+        // Add the server message
+        const serverMessage = {
+          id: new Date().getTime().toString(),
+          userId: userId.toString(),
+          username,
+          message,
+          timestamp: new Date(),
+        };
+
+        useGameStore
+          .getState()
+          .setChatMessages([...filteredMessages, serverMessage].slice(-100));
+      } else {
+        chatMessageBuffer.push({
+          id: new Date().getTime().toString(),
+          userId: userId.toString(),
+          username,
+          message,
+          timestamp: new Date(),
+        });
+        flushChatMessages();
+      }
 
       if (this.roomId) {
         analyticsService.trackChatMessage(this.roomId.toString());
@@ -397,6 +461,32 @@ class SocketService {
   }
 
   sendMessage(roomId: number, message: string) {
+    const authState = useAuthStore.getState();
+    const user = authState.user;
+
+    if (user) {
+      // Add optimistic message
+      const optimisticId = `${new Date().getTime()}-${Math.random()}`;
+      const optimisticMessage = {
+        id: optimisticId,
+        userId: user.id.toString(),
+        username: user.username,
+        message,
+        timestamp: new Date(),
+      };
+
+      // Track the optimistic message ID
+      this.optimisticMessageIds.add(optimisticId);
+
+      useGameStore
+        .getState()
+        .setChatMessages(
+          [...useGameStore.getState().chatMessages, optimisticMessage].slice(
+            -100
+          )
+        );
+    }
+
     this.socket?.emit("chatMessage", { roomId, message });
   }
 

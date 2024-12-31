@@ -178,7 +178,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
         <span
           className={cn(
             "text-[var(--text-primary)] break-words flex-1",
-            isAdmin || isTucik ? "text-base font-medium" : "text-sm"
+            isAdmin || isTucik ? "text-base font-medium" : "text-sm",
+            message.isRejected && "line-through opacity-50"
           )}
         >
           {renderMessageWithMentions(

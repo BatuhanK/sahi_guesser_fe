@@ -34,6 +34,7 @@ export interface ChatMessage {
   message: string;
   timestamp: Date;
   mentions?: ChatMention[];
+  isRejected?: boolean;
 }
 
 export interface GuessResult {
