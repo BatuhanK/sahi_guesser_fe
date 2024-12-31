@@ -6,7 +6,7 @@ interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: "login" | "register";
-  onAuth: (username: string, password: string) => void;
+  onAuth: (username: string, password: string, email?: string) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -17,17 +17,54 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
+  const [errors, setErrors] = useState<{
+    email?: string;
+    username?: string;
+    password?: string;
+  }>({});
 
   useEffect(() => {
     if (!isOpen) {
       setUsername("");
       setPassword("");
+      setEmail("");
+      setErrors({});
     }
   }, [isOpen]);
 
+  const validateForm = () => {
+    const newErrors: typeof errors = {};
+
+    if (type === "register") {
+      if (!email) {
+        newErrors.email = "E-posta adresi gereklidir";
+      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        newErrors.email = "Geçerli bir e-posta adresi giriniz";
+      }
+    }
+
+    if (!username) {
+      newErrors.username = "Kullanıcı adı gereklidir";
+    }
+
+    if (!password) {
+      newErrors.password = "Şifre gereklidir";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    onAuth(username, password);
+    if (validateForm()) {
+      if (type === "register") {
+        onAuth(username, password, email);
+      } else {
+        onAuth(username, password);
+      }
+    }
   };
 
   return (
@@ -83,6 +120,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               </div>
 
               <form onSubmit={handleSubmit} className="space-y-4">
+                {type === "register" && (
+                  <div>
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-[var(--text-secondary)]"
+                    >
+                      E-posta
+                    </label>
+                    <input
+                      type="email"
+                      id="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className={`mt-1 block w-full px-3 py-2 bg-[var(--bg-tertiary)] border ${
+                        errors.email
+                          ? "border-[var(--error-text)]"
+                          : "border-[var(--border-color)]"
+                      } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:border-transparent text-[var(--text-primary)]`}
+                      required
+                    />
+                    {errors.email && (
+                      <p className="mt-1 text-sm text-[var(--error-text)]">
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+                )}
+
                 <div>
                   <label
                     htmlFor="username"
@@ -95,9 +160,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     id="username"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:border-transparent text-[var(--text-primary)]"
+                    className={`mt-1 block w-full px-3 py-2 bg-[var(--bg-tertiary)] border ${
+                      errors.username
+                        ? "border-[var(--error-text)]"
+                        : "border-[var(--border-color)]"
+                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:border-transparent text-[var(--text-primary)]`}
                     required
                   />
+                  {errors.username && (
+                    <p className="mt-1 text-sm text-[var(--error-text)]">
+                      {errors.username}
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -112,9 +186,18 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                     id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="mt-1 block w-full px-3 py-2 bg-[var(--bg-tertiary)] border border-[var(--border-color)] rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:border-transparent text-[var(--text-primary)]"
+                    className={`mt-1 block w-full px-3 py-2 bg-[var(--bg-tertiary)] border ${
+                      errors.password
+                        ? "border-[var(--error-text)]"
+                        : "border-[var(--border-color)]"
+                    } rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] focus:border-transparent text-[var(--text-primary)]`}
                     required
                   />
+                  {errors.password && (
+                    <p className="mt-1 text-sm text-[var(--error-text)]">
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
 
                 <div className="mt-6">

@@ -7,6 +7,7 @@ import { Footer } from "./components/layout/Footer";
 import { Header } from "./components/layout/Header";
 import { useAuth } from "./hooks/useAuth";
 import { Contact } from "./pages/Contact";
+import { EmailVerification } from "./pages/EmailVerification";
 import { analyticsService } from "./services/analytics";
 
 // Initialize GA4
@@ -145,13 +146,20 @@ function App() {
     return () => mediaQuery.removeEventListener("change", handleChange);
   }, []);
 
-  const handleAuth = async (username: string, password: string) => {
+  const handleAuth = async (
+    username: string,
+    password: string,
+    email?: string
+  ) => {
     try {
       if (authModalType === "login") {
         await login(username, password);
         analyticsService.trackLogin("regular");
       } else if (authModalType === "register") {
-        await register(username, password);
+        if (!email) {
+          throw new Error("Email is required for registration");
+        }
+        await register(username, password, email);
         analyticsService.trackRegistration();
       }
       setIsAuthModalOpen(false);
@@ -218,6 +226,7 @@ function App() {
               <Route path="/" element={<GameContainer />} />
               <Route path="/oda/:slug" element={<GameContainer />} />
               <Route path="/iletisim" element={<Contact />} />
+              <Route path="/email-dogrula" element={<EmailVerification />} />
             </Routes>
           </main>
           <Footer />
