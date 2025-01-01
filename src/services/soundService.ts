@@ -6,7 +6,7 @@ class SoundService {
   private countdownSound: HTMLAudioElement;
   private gameOverSound: HTMLAudioElement;
   private countdownTimeout: number | null = null;
-  private volume: number = 1;
+  private volume: number = 0.3;
 
   constructor() {
     this.successSound = new Audio(

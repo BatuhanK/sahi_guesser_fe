@@ -266,7 +266,7 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
           }
         });
 
-        soundService.setVolume(1);
+        soundService.setVolume(0.3);
 
         // Disconnect from room
         await audioState.room.disconnect(true);
