@@ -1,3 +1,4 @@
+import { Adsense } from "@ctrl/react-adsense";
 import { Home } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -90,6 +91,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           {notSystemOnlinePlayerCount === 0 && ""}
         </span>
       </div>
+
+      <Adsense client="ca-pub-1940141709577516" slot="9672312243" />
 
       <AdPlaceholder
         width={728}

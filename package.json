@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@ctrl/react-adsense": "^1.8.0",
     "@emoji-mart/data": "^1.1.2",
     "@emoji-mart/react": "^1.1.1",
     "@headlessui/react": "^1.7.18",
@@ -29,6 +30,7 @@
     "lucide-react": "^0.400.0",
     "qrcode.react": "^4.1.0",
     "react": "^18.3.1",
+    "react-adsense": "^0.1.0",
     "react-confetti": "^6.1.0",
     "react-dom": "^18.3.1",
     "react-ga4": "^2.1.0",
