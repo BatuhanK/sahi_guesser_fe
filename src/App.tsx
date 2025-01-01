@@ -43,12 +43,28 @@ function EmailVerificationWrapper({ children }: { children: React.ReactNode }) {
     }
 
     if (user) {
+      const modalShownCount = parseInt(
+        localStorage.getItem(`emailModal_${user.id}`) || "0"
+      );
+
+      if (modalShownCount >= 3) {
+        return; // Don't show modal if it's been shown 3 times already
+      }
+
       if (!user.email) {
         setEmailModalType("set");
         setShowEmailModal(true);
+        localStorage.setItem(
+          `emailModal_${user.id}`,
+          String(modalShownCount + 1)
+        );
       } else if (!user.emailVerified) {
         setEmailModalType("verify");
         setShowEmailModal(true);
+        localStorage.setItem(
+          `emailModal_${user.id}`,
+          String(modalShownCount + 1)
+        );
       }
     }
   }, [user, location.pathname]);
