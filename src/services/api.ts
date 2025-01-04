@@ -10,6 +10,12 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  const fingerprint = localStorage.getItem("fingerprint");
+  if (fingerprint) {
+    config.headers["x-fingerprint"] = fingerprint;
+  }
+
   return config;
 });
 
@@ -53,12 +59,25 @@ export const authApi = {
     return response.data;
   },
 
-  register: async (username: string, password: string, email: string) => {
+  register: async (
+    username: string,
+    password: string,
+    email: string,
+    fingerprint: string | null
+  ) => {
     const response = await api.post("/auth/register", {
       username,
       password,
       email,
+      fingerprint,
     });
+    return response.data;
+  },
+
+  anonymousLogin: async (fingerprint: string) => {
+    const response = await api.get(
+      "/auth/anonymous?fingerprint=" + fingerprint
+    );
     return response.data;
   },
 

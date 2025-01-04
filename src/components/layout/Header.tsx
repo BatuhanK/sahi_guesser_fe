@@ -288,23 +288,27 @@ export const Header: React.FC<HeaderProps> = ({
                         </div>
                         {showUserMenu && (
                           <>
-                            <button
-                              onClick={handleLogout}
-                              className="flex items-center gap-2 text-red-500 p-2 hover:bg-[var(--bg-hover)] rounded"
-                            >
-                              <LogOut size={20} />
-                              <span>Çıkış Yap</span>
-                            </button>
-                            <button
-                              onClick={() => {
-                                setShowProfileEditModal(true);
-                                setShowUserMenu(false);
-                              }}
-                              className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
-                            >
-                              <Settings size={20} />
-                              <span>Profil Düzenle</span>
-                            </button>
+                            {!user?.isAnonymous && (
+                              <>
+                                <button
+                                  onClick={handleLogout}
+                                  className="flex items-center gap-2 text-red-500 p-2 hover:bg-[var(--bg-hover)] rounded"
+                                >
+                                  <LogOut size={20} />
+                                  <span>Çıkış Yap</span>
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    setShowProfileEditModal(true);
+                                    setShowUserMenu(false);
+                                  }}
+                                  className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                                >
+                                  <Settings size={20} />
+                                  <span>Profil Düzenle</span>
+                                </button>
+                              </>
+                            )}
                             <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
                               <Volume2
                                 size={20}
@@ -453,23 +457,39 @@ export const Header: React.FC<HeaderProps> = ({
                   </div>
                   {showUserMenu && (
                     <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 min-w-[200px] z-50">
-                      <button
-                        onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-red-500"
-                      >
-                        <LogOut size={20} />
-                        <span>Çıkış Yap</span>
-                      </button>
-                      <button
-                        onClick={() => {
-                          setShowProfileEditModal(true);
-                          setShowUserMenu(false);
-                        }}
-                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
-                      >
-                        <Settings size={20} />
-                        <span>Profil Düzenle</span>
-                      </button>
+                      {!user.isAnonymous && (
+                        <>
+                          <button
+                            onClick={handleLogout}
+                            className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-red-500"
+                          >
+                            <LogOut size={20} />
+                            <span>Çıkış Yap</span>
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowProfileEditModal(true);
+                              setShowUserMenu(false);
+                            }}
+                            className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                          >
+                            <Settings size={20} />
+                            <span>Profil Düzenle</span>
+                          </button>
+                        </>
+                      )}
+
+                      {user.isAnonymous && (
+                        <>
+                          <button
+                            onClick={() => onOpenAuth("register")}
+                            className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
+                          >
+                            <UserPlus size={20} />
+                            <span>Kayıt ol</span>
+                          </button>
+                        </>
+                      )}
                       <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
                         <Volume2
                           size={20}

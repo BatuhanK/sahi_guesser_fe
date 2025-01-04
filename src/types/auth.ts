@@ -5,6 +5,7 @@ export interface User {
   role: string;
   email: string;
   emailVerified: boolean;
+  isAnonymous: boolean;
 }
 
 export interface LoginCredentials {
