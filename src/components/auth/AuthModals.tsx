@@ -46,6 +46,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
     if (!username) {
       newErrors.username = "Kullanıcı adı gereklidir";
+    } else if (type === "register" && !/^[a-zA-Z0-9]+$/.test(username)) {
+      newErrors.username =
+        "Kullanıcı adı sadece harf ve rakam içerebilir. Türkçe karakter ya da boşluk vb. karakterler içeremez.";
     }
 
     if (!password) {
