@@ -34,11 +34,20 @@ function FingerprintWrapper({ children }: { children: React.ReactNode }) {
   const setFingerprint = useAuthStore((state) => state.setFingerprint);
 
   useEffect(() => {
-    // Initialize FingerprintJS
+    // Check localStorage first
+    const storedFingerprint = localStorage.getItem("fingerprint");
+    if (storedFingerprint) {
+      setFingerprint(storedFingerprint);
+      return;
+    }
+
+    // If no fingerprint in localStorage, initialize FingerprintJS
     load()
       .then((fp) => fp.get())
       .then((result) => {
-        setFingerprint(result.visitorId);
+        const visitorId = result.visitorId;
+        localStorage.setItem("fingerprint", visitorId);
+        setFingerprint(visitorId);
       })
       .catch((error) => {
         console.error("Error initializing FingerprintJS:", error);
