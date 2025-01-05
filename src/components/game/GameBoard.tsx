@@ -26,6 +26,7 @@ import {
   HotelsDetails,
   LetgoDetails,
   PropertyDetails,
+  SportsPlayerDetails,
 } from "./components/ListingDetails";
 import { GameOver } from "./GameOver";
 
@@ -201,6 +202,8 @@ export const GameBoard: React.FC = () => {
         return <LetgoDetails details={currentListing.details} />;
       case "hotels":
         return <HotelsDetails details={currentListing.details} />;
+      case "sports-player-listing":
+        return <SportsPlayerDetails details={currentListing.details} />;
       default:
         return null;
     }

@@ -54,6 +54,14 @@ export type LetgoListingDetails = {
   keyValues: Record<string, string>;
 };
 
+export type SportsPlayerListingDetails = {
+  type: "sports-player-listing";
+  subtype: "football";
+  team: string;
+  imageUrls: string[];
+  keyValues: Record<string, string>;
+};
+
 export interface Listing {
   id: number;
   title: string;
@@ -62,7 +70,8 @@ export interface Listing {
     | HouseForRentListingDetails
     | HouseForSaleListingDetails
     | LetgoListingDetails
-    | HotelsListingDetails;
+    | HotelsListingDetails
+    | SportsPlayerListingDetails;
 }
 
 export interface Player {

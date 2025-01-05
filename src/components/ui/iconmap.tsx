@@ -6,6 +6,7 @@ import {
   Home,
   HousePlus,
   LucideIcon,
+  PersonStanding,
   ShoppingBasket,
 } from "lucide-react";
 
@@ -17,4 +18,5 @@ export const iconMap: Record<string, LucideIcon> = {
   hotel: BedDouble,
   "house-plus": HousePlus,
   flower: Flower,
+  football: PersonStanding,
 };

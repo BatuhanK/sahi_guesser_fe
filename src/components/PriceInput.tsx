@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { formatPrice, parsePrice } from "../utils/priceFormatter";
+import {
+  formatPrice,
+  formatPriceWithCurrency,
+  parsePrice,
+} from "../utils/priceFormatter";
 
 interface PriceInputProps {
   onGuess: (guess: number) => void;
@@ -45,6 +49,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
       }
     } else if (listingType === "house-for-sale") {
       return [500_000, 250_000, 100_000];
+    } else if (listingType === "sports-player-listing") {
+      return [1000_000, 500_000, 100_000];
     } else {
       return [1000, 500, 100];
     }
@@ -86,7 +92,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         <div className="relative mb-4">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
             <span className="text-[var(--text-secondary)] text-base lg:text-lg font-medium">
-              ₺
+              {listingType === "sports-player-listing" ? "€" : "₺"}
             </span>
           </div>
           <input
@@ -161,7 +167,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               >
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              {formatPrice(amount)}
+              {formatPriceWithCurrency(amount, listingType)}
             </button>
           ))}
         </div>
@@ -192,7 +198,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               >
                 <path d="M5 12h14" />
               </svg>
-              {formatPrice(amount)}
+              {formatPriceWithCurrency(amount, listingType)}
             </button>
           ))}
         </div>

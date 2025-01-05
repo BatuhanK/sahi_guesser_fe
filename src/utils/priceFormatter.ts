@@ -17,3 +17,13 @@ export function parsePrice(input: string): number {
   const numericValue = parseInt(cleanInput.replace(/[km]/g, ""), 10);
   return isNaN(numericValue) ? 0 : numericValue * multiplier;
 }
+
+export function formatPriceWithCurrency(
+  price: number,
+  listingType?: string
+): string {
+  const formattedPrice = formatPrice(price);
+  return `${
+    listingType === "sports-player-listing" ? "€" : "₺"
+  }${formattedPrice}`;
+}

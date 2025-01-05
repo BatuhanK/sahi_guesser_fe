@@ -4,14 +4,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useGameStore } from "../store/gameStore";
-import {
-  CarListingDetails,
-  HotelsListingDetails,
-  HouseForRentListingDetails,
-  LetgoListingDetails,
-  Listing,
-  RoundEndScore,
-} from "../types/socket";
+import { Listing, RoundEndScore } from "../types/socket";
+import { formatPriceWithCurrency } from "../utils/priceFormatter";
 import AdPlaceholder from "./game/components/AdPlaceholder";
 
 interface RoundResultsProps {
@@ -19,9 +13,9 @@ interface RoundResultsProps {
   correctPrice: number;
   listing: Listing;
   intermissionDuration: number;
-  maxRounds: number;
-  roundNumber: number;
-  shouldShowRoundInfo: boolean;
+  maxRounds?: number;
+  roundNumber?: number;
+  shouldShowRoundInfo?: boolean;
 }
 
 export const RoundResults: React.FC<RoundResultsProps> = ({
@@ -51,7 +45,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
 
   const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
     const duration = Math.floor(intermissionDuration / 1000);
-    return isNaN(duration) ? 5 : duration; // Default to 10 seconds if invalid
+    return isNaN(duration) ? 5 : duration;
   });
 
   useEffect(() => {
@@ -113,103 +107,14 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
 
   const { user } = useAuth();
   const navigate = useNavigate();
-
   const room = useGameStore((state) => state.room);
+
   let adIdentifier = `tur-sonu-reklam-${room?.id}`;
   if (!room?.isSystemRoom) {
     adIdentifier = `tur-sonu-reklam-ozel-odalar`;
   }
 
-  const renderScoreRow = (score: (typeof sortedScores)[0], index: number) => (
-    <motion.div
-      initial={{ opacity: 0, x: -20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.1 }}
-      key={score.userId}
-      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
-        index
-      )} backdrop-blur-sm backdrop-filter`}
-    >
-      <div className="flex items-center gap-3 w-full sm:w-auto sm:flex-1 min-w-0">
-        {index <= 2 ? (
-          <motion.div
-            initial={{ rotate: -180, scale: 0 }}
-            animate={{ rotate: 0, scale: 1 }}
-            transition={{ type: "spring", stiffness: 200, delay: index * 0.1 }}
-            className="shrink-0"
-          >
-            <Medal
-              className={`${getMedalColor(index)} drop-shadow-md`}
-              size={24}
-            />
-          </motion.div>
-        ) : (
-          <span className="w-6 text-center font-medium text-[var(--text-tertiary)] shrink-0">
-            {index + 1}
-          </span>
-        )}
-        <span className="font-medium text-base sm:text-lg truncate text-[var(--text-primary)]">
-          {score.username}
-        </span>
-      </div>
-
-      <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
-        <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
-          ₺{score.guess.toLocaleString("tr-TR")}
-        </span>
-        <div className="shrink-0">
-          <motion.span
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ delay: index * 0.1 + 0.2 }}
-            className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
-              score.accuracy >= 90
-                ? "bg-[var(--success-bg)] text-[var(--success-text)]"
-                : score.accuracy >= 70
-                ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
-                : "bg-[var(--error-bg)] text-[var(--error-text)]"
-            }`}
-          >
-            %{score.accuracy.toFixed(1)}
-          </motion.span>
-        </div>
-        <motion.span
-          initial={{ x: 20, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ delay: index * 0.1 + 0.3 }}
-          className="font-bold text-[var(--success-text)] text-sm sm:text-base shrink-0 min-w-[60px] text-right"
-        >
-          +{score.roundScore}
-        </motion.span>
-      </div>
-    </motion.div>
-  );
-
   const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
-
-  const carListingInfo = useMemo(() => {
-    if (listing.details.type !== "car") return null;
-    const details = listing.details as CarListingDetails;
-    return `${details.brand} ${details.model}`;
-  }, [listing.details]);
-
-  const houseListingInfo = useMemo(() => {
-    if (listing.details.type !== "house-for-rent") return null;
-    const details = listing.details as HouseForRentListingDetails;
-    return `${details.rooms} oda ${details.squareMeters} m² ${details.city} ${details.district}`;
-  }, [listing.details]);
-
-  const letgoListingInfo = useMemo(() => {
-    if (listing.details.type !== "letgo") return null;
-    const details = listing.details as LetgoListingDetails;
-    return `${details.title}`;
-  }, [listing.details]);
-
-  const hotelListingInfo = useMemo(() => {
-    if (listing.details.type !== "hotels") return null;
-    const details = listing.details as HotelsListingDetails;
-    return `${details.title} - ${details.city}, ${details.country}`;
-  }, [listing.details]);
 
   return (
     <div className="h-full lg:p-6 rounded-xl" style={{ padding: 0 }}>
@@ -257,21 +162,92 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                   </AdPlaceholder>
                   <div className="flex flex-col gap-2">
                     <p className="text-[var(--text-secondary)] text-lg">
-                      {carListingInfo ||
-                        houseListingInfo ||
-                        letgoListingInfo ||
-                        hotelListingInfo}
+                      {listing.title}
                     </p>
                     <p className="text-2xl font-semibold text-[var(--success-text)]">
-                      Gerçek Fiyat: ₺{correctPrice.toLocaleString("tr-TR")}
+                      Gerçek Fiyat:{" "}
+                      {formatPriceWithCurrency(
+                        correctPrice,
+                        listing.details.type
+                      )}
                     </p>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  {sortedScores
-                    .slice(0, 3)
-                    .map((score, index) => renderScoreRow(score, index))}
+                  {sortedScores.slice(0, 3).map((score, index) => (
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1 }}
+                      key={score.userId}
+                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
+                        index
+                      )} backdrop-blur-sm backdrop-filter`}
+                    >
+                      <div className="flex items-center gap-3 w-full sm:w-auto sm:flex-1 min-w-0">
+                        {index <= 2 ? (
+                          <motion.div
+                            initial={{ rotate: -180, scale: 0 }}
+                            animate={{ rotate: 0, scale: 1 }}
+                            transition={{
+                              type: "spring",
+                              stiffness: 200,
+                              delay: index * 0.1,
+                            }}
+                            className="shrink-0"
+                          >
+                            <Medal
+                              className={`${getMedalColor(
+                                index
+                              )} drop-shadow-md`}
+                              size={24}
+                            />
+                          </motion.div>
+                        ) : (
+                          <span className="w-6 text-center font-medium text-[var(--text-tertiary)] shrink-0">
+                            {index + 1}
+                          </span>
+                        )}
+                        <span className="font-medium text-base sm:text-lg truncate text-[var(--text-primary)]">
+                          {score.username}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
+                        <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
+                          {formatPriceWithCurrency(
+                            score.guess,
+                            listing.details.type
+                          )}
+                        </span>
+                        <div className="shrink-0">
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: index * 0.1 + 0.2 }}
+                            className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                              score.accuracy >= 90
+                                ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                                : score.accuracy >= 70
+                                ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
+                                : "bg-[var(--error-bg)] text-[var(--error-text)]"
+                            }`}
+                          >
+                            %{score.accuracy.toFixed(1)}
+                          </motion.span>
+                        </div>
+                        <motion.span
+                          initial={{ x: 20, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: index * 0.1 + 0.3 }}
+                          className="font-bold text-[var(--success-text)] text-sm sm:text-base shrink-0 min-w-[60px] text-right"
+                        >
+                          +{score.roundScore}
+                        </motion.span>
+                      </div>
+                    </motion.div>
+                  ))}
 
                   {userRank > 3 && (
                     <div className="flex justify-center py-1">
@@ -283,7 +259,57 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                     </div>
                   )}
                   {userRank > 2 && (
-                    <>{renderScoreRow(sortedScores[userRank], userRank)}</>
+                    <motion.div
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.4 }}
+                      key={sortedScores[userRank].userId}
+                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
+                        userRank
+                      )} backdrop-blur-sm backdrop-filter`}
+                    >
+                      <div className="flex items-center gap-3 w-full sm:w-auto sm:flex-1 min-w-0">
+                        <span className="w-6 text-center font-medium text-[var(--text-tertiary)] shrink-0">
+                          {userRank + 1}
+                        </span>
+                        <span className="font-medium text-base sm:text-lg truncate text-[var(--text-primary)]">
+                          {sortedScores[userRank].username}
+                        </span>
+                      </div>
+
+                      <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
+                        <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
+                          {formatPriceWithCurrency(
+                            sortedScores[userRank].guess,
+                            listing.details.type
+                          )}
+                        </span>
+                        <div className="shrink-0">
+                          <motion.span
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ delay: 0.5 }}
+                            className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                              sortedScores[userRank].accuracy >= 90
+                                ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                                : sortedScores[userRank].accuracy >= 70
+                                ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
+                                : "bg-[var(--error-bg)] text-[var(--error-text)]"
+                            }`}
+                          >
+                            %{sortedScores[userRank].accuracy.toFixed(1)}
+                          </motion.span>
+                        </div>
+                        <motion.span
+                          initial={{ x: 20, opacity: 0 }}
+                          animate={{ x: 0, opacity: 1 }}
+                          transition={{ delay: 0.6 }}
+                          className="font-bold text-[var(--success-text)] text-sm sm:text-base shrink-0 min-w-[60px] text-right"
+                        >
+                          +{sortedScores[userRank].roundScore}
+                        </motion.span>
+                      </div>
+                    </motion.div>
                   )}
                 </div>
               </div>
