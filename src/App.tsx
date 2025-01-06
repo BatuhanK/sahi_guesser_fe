@@ -45,6 +45,7 @@ function FingerprintWrapper({ children }: { children: React.ReactNode }) {
 
     const uuid = uuidv4()
     localStorage.setItem("fingerprint", uuid)
+    setFingerprint(uuid)
 
   }, [setFingerprint]);
 
