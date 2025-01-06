@@ -1,7 +1,7 @@
-import { load } from "@fingerprintjs/fingerprintjs";
 import { useEffect, useState } from "react";
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { v4 as uuidv4 } from 'uuid';
 import { AuthModal } from "./components/auth/AuthModals";
 import { EmailVerificationModal } from "./components/auth/EmailVerificationModal";
 import { GameContainer } from "./components/game/GameContainer";
@@ -42,16 +42,10 @@ function FingerprintWrapper({ children }: { children: React.ReactNode }) {
     }
 
     // If no fingerprint in localStorage, initialize FingerprintJS
-    load()
-      .then((fp) => fp.get())
-      .then((result) => {
-        const visitorId = result.visitorId;
-        localStorage.setItem("fingerprint", visitorId);
-        setFingerprint(visitorId);
-      })
-      .catch((error) => {
-        console.error("Error initializing FingerprintJS:", error);
-      });
+
+    const uuid = uuidv4()
+    localStorage.setItem("fingerprint", uuid)
+
   }, [setFingerprint]);
 
   return <>{children}</>;
