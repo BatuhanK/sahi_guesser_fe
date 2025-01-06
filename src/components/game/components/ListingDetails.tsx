@@ -21,6 +21,15 @@ import {
   SportsPlayerListingDetails,
 } from "../../../types/socket";
 
+
+const hotelDetailsPropertyMap: Record<string, string> = {
+  Features: "Özellik",
+  "Hotel Rating": "Otel Puanı",
+  "Hotel Type": "Otel Tipi",
+  "Room Type": "Oda Tipi",
+  "Review Count": "Yorum Sayısı",
+};
+
 const DetailPill: React.FC<{
   icon: React.ReactNode;
   text: React.ReactNode;
