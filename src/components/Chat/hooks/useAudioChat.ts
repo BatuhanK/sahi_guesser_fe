@@ -69,7 +69,7 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
       const audioTrack = await createLocalAudioTrack();
       await livekitRoom.localParticipant.publishTrack(audioTrack);
 
-      soundService.setVolume(0.1);
+      soundService.setVolume(0.05);
 
       setAudioState((prev) => ({
         ...prev,
@@ -266,7 +266,7 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
           }
         });
 
-        soundService.setVolume(0.3);
+        soundService.setVolume(0.05);
 
         // Disconnect from room
         await audioState.room.disconnect(true);

@@ -150,7 +150,7 @@ export const Header: React.FC<HeaderProps> = ({
     useAnnouncementStore();
   const [volume, setVolume] = useState(() => {
     const savedVolume = localStorage.getItem("app-volume");
-    return savedVolume ? parseFloat(savedVolume) : 0.1;
+    return savedVolume ? parseFloat(savedVolume) : 0.05;
   });
 
   useEffect(() => {
