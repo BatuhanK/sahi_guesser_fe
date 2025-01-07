@@ -16,14 +16,18 @@ export function useAuth() {
   const isLoadingRef = useRef(false);
 
   useEffect(() => {
+    let isMounted = true;
+
     if (token && !user && !isLoadingRef.current) {
       isLoadingRef.current = true;
 
       authApi
         .getCurrentUser()
         .then(({ user, email }) => {
-          user.email = email;
-          setUser(user);
+          if (isMounted) {
+            user.email = email;
+            setUser(user);
+          }
         })
         .catch((error) => {
           console.log("auth error", error);
@@ -32,7 +36,11 @@ export function useAuth() {
           isLoadingRef.current = false;
         });
     }
-  }, [token, user, logout, setUser]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token]); // Only depend on token changes
 
   // Handle anonymous login with fingerprint
   useEffect(() => {
