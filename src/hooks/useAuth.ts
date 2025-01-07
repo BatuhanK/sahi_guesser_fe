@@ -15,69 +15,66 @@ export function useAuth() {
   } = useAuthStore();
   const isLoadingRef = useRef(false);
 
+  // Handle current user fetch
   useEffect(() => {
+    if (!token || user || isLoadingRef.current) return;
+
     let isMounted = true;
+    isLoadingRef.current = true;
 
-    if (token && !user && !isLoadingRef.current) {
-      isLoadingRef.current = true;
-
-      authApi
-        .getCurrentUser()
-        .then(({ user, email }) => {
-          if (isMounted) {
-            user.email = email;
-            setUser(user);
-          }
-        })
-        .catch((error) => {
-          console.log("auth error", error);
-        })
-        .finally(() => {
+    authApi
+      .getCurrentUser()
+      .then(({ user, email }) => {
+        if (isMounted) {
+          user.email = email;
+          setUser(user);
+        }
+      })
+      .catch((error) => {
+        console.log("auth error", error);
+      })
+      .finally(() => {
+        if (isMounted) {
           isLoadingRef.current = false;
-        });
-    }
+        }
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [token]); // Only depend on token changes
+  }, [token, user, setUser]);
 
   // Handle anonymous login with fingerprint
   useEffect(() => {
     const isForcedLogout = localStorage.getItem("forced_logout") === "true";
+    if (!fingerprint || user || token || isLoadingRef.current || isForcedLogout) return;
+
     let isMounted = true;
+    isLoadingRef.current = true;
 
-    if (
-      fingerprint &&
-      !user &&
-      !token &&
-      !isLoadingRef.current &&
-      !isForcedLogout
-    ) {
-      isLoadingRef.current = true;
-
-      authApi
-        .anonymousLogin(fingerprint)
-        .then(({ user, token, email }) => {
-          if (isMounted) {
-            user.email = email;
-            setUser(user);
-            setToken(token.token);
-            socketService.reconnect();
-          }
-        })
-        .catch((error) => {
-          console.log("anonymous login error", error);
-        })
-        .finally(() => {
+    authApi
+      .anonymousLogin(fingerprint)
+      .then(({ user, token, email }) => {
+        if (isMounted) {
+          user.email = email;
+          setUser(user);
+          setToken(token.token);
+          socketService.reconnect();
+        }
+      })
+      .catch((error) => {
+        console.log("anonymous login error", error);
+      })
+      .finally(() => {
+        if (isMounted) {
           isLoadingRef.current = false;
-        });
-    }
+        }
+      });
 
     return () => {
       isMounted = false;
     };
-  }, [fingerprint]); // Only depend on fingerprint changes
+  }, [fingerprint, user, token, setUser, setToken]);
 
   const login = async (username: string, password: string) => {
     const { user, token } = await authApi.login(username, password);
