@@ -37,6 +37,7 @@ export function useAuth() {
   // Handle anonymous login with fingerprint
   useEffect(() => {
     const isForcedLogout = localStorage.getItem("forced_logout") === "true";
+    let isMounted = true;
 
     if (
       fingerprint &&
@@ -50,10 +51,12 @@ export function useAuth() {
       authApi
         .anonymousLogin(fingerprint)
         .then(({ user, token, email }) => {
-          user.email = email;
-          setUser(user);
-          setToken(token.token);
-          socketService.reconnect();
+          if (isMounted) {
+            user.email = email;
+            setUser(user);
+            setToken(token.token);
+            socketService.reconnect();
+          }
         })
         .catch((error) => {
           console.log("anonymous login error", error);
@@ -62,7 +65,11 @@ export function useAuth() {
           isLoadingRef.current = false;
         });
     }
-  }, [fingerprint, user, token, setUser, setToken]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [fingerprint]); // Only depend on fingerprint changes
 
   const login = async (username: string, password: string) => {
     const { user, token } = await authApi.login(username, password);
