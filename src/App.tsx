@@ -10,6 +10,7 @@ import { Header } from "./components/layout/Header";
 import { useAuth } from "./hooks/useAuth";
 import { Contact } from "./pages/Contact";
 import { EmailVerification } from "./pages/EmailVerification";
+import { Terms } from "./pages/Terms";
 import { analyticsService } from "./services/analytics";
 import { useAuthStore } from "./store/authStore";
 
@@ -299,6 +300,7 @@ function App() {
                     path="/email-dogrula"
                     element={<EmailVerification />}
                   />
+                  <Route path="/sozlesmeler" element={<Terms />} />
                 </Routes>
               </main>
               <Footer />
