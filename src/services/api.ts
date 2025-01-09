@@ -62,9 +62,13 @@ export const authApi = {
   register: async (
     username: string,
     password: string,
-    email: string,
-    fingerprint: string | null
+    email: string
   ) => {
+    let fingerprint = localStorage.getItem("fingerprint");
+    if (!fingerprint) {
+      fingerprint = crypto.randomUUID();
+      localStorage.setItem("fingerprint", fingerprint);
+    }
     const response = await api.post("/auth/register", {
       username,
       password,
