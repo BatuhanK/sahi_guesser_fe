@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import ReactMarkdown from "react-markdown";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { X } from "lucide-react";
@@ -8,11 +9,12 @@ import { socketService } from "../../services/socket";
 import { useAnnouncementStore } from "../../store/announcementStore";
 import { useAuthStore } from "../../store/authStore";
 import { useGameStore } from "../../store/gameStore";
+import { getAnnouncementColors, getAnnouncementIcon } from "../../utils/announcement";
 import { CategorySelector } from "../CategorySelector";
+import { ContactForm } from "../ContactForm";
 import { LeaderboardTable } from "../LeaderboardTable";
 import { Loader } from "../ui/Loader";
 import { GameBoard } from "./GameBoard";
-import { ContactForm } from "../ContactForm";
 
 export const GameContainer: React.FC = () => {
   const { currentListing, currentQuestion, roomId, room } = useGameStore();
@@ -120,19 +122,24 @@ export const GameContainer: React.FC = () => {
     return (
       <div className="space-y-6 min-h-screen">
         {latestAnnouncement && !isLatestRead && (
-          <div className="bg-[var(--warning-bg)] border-l-4 border-[var(--warning-text)] p-4 relative">
+          <div className={`${getAnnouncementColors(latestAnnouncement.type).bg} border-l-4 ${getAnnouncementColors(latestAnnouncement.type).border} p-4 relative`}>
             <button
               onClick={() => markAsRead(latestAnnouncement.id)}
-              className="absolute top-2 right-2 hover:bg-[var(--warning-bg)]/80 p-1 rounded"
+              className={`absolute top-2 right-2 ${getAnnouncementColors(latestAnnouncement.type).hover} p-1 rounded`}
             >
-              <X size={16} className="text-[var(--warning-text)]" />
+              <X size={16} className={`text-[var(--${latestAnnouncement.type}-text)]`} />
             </button>
-            <h4 className="font-medium text-[var(--warning-text)] mb-1">
-              {latestAnnouncement.title}
-            </h4>
-            <p className="text-[var(--warning-text)]/90">
-              {latestAnnouncement.content}
-            </p>
+            <div className="flex items-start gap-3">
+              {getAnnouncementIcon(latestAnnouncement.type)}
+              <div className="flex-1">
+                <h4 className={`font-medium text-[var(--${latestAnnouncement.type}-text)] text-lg mb-2`}>
+                  {latestAnnouncement.title}
+                </h4>
+                <div className={`text-[var(--${latestAnnouncement.type}-text)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3`}>
+                  <ReactMarkdown>{latestAnnouncement.content}</ReactMarkdown>
+                </div>
+              </div>
+            </div>
           </div>
         )}
         <CategorySelector
@@ -164,19 +171,24 @@ export const GameContainer: React.FC = () => {
     <div className="mb-24 sm:mb-32">
       {showContactForm && <ContactForm onClose={() => setShowContactForm(false)} />}
       {latestAnnouncement && !isLatestRead && (
-        <div className="bg-[var(--warning-bg)] border-l-4 border-[var(--warning-text)] p-4 mb-4 relative">
+        <div className={`${getAnnouncementColors(latestAnnouncement.type).bg} border-l-4 ${getAnnouncementColors(latestAnnouncement.type).border} p-4 mb-4 relative`}>
           <button
             onClick={() => markAsRead(latestAnnouncement.id)}
-            className="absolute top-2 right-2 hover:bg-[var(--warning-bg)]/80 p-1 rounded"
+            className={`absolute top-2 right-2 ${getAnnouncementColors(latestAnnouncement.type).hover} p-1 rounded`}
           >
-            <X size={16} className="text-[var(--warning-text)]" />
+            <X size={16} className={`text-[var(--${latestAnnouncement.type}-text)]`} />
           </button>
-          <h4 className="font-medium text-[var(--warning-text)] mb-1">
-            {latestAnnouncement.title}
-          </h4>
-          <p className="text-[var(--warning-text)]/90">
-            {latestAnnouncement.content}
-          </p>
+          <div className="flex items-start gap-3">
+            {getAnnouncementIcon(latestAnnouncement.type)}
+            <div className="flex-1">
+              <h4 className={`font-medium text-[var(--${latestAnnouncement.type}-text)] mb-1`}>
+                {latestAnnouncement.title}
+              </h4>
+              <div className={`text-[var(--${latestAnnouncement.type}-text)]/90 prose prose-invert max-w-none`}>
+                <ReactMarkdown>{latestAnnouncement.content}</ReactMarkdown>
+              </div>
+            </div>
+          </div>
         </div>
       )}
       <GameBoard />
