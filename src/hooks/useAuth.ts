@@ -27,7 +27,8 @@ export function useAuth() {
   }, [token, user, logout, setUser]);
 
   const login = async (username: string, password: string) => {
-    const { user, token } = await authApi.login(username, password);
+    const { user, token, email } = await authApi.login(username, password);
+    user.email = email;
     setUser(user);
     setToken(token.token);
 
