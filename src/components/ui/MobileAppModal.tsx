@@ -7,7 +7,7 @@ interface MobileAppModalProps {
   onClose: () => void;
 }
 
-const isIOS = false;
+const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 const isAndroid = /Android/.test(navigator.userAgent);
 
 const DAILY_SHOW_LIMIT = 8;
@@ -66,7 +66,7 @@ export const MobileAppModal: React.FC<MobileAppModalProps> = ({
   if (!isIOS && !isAndroid) return null;
   if (remainingShows <= 0) return null;
 
-  const appStoreUrl = "https://apps.apple.com/app/your-app-id";
+  const appStoreUrl = "https://apps.apple.com/app/id6740282799";
   const playStoreUrl = "https://play.google.com/store/apps/details?id=com.sahikaca.tr";
 
   const handleAppStoreClick = () => {
