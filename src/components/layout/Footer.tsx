@@ -42,6 +42,10 @@ export const Footer = () => {
           <Link to="/sozlesmeler" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             Gizlilik ve Kullanım Koşulları
           </Link>
+
+          <Link to="/indir" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+            Uygulamalar
+          </Link>
         </div>
       </div>
     </FooterContainer>
