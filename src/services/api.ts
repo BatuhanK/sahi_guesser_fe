@@ -3,6 +3,9 @@ import toast from "react-hot-toast";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || window.location.origin + "/api",
+  headers: {
+    'Cache-Control': 'no-cache'
+  }
 });
 
 api.interceptors.request.use((config) => {
