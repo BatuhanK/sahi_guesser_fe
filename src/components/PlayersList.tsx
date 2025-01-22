@@ -26,6 +26,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
     new Set()
   );
 
+  // Disable animations if there are more than 150 players
+  const shouldDisableAnimations = onlinePlayers.length > 150;
+
   // Group players based on correct guesses
   const groupedPlayers = onlinePlayers.reduce(
     (acc, player) => {
@@ -44,27 +47,35 @@ export const PlayersList: React.FC<PlayersListProps> = ({
 
   // Watch for new guesses and trigger animations
   useEffect(() => {
-    if (lastGuesses.length > 0) {
-      const latestGuess = lastGuesses[0];
-      const guessId =
-        latestGuess.playerId + (latestGuess.isCorrect ? "y" : "n") + "0";
+    if (shouldDisableAnimations || lastGuesses.length === 0) return;
 
-      if (!animatingGuesses.has(guessId)) {
-        setAnimatingGuesses((prev) => new Set(prev).add(guessId));
+    const latestGuess = lastGuesses[0];
+    const guessId =
+      latestGuess.playerId + (latestGuess.isCorrect ? "y" : "n") + "0";
 
-        if (latestGuess.isCorrect) {
-          setConfettiGuessId(guessId);
-          setTimeout(() => {
-            setConfettiGuessId(null);
-          }, 2000);
-        }
+    if (!animatingGuesses.has(guessId)) {
+      setAnimatingGuesses((prev) => new Set(prev).add(guessId));
+
+      if (latestGuess.isCorrect) {
+        setConfettiGuessId(guessId);
+        setTimeout(() => {
+          setConfettiGuessId(null);
+        }, 2000);
       }
     }
-  }, [lastGuesses]);
+  }, [lastGuesses, shouldDisableAnimations]);
 
   if (!isDesktop) {
     return null;
   }
+
+  const playerItemProps = shouldDisableAnimations
+    ? {}
+    : {
+        initial: { opacity: 0, y: 20 },
+        animate: { opacity: 1, y: 0 },
+        exit: { opacity: 0, y: 20 },
+      };
 
   return (
     <div className="flex flex-col h-full bg-[var(--bg-secondary)] rounded-lg">
@@ -90,9 +101,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             {groupedPlayers.correct.map((player) => (
               <motion.div
                 key={player.playerId}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
+                {...playerItemProps}
                 className="flex items-center justify-between bg-[var(--success-muted)] p-2 rounded-lg hover:bg-[var(--success-hover)] transition-colors mb-2"
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -114,9 +123,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             {groupedPlayers.incorrect.map((player) => (
               <motion.div
                 key={player.playerId}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: 20 }}
+                {...playerItemProps}
                 className="flex items-center justify-between bg-[var(--bg-tertiary)] p-2 rounded-lg hover:bg-[var(--hover-color)] transition-colors mb-2"
               >
                 <span className="font-medium truncate flex-1 min-w-0 text-[var(--text-primary)]">
@@ -153,19 +160,19 @@ export const PlayersList: React.FC<PlayersListProps> = ({
               return (
                 <motion.div
                   key={guessId}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
+                  {...playerItemProps}
                   onAnimationComplete={() => {
-                    setAnimatingGuesses((prev) => {
-                      const newSet = new Set(prev);
-                      newSet.delete(guessId);
-                      return newSet;
-                    });
+                    if (!shouldDisableAnimations) {
+                      setAnimatingGuesses((prev) => {
+                        const newSet = new Set(prev);
+                        newSet.delete(guessId);
+                        return newSet;
+                      });
+                    }
                   }}
                   className="relative mb-2"
                 >
-                  {confettiGuessId === guessId && (
+                  {confettiGuessId === guessId && !shouldDisableAnimations && (
                     <div className="absolute inset-0 pointer-events-none">
                       <Confetti
                         width={300}
@@ -178,7 +185,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                   <motion.div
                     initial={false}
                     animate={
-                      guess.isCorrect && animatingGuesses.has(guessId)
+                      !shouldDisableAnimations &&
+                      guess.isCorrect &&
+                      animatingGuesses.has(guessId)
                         ? {
                             scale: [1, 1.05, 1],
                             transition: { duration: 0.5, delay: 0.3 },
