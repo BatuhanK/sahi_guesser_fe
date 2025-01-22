@@ -24,7 +24,7 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
   const handleConfirm = () => {
     if (selectedUser) {
       if (banDuration === 'perma') {
-        onToggleBan(`${selectedUser} --minutes=-1`);
+        onToggleBan(`${selectedUser}`);
       } else {
         onToggleBan(`${selectedUser} --minutes=${banDuration}`);
       }
