@@ -1,0 +1,15 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls",
+      "delegate_permission/common.get_login_creds"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.sahikaca.tr",
+      "sha256_cert_fingerprints": [
+        "73:19:A6:B1:A6:64:2F:C1:83:91:43:90:13:C0:E5:E7:70:B1:AD:31:4E:B9:39:31:F0:98:5B:67:41:BE:7C:4D"
+      ]
+    }
+  }
+]

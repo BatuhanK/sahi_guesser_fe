@@ -1,12 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import {
-  AlertOctagon,
-  AlertTriangle,
   Bell,
   Car,
   HelpCircle,
   Home,
-  Info,
   LogIn,
   LogOut,
   Menu,
@@ -15,9 +12,10 @@ import {
   ShoppingBag,
   Sun,
   UserPlus,
-  Volume2,
+  Volume2
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
+import ReactMarkdown from "react-markdown";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../hooks/useAuth";
@@ -27,6 +25,7 @@ import { socketService } from "../../services/socket";
 import { soundService } from "../../services/soundService";
 import { useAnnouncementStore } from "../../store/announcementStore";
 import { useGameStore } from "../../store/gameStore";
+import { getAnnouncementColors, getAnnouncementIcon } from "../../utils/announcement";
 import { ProfileEditModal } from "../ProfileEditModal";
 import { ScoreBoard } from "../ScoreBoard";
 import { Timer } from "../Timer";
@@ -89,40 +88,6 @@ interface HeaderProps {
   isDarkMode: boolean;
   onToggleTheme: () => void;
 }
-
-const getAnnouncementIcon = (type: "info" | "warning" | "error") => {
-  switch (type) {
-    case "warning":
-      return <AlertTriangle className="text-[var(--warning-text)]" size={20} />;
-    case "error":
-      return <AlertOctagon className="text-[var(--error-text)]" size={20} />;
-    default:
-      return <Info className="text-[var(--info-text)]" size={20} />;
-  }
-};
-
-const getAnnouncementColors = (type: "info" | "warning" | "error") => {
-  switch (type) {
-    case "warning":
-      return {
-        bg: "bg-[var(--warning-bg)]",
-        border: "border-[var(--warning-text)]",
-        hover: "hover:bg-[var(--warning-hover)]",
-      };
-    case "error":
-      return {
-        bg: "bg-[var(--error-bg)]",
-        border: "border-[var(--error-text)]",
-        hover: "hover:bg-[var(--error-hover)]",
-      };
-    default:
-      return {
-        bg: "bg-[var(--info-bg)]",
-        border: "border-[var(--info-text)]",
-        hover: "hover:bg-[var(--info-hover)]",
-      };
-  }
-};
 
 export const Header: React.FC<HeaderProps> = ({
   onOpenAuth,
@@ -392,9 +357,9 @@ export const Header: React.FC<HeaderProps> = ({
                                       <h4 className="font-medium text-[var(--text-primary)] mb-1">
                                         {announcement.title}
                                       </h4>
-                                      <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">
-                                        {announcement.content}
-                                      </p>
+                                      <div className="text-[var(--text-secondary)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
+                                        <ReactMarkdown>{announcement.content}</ReactMarkdown>
+                                      </div>
                                       <div className="flex justify-between items-center mt-3">
                                         <span className="text-xs text-[var(--text-tertiary)]">
                                           {new Date(
@@ -570,9 +535,9 @@ export const Header: React.FC<HeaderProps> = ({
                                 <h4 className="font-medium text-[var(--text-primary)] mb-1">
                                   {announcement.title}
                                 </h4>
-                                <p className="text-sm text-[var(--text-secondary)] whitespace-pre-wrap">
-                                  {announcement.content}
-                                </p>
+                                <div className="text-[var(--text-secondary)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
+                                  <ReactMarkdown>{announcement.content}</ReactMarkdown>
+                                </div>
                                 <div className="flex justify-between items-center mt-3">
                                   <span className="text-xs text-[var(--text-tertiary)]">
                                     {new Date(

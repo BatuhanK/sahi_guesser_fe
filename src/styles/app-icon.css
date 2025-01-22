@@ -1,0 +1,29 @@
+.perspective {
+  perspective: 1000px;
+}
+
+.transform-style-3d {
+  transform-style: preserve-3d;
+  transition: transform 0.8s;
+}
+
+.translate-z-4 {
+  transform: translateZ(2px);
+}
+
+.translate-z-8 {
+  transform: translateZ(4px);
+}
+
+.rotate-y-180 {
+  transform: rotateY(180deg);
+}
+
+@keyframes shine {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+} 

@@ -1,0 +1,21 @@
+{
+  "applinks": {
+      "details": [
+           {
+             "appIDs": [ "com.sahikaca.ios" ],
+             "components": [
+               {
+                  "/": "/oda/*",
+                  "comment": "Matches any URL with a path that starts with /oda/"
+               }
+             ]
+           }
+       ]
+   },
+   "webcredentials": {
+      "apps": [ "com.sahikaca.ios" ]
+   },
+   "appclips": {
+        "apps": []
+   }
+}

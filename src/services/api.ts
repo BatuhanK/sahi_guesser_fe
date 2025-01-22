@@ -3,6 +3,9 @@ import toast from "react-hot-toast";
 
 const api = axios.create({
   baseURL: import.meta.env.VITE_API_URL || window.location.origin + "/api",
+  headers: {
+    'Cache-Control': 'no-cache'
+  }
 });
 
 api.interceptors.request.use((config) => {
@@ -62,9 +65,13 @@ export const authApi = {
   register: async (
     username: string,
     password: string,
-    email: string,
-    fingerprint: string | null
+    email: string
   ) => {
+    let fingerprint = localStorage.getItem("fingerprint");
+    if (!fingerprint) {
+      fingerprint = crypto.randomUUID();
+      localStorage.setItem("fingerprint", fingerprint);
+    }
     const response = await api.post("/auth/register", {
       username,
       password,

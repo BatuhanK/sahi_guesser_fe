@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
@@ -7,11 +8,16 @@ import { EmailVerificationModal } from "./components/auth/EmailVerificationModal
 import { GameContainer } from "./components/game/GameContainer";
 import { Footer } from "./components/layout/Footer";
 import { Header } from "./components/layout/Header";
+import { MobileAppModal } from "./components/ui/MobileAppModal";
 import { useAuth } from "./hooks/useAuth";
+import { ApplicationLanding } from "./pages/ApplicationLanding";
 import { Contact } from "./pages/Contact";
 import { EmailVerification } from "./pages/EmailVerification";
+import { LogosPage } from "./pages/LogosPage";
+import { Terms } from "./pages/Terms";
 import { analyticsService } from "./services/analytics";
 import { useAuthStore } from "./store/authStore";
+import "./styles/app-icon.css";
 
 // Initialize GA4
 analyticsService.initialize(
@@ -171,6 +177,27 @@ const setThemeColors = (isDark: boolean) => {
   }
 };
 
+// App wrapper component to handle route-specific modals
+function AppWrapper({ children }: { children: React.ReactNode }) {
+  const location = useLocation();
+  const [showMobileAppModal, setShowMobileAppModal] = useState(false);
+
+  useEffect(() => {
+    // Only show on home route
+    setShowMobileAppModal(location.pathname === "/");
+  }, [location.pathname]);
+
+  return (
+    <>
+      {children}
+      <MobileAppModal
+        isOpen={showMobileAppModal}
+        onClose={() => setShowMobileAppModal(false)}
+      />
+    </>
+  );
+}
+
 function App() {
   const [authModalType, setAuthModalType] = useState<
     "login" | "register" | null
@@ -247,72 +274,79 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <AnalyticsWrapper>
-        <FingerprintWrapper>
-          <EmailVerificationWrapper>
-            <Toaster
-              position="top-right"
-              toastOptions={{
-                duration: 4000,
-                style: {
-                  background: isDarkMode ? "var(--bg-secondary)" : "#333",
-                  color: isDarkMode ? "var(--text-primary)" : "#fff",
-                },
-                success: {
-                  duration: 3000,
-                  style: {
-                    background: "var(--success-bg)",
-                    color: "var(--success-text)",
-                  },
-                },
-                error: {
-                  duration: 4000,
-                  style: {
-                    background: "var(--error-bg)",
-                    color: "var(--error-text)",
-                  },
-                },
-              }}
-            />
-            <div
-              className="min-h-screen flex flex-col transition-colors duration-200"
-              style={{
-                backgroundColor: "var(--bg-primary)",
-                color: "var(--text-primary)",
-              }}
-            >
-              <Header
-                onOpenAuth={handleOpenAuthModal}
-                isDarkMode={isDarkMode}
-                onToggleTheme={toggleTheme}
-              />
-              <main
-                className="flex-1 mx-auto w-full p-4"
-                style={{ maxWidth: "95rem" }}
-              >
-                <Routes>
-                  <Route path="/" element={<GameContainer />} />
-                  <Route path="/oda/:slug" element={<GameContainer />} />
-                  <Route path="/iletisim" element={<Contact />} />
-                  <Route
-                    path="/email-dogrula"
-                    element={<EmailVerification />}
+    <HelmetProvider>
+      <BrowserRouter>
+        <AnalyticsWrapper>
+          <FingerprintWrapper>
+            <EmailVerificationWrapper>
+              <AppWrapper>
+                <Toaster
+                  position="top-right"
+                  toastOptions={{
+                    duration: 4000,
+                    style: {
+                      background: isDarkMode ? "var(--bg-secondary)" : "#333",
+                      color: isDarkMode ? "var(--text-primary)" : "#fff",
+                    },
+                    success: {
+                      duration: 3000,
+                      style: {
+                        background: "var(--success-bg)",
+                        color: "var(--success-text)",
+                      },
+                    },
+                    error: {
+                      duration: 4000,
+                      style: {
+                        background: "var(--error-bg)",
+                        color: "var(--error-text)",
+                      },
+                    },
+                  }}
+                />
+                <div
+                  className="min-h-screen flex flex-col transition-colors duration-200"
+                  style={{
+                    backgroundColor: "var(--bg-primary)",
+                    color: "var(--text-primary)",
+                  }}
+                >
+                  <Header
+                    onOpenAuth={handleOpenAuthModal}
+                    isDarkMode={isDarkMode}
+                    onToggleTheme={toggleTheme}
                   />
-                </Routes>
-              </main>
-              <Footer />
-              <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-                type={authModalType || "login"}
-                onAuth={handleAuth}
-              />
-            </div>
-          </EmailVerificationWrapper>
-        </FingerprintWrapper>
-      </AnalyticsWrapper>
-    </BrowserRouter>
+                  <main
+                    className="flex-1 mx-auto w-full p-4"
+                    style={{ maxWidth: "95rem" }}
+                  >
+                    <Routes>
+                      <Route path="/" element={<GameContainer />} />
+                      <Route path="/oda/:slug" element={<GameContainer />} />
+                      <Route path="/iletisim" element={<Contact />} />
+                      <Route path="/logolar" element={<LogosPage />} />
+                      <Route path="/indir" element={<ApplicationLanding />} />
+                      <Route
+                        path="/email-dogrula"
+                        element={<EmailVerification />}
+                      />
+                      <Route path="/sozlesmeler" element={<Terms />} />
+                    </Routes>
+                  </main>
+                  <Footer />
+                  <AuthModal
+                    isOpen={isAuthModalOpen}
+                    onClose={() => setIsAuthModalOpen(false)}
+                    type={authModalType || "login"}
+                    onAuth={handleAuth}
+                  />
+                </div>
+              </AppWrapper>
+            </EmailVerificationWrapper>
+          </FingerprintWrapper>
+        </AnalyticsWrapper>
+      </BrowserRouter>
+    </HelmetProvider>
   );
 }
 

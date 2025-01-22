@@ -4,15 +4,7 @@ import { socketService } from "../services/socket";
 import { useAuthStore } from "../store/authStore";
 
 export function useAuth() {
-  const {
-    user,
-    token,
-    fingerprint,
-    setUser,
-    setToken,
-    clearForcedLogout,
-    logout,
-  } = useAuthStore();
+  const { user, token, setUser, setToken, logout } = useAuthStore();
   const isLoadingRef = useRef(false);
 
   useEffect(() => {
@@ -34,39 +26,9 @@ export function useAuth() {
     }
   }, [token, user, logout, setUser]);
 
-  // Handle anonymous login with fingerprint
-  useEffect(() => {
-    const isForcedLogout = localStorage.getItem("forced_logout") === "true";
-
-    if (
-      fingerprint &&
-      !user &&
-      !token &&
-      !isLoadingRef.current &&
-      !isForcedLogout
-    ) {
-      isLoadingRef.current = true;
-
-      authApi
-        .anonymousLogin(fingerprint)
-        .then(({ user, token, email }) => {
-          user.email = email;
-          setUser(user);
-          setToken(token.token);
-          socketService.reconnect();
-        })
-        .catch((error) => {
-          console.log("anonymous login error", error);
-        })
-        .finally(() => {
-          isLoadingRef.current = false;
-        });
-    }
-  }, [fingerprint, user, token, setUser, setToken]);
-
   const login = async (username: string, password: string) => {
-    const { user, token } = await authApi.login(username, password);
-    clearForcedLogout();
+    const { user, token, email } = await authApi.login(username, password);
+    user.email = email;
     setUser(user);
     setToken(token.token);
 
@@ -78,13 +40,7 @@ export function useAuth() {
     password: string,
     email: string
   ) => {
-    const { user, token } = await authApi.register(
-      username,
-      password,
-      email,
-      fingerprint
-    );
-    clearForcedLogout();
+    const { user, token } = await authApi.register(username, password, email);
     setUser(user);
     setToken(token.token);
 

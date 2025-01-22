@@ -255,6 +255,7 @@ export const GameBoard: React.FC = () => {
                       src={
                         currentListing?.details.imageUrls?.[currentImageIndex]
                       }
+                      referrerPolicy="no-referrer"
                       onContextMenu={(e) => e.preventDefault()}
                       alt="Listing image"
                       className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
