@@ -9,7 +9,7 @@ interface ScoreBoardProps {
 
 export const ScoreBoard: React.FC<ScoreBoardProps> = ({ totalScore }) => {
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-
+  console.log("21");
   return (
     <>
       <button
