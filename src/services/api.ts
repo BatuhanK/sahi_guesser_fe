@@ -14,11 +14,6 @@ api.interceptors.request.use((config) => {
     config.headers.Authorization = `Bearer ${token}`;
   }
 
-  const fingerprint = localStorage.getItem("fingerprint");
-  if (fingerprint) {
-    config.headers["x-fingerprint"] = fingerprint;
-  }
-
   return config;
 });
 
@@ -30,10 +25,13 @@ api.interceptors.response.use(
       error?: {
         response?: {
           availableIn?: number;
+          reason?: string;
         };
       };
     }>
   ) => {
+
+    console.log(error)
     const notShowToastUrls = ["/auth/me"];
     if (notShowToastUrls.includes(error.config?.url || "")) {
       return Promise.reject(error);
@@ -78,6 +76,22 @@ export const authApi = {
       email,
       fingerprint,
     });
+    return response.data;
+  },
+
+  loginWithFirebase: async (firebaseToken: string, username?: string) => {
+    console.log('Making API request with:', { firebaseToken, username });
+    const fingerprint = localStorage.getItem("fingerprint") || crypto.randomUUID();
+    if (!fingerprint) {
+      localStorage.setItem("fingerprint", fingerprint);
+    }
+    
+    const response = await api.post("/auth/firebase", { 
+      token: firebaseToken,
+      username,
+      fingerprint
+    });
+    console.log('API response:', response.data);
     return response.data;
   },
 
@@ -140,6 +154,7 @@ export type Room = {
   isSystemRoom: boolean;
   roomSettings: {
     maxGuessesPerRound: number;
+    roomQuestionType: "price" | "text";
   };
 };
 

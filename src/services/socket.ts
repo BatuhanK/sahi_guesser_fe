@@ -141,6 +141,7 @@ class SocketService {
         state.setShowResults(false);
         state.setRoundEndScores([]);
         state.setCorrectPrice(null);
+        state.setCurrentAnswer(null);
         state.setLastGuesses([]);
         state.setCorrectGuesses([]);
         state.setIncorrectGuesses([]);
@@ -159,7 +160,7 @@ class SocketService {
       }
     );
 
-    this.socket.on("roundEnd", ({ correctPrice, scores }) => {
+    this.socket.on("roundEnd", ({ scores, currentAnswer, correctPrice }) => {
       const state = useGameStore.getState();
       const authState = useAuthStore.getState();
 
@@ -177,10 +178,11 @@ class SocketService {
         };
       });
       state.setOnlinePlayers(updatedOnlinePlayers);
-      state.setCorrectPrice(correctPrice);
+     
       state.setRoundEndScores(scores);
 
       state.setShowResults(true);
+
 
       if (authState.user) {
         authState.setUser({
@@ -188,6 +190,12 @@ class SocketService {
           score: currentUserScore,
         });
       }
+
+      state.setCurrentAnswer(currentAnswer === undefined ? null : typeof currentAnswer === 'number' ? currentAnswer.toString() : currentAnswer);
+      if (correctPrice) {
+        state.setCorrectPrice(correctPrice);
+      }
+      console.log('setting current answer', currentAnswer);
     });
 
     // Debounce the guess result handler
@@ -499,7 +507,7 @@ class SocketService {
     soundService.clearCountdownTimeout();
   }
 
-  submitGuess(roomId: number, price: number): void {
+  submitGuess(roomId: number, price: string | number): void {
     this.socket?.emit("submitGuess", { roomId, price });
   }
 

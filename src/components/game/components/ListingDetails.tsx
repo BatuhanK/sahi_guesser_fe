@@ -3,6 +3,7 @@ import {
   Building2,
   Calendar,
   Car,
+  DollarSign,
   Filter,
   Home,
   MapPin,
@@ -54,36 +55,53 @@ const DetailPill: React.FC<{
   </div>
 );
 
-export const CarDetails: React.FC<{ details: CarListingDetails }> = ({
+export const CarDetails: React.FC<{ details: CarListingDetails, price?: number }> = ({
   details,
-}) => (
-  <div className="flex flex-wrap gap-2 text-sm lg:text-base">
-    {[
-      {
-        icon: <Car className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
-        text: `${details.brand} ${details.model}`,
-      },
-      {
-        icon: <Calendar className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
-        text: `${details.year}`,
-      },
-      {
-        icon: <Zap className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
-        text: `${details.mileage} km`,
-      },
-      {
-        icon: <Filter className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
-        text: details.fuelType,
-      },
-      {
-        icon: <Move className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
-        text: details.transmission,
-      },
-    ].map((item, index) => (
-      <DetailPill key={index} icon={item.icon} text={item.text} />
+  price,
+}) => {
+  let items = []
+
+  if (price) {
+    items.push({
+      icon: <DollarSign className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+      text: `${price.toLocaleString('tr-TR')} TL`,
+    })
+  }
+
+  items = [
+    ...items,
+    {
+      icon: <Calendar className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+      text: `${details.year}`,
+    },
+    {
+      icon: <Zap className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+      text: `${details.mileage} km`,
+    },
+    {
+      icon: <Filter className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+      text: details.fuelType,
+    },
+    {
+      icon: <Move className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+      text: details.transmission,
+    },
+  ]
+
+  if (details.brand !== '' && details.model !== '') {
+    items.push({
+      icon: <Car className="h-3.5 w-3.5 lg:h-4 lg:w-4" />,
+      text: `${details.brand} ${details.model}`,
+    })
+  }
+  return (
+    <div className="flex flex-wrap gap-2 text-sm lg:text-base">
+      {items.map((item, index) => (
+        <DetailPill key={index} icon={item.icon} text={item.text} />
     ))}
   </div>
-);
+  );
+};
 
 export const PropertyDetails: React.FC<{
   details: HouseForRentListingDetails | HouseForSaleListingDetails;

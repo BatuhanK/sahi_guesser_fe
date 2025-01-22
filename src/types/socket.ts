@@ -65,6 +65,7 @@ export type SportsPlayerListingDetails = {
 export interface Listing {
   id: number;
   title: string;
+  price?: number;
   details:
     | CarListingDetails
     | HouseForRentListingDetails
@@ -143,7 +144,7 @@ export interface ServerToClientEvents {
     maxRounds: number;
     roundNumber: number;
   }) => void;
-  roundEnd: (data: { correctPrice: number; scores: RoundEndScore[] }) => void;
+  roundEnd: (data: { correctPrice?: number; scores: RoundEndScore[]; currentAnswer?: string | number }) => void;
   roomCompleted: (data: { roomId: number }) => void;
   correctGuess: (data: {
     userId: number;
@@ -185,6 +186,6 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   joinRoom: (data: { roomId: number }) => void;
   leaveRoom: (data: { roomId: number }) => void;
-  submitGuess: (data: { roomId: number; price: number }) => void;
+  submitGuess: (data: { roomId: number; price: number | string }) => void;
   chatMessage: (data: { roomId: number; message: string }) => void;
 }

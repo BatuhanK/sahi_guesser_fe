@@ -1,16 +1,15 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Medal } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { useGameStore } from "../store/gameStore";
 import { Listing, RoundEndScore } from "../types/socket";
 import { formatPriceWithCurrency } from "../utils/priceFormatter";
-import AdPlaceholder from "./game/components/AdPlaceholder";
 
 interface RoundResultsProps {
   scores: RoundEndScore[];
   correctPrice: number;
+  currentAnswer?: string | number;
   listing: Listing;
   intermissionDuration: number;
   maxRounds?: number;
@@ -18,18 +17,29 @@ interface RoundResultsProps {
   shouldShowRoundInfo?: boolean;
 }
 
+type ScoreWithAccuracy = RoundEndScore & {
+  accuracy?: number;
+};
+
 export const RoundResults: React.FC<RoundResultsProps> = ({
   scores,
   correctPrice,
+  currentAnswer,
   listing,
   intermissionDuration,
   maxRounds,
   roundNumber,
   shouldShowRoundInfo,
 }) => {
+  const room = useGameStore((state) => state.room);
+  const isTextQuestion = room?.roomSettings.roomQuestionType === 'text';
+
   const scoresWithAccuracy = scores
     .filter((score) => score.roundScore)
     .map((score) => {
+      if (isTextQuestion) {
+        return score;
+      }
       return {
         ...score,
         accuracy:
@@ -41,7 +51,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
             ).toFixed(1)
           ),
       };
-    });
+    }) as ScoreWithAccuracy[];
 
   const [remainingSeconds, setRemainingSeconds] = useState<number>(() => {
     const duration = Math.floor(intermissionDuration / 1000);
@@ -106,13 +116,6 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   };
 
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const room = useGameStore((state) => state.room);
-
-  let adIdentifier = `tur-sonu-reklam-${room?.id}`;
-  if (!room?.isSystemRoom) {
-    adIdentifier = `tur-sonu-reklam-ozel-odalar`;
-  }
 
   const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
 
@@ -140,35 +143,22 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       </div>
                     )}
                   </h2>
-                  <AdPlaceholder
-                    width={728}
-                    height={90}
-                    identifier={adIdentifier}
-                    onClick={() => {
-                      navigate("/iletisim", {
-                        state: {
-                          preSelectedType: "advertisement",
-                          message: "Tur sonu reklam vermek istiyorum.\n",
-                        },
-                      });
-                    }}
-                  >
-                    <p className="text-center p-4">
-                      Bu alana reklam verebilirsiniz
-                    </p>
-                    <button className="bg-[var(--accent-color)] text-white rounded-lg px-4 py-2">
-                      Reklam ver
-                    </button>
-                  </AdPlaceholder>
+         
                   <div className="flex flex-col gap-2">
                     <p className="text-[var(--text-secondary)] text-lg">
                       {listing.title}
                     </p>
                     <p className="text-2xl font-semibold text-[var(--success-text)]">
-                      Gerçek Fiyat:{" "}
-                      {formatPriceWithCurrency(
-                        correctPrice,
-                        listing.details.type
+                      {isTextQuestion ? (
+                        <>Cevap: {currentAnswer}</>
+                      ) : (
+                        <>
+                          Gerçek Fiyat:{" "}
+                          {formatPriceWithCurrency(
+                            correctPrice,
+                            listing.details.type
+                          )}
+                        </>
                       )}
                     </p>
                   </div>
@@ -215,28 +205,38 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       </div>
 
                       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
-                        <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
-                          {formatPriceWithCurrency(
-                            score.guess,
-                            listing.details.type
-                          )}
-                        </span>
-                        <div className="shrink-0">
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: index * 0.1 + 0.2 }}
-                            className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
-                              score.accuracy >= 90
-                                ? "bg-[var(--success-bg)] text-[var(--success-text)]"
-                                : score.accuracy >= 70
-                                ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
-                                : "bg-[var(--error-bg)] text-[var(--error-text)]"
-                            }`}
-                          >
-                            %{score.accuracy.toFixed(1)}
-                          </motion.span>
-                        </div>
+                        {isTextQuestion ? (
+                          <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
+                            "{score.guess}"
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
+                              {formatPriceWithCurrency(
+                                score.guess,
+                                listing.details.type
+                              )}
+                            </span>
+                            {score.accuracy !== undefined && (
+                              <div className="shrink-0">
+                                <motion.span
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ delay: index * 0.1 + 0.2 }}
+                                  className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                                    score.accuracy >= 90
+                                      ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                                      : score.accuracy >= 70
+                                      ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
+                                      : "bg-[var(--error-bg)] text-[var(--error-text)]"
+                                  }`}
+                                >
+                                  %{score.accuracy.toFixed(1)}
+                                </motion.span>
+                              </div>
+                            )}
+                          </>
+                        )}
                         <motion.span
                           initial={{ x: 20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}
@@ -278,28 +278,38 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       </div>
 
                       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
-                        <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
-                          {formatPriceWithCurrency(
-                            sortedScores[userRank].guess,
-                            listing.details.type
-                          )}
-                        </span>
-                        <div className="shrink-0">
-                          <motion.span
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            transition={{ delay: 0.5 }}
-                            className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
-                              sortedScores[userRank].accuracy >= 90
-                                ? "bg-[var(--success-bg)] text-[var(--success-text)]"
-                                : sortedScores[userRank].accuracy >= 70
-                                ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
-                                : "bg-[var(--error-bg)] text-[var(--error-text)]"
-                            }`}
-                          >
-                            %{sortedScores[userRank].accuracy.toFixed(1)}
-                          </motion.span>
-                        </div>
+                        {isTextQuestion ? (
+                          <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
+                            "{sortedScores[userRank].guess}"
+                          </span>
+                        ) : (
+                          <>
+                            <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
+                              {formatPriceWithCurrency(
+                                sortedScores[userRank].guess,
+                                listing.details.type
+                              )}
+                            </span>
+                            {sortedScores[userRank].accuracy !== undefined && (
+                              <div className="shrink-0">
+                                <motion.span
+                                  initial={{ scale: 0 }}
+                                  animate={{ scale: 1 }}
+                                  transition={{ delay: 0.5 }}
+                                  className={`inline-block px-2 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium ${
+                                    sortedScores[userRank].accuracy >= 90
+                                      ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                                      : sortedScores[userRank].accuracy >= 70
+                                      ? "bg-[var(--warning-bg)] text-[var(--warning-text)]"
+                                      : "bg-[var(--error-bg)] text-[var(--error-text)]"
+                                  }`}
+                                >
+                                  %{sortedScores[userRank].accuracy.toFixed(1)}
+                                </motion.span>
+                              </div>
+                            )}
+                          </>
+                        )}
                         <motion.span
                           initial={{ x: 20, opacity: 0 }}
                           animate={{ x: 0, opacity: 1 }}

@@ -36,10 +36,9 @@ class AnalyticsService {
     });
   }
 
-  trackRoundEnd(listingId: string, correctPrice: number, userScore: number) {
+  trackRoundEnd(listingId: string, userScore: number) {
     ReactGA.event("round_end", {
       listing_id: listingId,
-      correct_price: correctPrice,
       user_score: userScore,
     });
   }

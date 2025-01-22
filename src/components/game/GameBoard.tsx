@@ -52,6 +52,7 @@ export const GameBoard: React.FC = () => {
     intermissionDuration,
     roundEndScores,
     correctPrice,
+    currentAnswer,
     room,
     guessCount,
     roomSummary,
@@ -115,22 +116,21 @@ export const GameBoard: React.FC = () => {
   }, [feedback, currentListing, guessCount]);
 
   useEffect(() => {
-    if (showResults && correctPrice && roundEndScores.length > 0) {
+    if (showResults && (correctPrice || currentAnswer) && roundEndScores.length > 0) {
       const userScore =
         roundEndScores.find((score) => score.playerId === user?.id)
           ?.userScore || 0;
       if (currentListing) {
         analyticsService.trackRoundEnd(
           currentListing.id.toString(),
-          correctPrice,
           userScore
         );
       }
     }
-  }, [showResults, correctPrice, roundEndScores, currentListing, user?.id]);
+  }, [showResults, correctPrice, currentAnswer, roundEndScores, currentListing, user?.id]);
 
   const handleGuess = useCallback(
-    (guess: number) => {
+    (guess: string | number) => {
       if (!currentListing || !isAuthenticated || !roomId) return;
       socketService.submitGuess(roomId, guess);
       analyticsService.trackGuess(
@@ -193,7 +193,7 @@ export const GameBoard: React.FC = () => {
 
     switch (currentListing.details.type) {
       case "car":
-        return <CarDetails details={currentListing.details} />;
+        return <CarDetails details={currentListing.details} price={currentListing.price} />;
       case "house-for-rent":
         return <PropertyDetails details={currentListing.details} />;
       case "house-for-sale":
@@ -236,15 +236,18 @@ export const GameBoard: React.FC = () => {
         {/* Center - Main Content */}
         <div className="md:col-span-2 lg:col-span-2 xl:col-span-6 space-y-4 lg:space-y-6 order-1 xl:order-1">
           {showResults && intermissionDuration && currentListing ? (
+            <>
             <RoundResults
               scores={roundEndScores}
               correctPrice={correctPrice ?? 0}
+              currentAnswer={currentAnswer ?? undefined}
               listing={currentListing}
               intermissionDuration={intermissionDuration}
               maxRounds={maxRounds}
               roundNumber={roundNumber}
               shouldShowRoundInfo={shouldShowRoundInfo}
             />
+            </>
           ) : (
             <>
               <div className="bg-[var(--bg-secondary)] rounded-xl shadow-lg transition-colors">
@@ -326,8 +329,9 @@ export const GameBoard: React.FC = () => {
                           maxGuessExceeded
                         }
                         listingType={
-                          currentListing?.details.type || "generative"
+                          currentListing?.details.type
                         }
+                        roomQuestionType={room?.roomSettings.roomQuestionType}
                         listingId={currentListing?.id || 0}
                       />
                     ) : null}

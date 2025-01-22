@@ -6,10 +6,11 @@ import {
 } from "../utils/priceFormatter";
 
 interface PriceInputProps {
-  onGuess: (guess: number) => void;
+  onGuess: (guess: number | string) => void;
   disabled?: boolean;
   listingType: string;
   listingId: number;
+  roomQuestionType?: 'price' | 'text';
 }
 
 export const PriceInput: React.FC<PriceInputProps> = ({
@@ -17,20 +18,29 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   disabled,
   listingType,
   listingId,
+  roomQuestionType = 'price',
 }) => {
   const [price, setPrice] = useState(0);
+  const [text, setText] = useState('');
 
   useEffect(() => {
     setPrice(0);
+    setText('');
   }, [listingId]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPrice(parsePrice(e.target.value));
+    if (roomQuestionType === 'text') {
+      setText(e.target.value);
+    } else {
+      setPrice(parsePrice(e.target.value));
+    }
   };
 
   const adjustPrice = useCallback((amount: number) => {
-    setPrice((prevPrice) => Math.max(0, prevPrice + amount));
-  }, []);
+    if (roomQuestionType === 'price') {
+      setPrice((prevPrice) => Math.max(0, prevPrice + amount));
+    }
+  }, [roomQuestionType]);
 
   const getAdjustmentAmounts = useCallback(() => {
     if (listingType === "car") {
@@ -81,10 +91,66 @@ export const PriceInput: React.FC<PriceInputProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (price > 0) {
+    if (roomQuestionType === 'text') {
+      if (text.trim()) {
+        onGuess(text);
+      }
+    } else if (price > 0) {
       onGuess(price);
     }
   };
+
+  if (roomQuestionType === 'text') {
+    return (
+      <div className="w-full max-w-md mx-auto">
+        <form onSubmit={handleSubmit}>
+          <div className="relative mb-4">
+            <input
+              type="text"
+              value={text}
+              onChange={handleInputChange}
+              disabled={disabled}
+              className={`w-full px-4 py-4 text-lg lg:text-xl bg-[var(--bg-secondary)] border-2 
+                ${
+                  disabled
+                    ? "border-[var(--border-color)] bg-[var(--bg-tertiary)]"
+                    : "border-[var(--accent-color)]"
+                }
+                rounded-xl focus:outline-none focus:border-[var(--accent-hover)] transition-colors
+                font-medium text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]`}
+              placeholder="Cevabını yaz..."
+            />
+            <button
+              type="submit"
+              disabled={disabled || !text.trim()}
+              className={`absolute right-2 top-1/2 -translate-y-1/2 
+                ${
+                  disabled || !text.trim()
+                    ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
+                    : "bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] active:scale-95 text-white"
+                }
+                p-3 lg:p-2 rounded-lg transition-all touch-manipulation`}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="lg:w-6 lg:h-6"
+              >
+                <path d="M5 12h14M12 5l7 7-7 7" />
+              </svg>
+            </button>
+          </div>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-md mx-auto space-y-4">

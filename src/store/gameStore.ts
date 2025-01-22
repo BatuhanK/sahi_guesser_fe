@@ -28,6 +28,7 @@ interface GameState {
   correctGuesses: GuessResult[];
   incorrectGuesses: GuessResult[];
   correctPrice: number | null;
+  currentAnswer: string | null;
   roundEndScores: RoundEndScore[];
   guessCount: number;
   lastGuesses: GuessResult[];
@@ -50,6 +51,7 @@ interface GameState {
   addCorrectGuess: (guess: GuessResult) => void;
   addIncorrectGuess: (guess: GuessResult) => void;
   setCorrectPrice: (correctPrice: number | null) => void;
+  setCurrentAnswer: (currentAnswer: string | null) => void;
   setRoundEndScores: (roundEndScores: RoundEndScore[]) => void;
   setShowResults: (showResults: boolean) => void;
   setLastGuesses: (lastGuesses: GuessResult[]) => void;
@@ -82,6 +84,7 @@ export const useGameStore = create<GameState>()(
     onlinePlayers: [],
     correctPrice: null,
     roundEndScores: [],
+    currentAnswer: null,
     showResults: false,
     intermissionDuration: 0,
     roomSummary: null,
@@ -139,6 +142,7 @@ export const useGameStore = create<GameState>()(
     setIncorrectGuesses: (incorrectGuesses) => set({ incorrectGuesses }),
     setLastGuesses: (lastGuesses) => set({ lastGuesses }),
     setCorrectPrice: (correctPrice) => set({ correctPrice }),
+    setCurrentAnswer: (currentAnswer) => set({ currentAnswer }),
     setRoundEndScores: (roundEndScores) => set({ roundEndScores }),
     setShowResults: (showResults) => set({ showResults }),
     setIntermissionDuration: (intermissionDuration) =>

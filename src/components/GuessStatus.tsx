@@ -4,9 +4,10 @@ import React from "react";
 interface GuessStatusProps {
   type: "success" | "error" | "info";
   feedback: "correct" | "go_higher" | "go_lower";
+  roomQuestionType?: "text" | "price";
 }
 
-export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
+export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type, roomQuestionType = "price" }) => {
   const icons = {
     success: <CheckCircle className="text-[var(--success-text)]" size={24} />,
     error: <AlertCircle className="text-[var(--error-text)]" size={24} />,
@@ -27,17 +28,14 @@ export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
         <div className="w-5 h-5 lg:w-6 lg:h-6">{icons[type]}</div>
         <span className="text-sm lg:text-base font-medium text-[var(--text-primary)]">
           {feedback === "correct" && "Doğru tahmin ettin!"}
-          {feedback === "go_higher" && (
-            <span>
-              Daha <b className="text-[var(--error-text)]">yüksek</b> bir tahmin
-              deneyin
-            </span>
-          )}
-          {feedback === "go_lower" && (
-            <span>
-              Daha <b className="text-[var(--error-text)]">düşük</b> bir tahmin
-              deneyin
-            </span>
+          {(feedback === "go_higher" || feedback === "go_lower") && (
+            roomQuestionType === "text" ? (
+              "Doğru değil, tekrar deneyin"
+            ) : (
+              <span>
+                Daha <b className="text-[var(--error-text)]">{feedback === "go_higher" ? "yüksek" : "düşük"}</b> bir tahmin deneyin
+              </span>
+            )
           )}
         </span>
       </div>
