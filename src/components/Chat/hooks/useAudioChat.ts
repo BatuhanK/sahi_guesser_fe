@@ -1,5 +1,6 @@
 import {
   createLocalAudioTrack,
+  LocalAudioTrack,
   RemoteParticipant,
   RemoteTrack,
   Room,
@@ -66,7 +67,11 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
 
       await livekitRoom.connect("https://aws-livekit.sahikaca.com", token);
 
-      const audioTrack = await createLocalAudioTrack();
+      const audioTrack = await createLocalAudioTrack({
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true
+      });
       await livekitRoom.localParticipant.publishTrack(audioTrack);
 
       soundService.setVolume(0.05);
@@ -94,6 +99,15 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
         isConnected: false,
         room: null,
       }));
+    });
+
+    room.on(RoomEvent.LocalTrackPublished, async (trackPublication) => {
+      if (
+        trackPublication.source === Track.Source.Microphone &&
+        trackPublication.track instanceof LocalAudioTrack
+      ) {
+        console.log('Local audio track published with native noise suppression and echo cancellation');
+      }
     });
 
     room.on(RoomEvent.ParticipantConnected, (participant) => {
@@ -401,3 +415,4 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
     toggleParticipantMute,
   };
 };
+
