@@ -1,4 +1,4 @@
-import { Clock, DollarSign, Trophy, Users } from "lucide-react";
+import { Clock, DollarSign, Plus, Trophy, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreatePrivateRoomModal } from "../components/CreatePrivateRoomModal";
@@ -125,6 +125,27 @@ export const PublicRooms = () => {
       <h1 className="text-3xl font-bold mb-8 text-[var(--text-primary)]">Kullanıcı Odaları</h1>
       
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Create Room Box */}
+        <div className="bg-[var(--bg-secondary)] rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-200 border border-[var(--border-color)] border-dashed flex flex-col">
+          <div className="p-6 flex-1 flex flex-col items-center justify-center text-center space-y-4">
+            <div className="w-16 h-16 rounded-full bg-[var(--accent-color)] bg-opacity-10 flex items-center justify-center">
+              <Plus className="w-8 h-8 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold text-[var(--text-primary)]">
+              Yeni Oda Oluştur
+            </h2>
+            <p className="text-[var(--text-secondary)] text-sm">
+              Kendi odanı oluştur ve arkadaşlarınla oynamaya başla
+            </p>
+            <button
+              onClick={handleShowCreateModal}
+              className="mt-4 px-6 py-2.5 bg-[var(--accent-color)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors font-medium"
+            >
+              Oda Oluştur
+            </button>
+          </div>
+        </div>
+
         {data?.publicRooms.map((room) => {
           const categories = getCategoriesForRoom(room);
 
