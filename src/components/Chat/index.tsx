@@ -141,6 +141,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
                   showTimestamp={shouldShowTimestamp(messages, index)}
                   currentUsername={user?.username}
                   onMentionClick={handleMentionClick}
+                  onBanClick={toggleBan}
                 />
               ))}
               <div ref={messagesEndRef} />

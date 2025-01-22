@@ -36,6 +36,7 @@ export interface ChatMessageProps {
   showTimestamp: boolean;
   currentUsername?: string | null;
   onMentionClick?: (username: string) => void;
+  onBanClick?: (username: string) => void;
 }
 
 export interface ChatHeaderProps {

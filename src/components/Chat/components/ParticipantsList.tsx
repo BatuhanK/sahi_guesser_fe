@@ -14,14 +14,20 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
   const { user } = useAuth();
   const isStaff = user?.role === "admin" || user?.role === "moderator";
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [banDuration, setBanDuration] = useState<number | 'perma'>(5);
 
   const handleBanClick = (username: string) => {
     setSelectedUser(username);
+    setBanDuration(5);
   };
 
   const handleConfirm = () => {
     if (selectedUser) {
-      onToggleBan(selectedUser);
+      if (banDuration === 'perma') {
+        onToggleBan(`${selectedUser} --minutes=-1`);
+      } else {
+        onToggleBan(`${selectedUser} --minutes=${banDuration}`);
+      }
       setSelectedUser(null);
     }
   };
@@ -98,8 +104,25 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">
-              {selectedUser} adlı kullanıcı banlanacak, onaylıyor musunuz?
+              {selectedUser} adlı kullanıcı banlanacak
             </h3>
+            <div className="mb-4">
+              <label className="block text-sm font-medium mb-2">Kaç dakika?</label>
+              <div className="flex gap-2">
+                <select
+                  value={banDuration}
+                  onChange={(e) => setBanDuration(e.target.value === 'perma' ? 'perma' : Number(e.target.value))}
+                  className="flex-1 rounded-md border border-gray-300 px-3 py-2"
+                >
+                  <option value="5">5 dakika</option>
+                  <option value="10">10 dakika</option>
+                  <option value="30">30 dakika</option>
+                  <option value="60">1 saat</option>
+                  <option value="1440">24 saat</option>
+                  <option value="perma">Perma Ban</option>
+                </select>
+              </div>
+            </div>
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setSelectedUser(null)}
