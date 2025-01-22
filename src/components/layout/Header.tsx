@@ -12,6 +12,7 @@ import {
   ShoppingBag,
   Sun,
   UserPlus,
+  Users,
   Volume2
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
@@ -168,13 +169,13 @@ export const Header: React.FC<HeaderProps> = ({
     fetchAnnouncements();
   }, []);
 
-  const handleLeaveRoom = () => {
+  const handleLeaveRoom = (redirectTo: string = "/") => {
     if (roomId) {
       socketService.leaveRoom(roomId);
     }
     setRoom(null);
     setRoomId(null);
-    navigate("/");
+    navigate(redirectTo);
   };
 
   const handleLogout = () => {
@@ -240,6 +241,13 @@ export const Header: React.FC<HeaderProps> = ({
               {showMobileMenu && (
                 <div className="absolute top-full right-0 mt-2 w-full bg-[var(--bg-secondary)] shadow-lg rounded-b-lg p-4 z-50">
                   <div className="flex flex-col gap-4">
+                    <button
+                      onClick={() => handleLeaveRoom("/kullanici-odalari")}
+                      className="flex items-center gap-2 text-[var(--text-primary)] p-2 hover:bg-[var(--bg-hover)] rounded transition-colors"
+                    >
+                      <Users size={20} />
+                      <span>Kullanıcı Odaları</span>
+                    </button>
                     {user && <ScoreBoard totalScore={user.score} />}
                     {user && (
                       <div className="flex flex-col gap-2">
@@ -409,6 +417,13 @@ export const Header: React.FC<HeaderProps> = ({
               {currentListing && roundStartTime && status === "PLAYING" && (
                 <Timer timeLeft={timeLeft} />
               )}
+              <button
+                onClick={() => handleLeaveRoom("/kullanici-odalari")}
+                className="flex items-center gap-2 text-[var(--bg-secondary)] px-4 py-2 rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+              >
+                <Users size={20} />
+                <span>Kullanıcı Odaları</span>
+              </button>
               {user && <ScoreBoard totalScore={user.score} />}
               {user && (
                 <div className="relative">

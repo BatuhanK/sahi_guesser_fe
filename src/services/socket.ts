@@ -190,6 +190,11 @@ class SocketService {
       }
     });
 
+    this.socket.on("roomFull", () => {
+      const state = useGameStore.getState();
+      state.setShowRoomFullModal(true);
+    });
+
     // Debounce the guess result handler
     const debouncedGuessResult = debounce(
       (direction: "correct" | "go_higher" | "go_lower") => {
@@ -492,10 +497,12 @@ class SocketService {
 
   leaveRoom(roomId: number): void {
     this.socket?.emit("leaveRoom", { roomId });
-    useGameStore.getState().setRoomId(null);
+    const state = useGameStore.getState();
+    state.setRoomId(null);
+    state.setShowRoomFullModal(false);
 
-    useGameStore.getState().setCurrentListing(null);
-    useGameStore.getState().setCurrentQuestion(null);
+    state.setCurrentListing(null);
+    state.setCurrentQuestion(null);
     soundService.clearCountdownTimeout();
   }
 
@@ -507,6 +514,7 @@ class SocketService {
     soundService.clearCountdownTimeout();
     this.socket?.disconnect();
     this.socket = null;
+    useGameStore.getState().setShowRoomFullModal(false);
   }
 }
 

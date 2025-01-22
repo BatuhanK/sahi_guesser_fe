@@ -9,14 +9,17 @@ import { GameContainer } from "./components/game/GameContainer";
 import { Footer } from "./components/layout/Footer";
 import { Header } from "./components/layout/Header";
 import { MobileAppModal } from "./components/ui/MobileAppModal";
+import { RoomFullModal } from "./components/ui/RoomFullModal";
 import { useAuth } from "./hooks/useAuth";
 import { ApplicationLanding } from "./pages/ApplicationLanding";
 import { Contact } from "./pages/Contact";
 import { EmailVerification } from "./pages/EmailVerification";
 import { LogosPage } from "./pages/LogosPage";
+import { PublicRooms } from "./pages/PublicRooms";
 import { Terms } from "./pages/Terms";
 import { analyticsService } from "./services/analytics";
 import { useAuthStore } from "./store/authStore";
+import { useGameStore } from "./store/gameStore";
 import "./styles/app-icon.css";
 
 // Initialize GA4
@@ -181,6 +184,8 @@ const setThemeColors = (isDark: boolean) => {
 function AppWrapper({ children }: { children: React.ReactNode }) {
   const location = useLocation();
   const [showMobileAppModal, setShowMobileAppModal] = useState(false);
+  const showRoomFullModal = useGameStore((state) => state.showRoomFullModal);
+  const setShowRoomFullModal = useGameStore((state) => state.setShowRoomFullModal);
 
   useEffect(() => {
     // Only show on home route
@@ -193,6 +198,10 @@ function AppWrapper({ children }: { children: React.ReactNode }) {
       <MobileAppModal
         isOpen={showMobileAppModal}
         onClose={() => setShowMobileAppModal(false)}
+      />
+      <RoomFullModal 
+        isOpen={showRoomFullModal}
+        onClose={() => setShowRoomFullModal(false)}
       />
     </>
   );
@@ -326,6 +335,7 @@ function App() {
                       <Route path="/iletisim" element={<Contact />} />
                       <Route path="/logolar" element={<LogosPage />} />
                       <Route path="/indir" element={<ApplicationLanding />} />
+                      <Route path="/kullanici-odalari" element={<PublicRooms />} />
                       <Route
                         path="/email-dogrula"
                         element={<EmailVerification />}

@@ -4,12 +4,12 @@ import { devtools } from "zustand/middleware";
 import { Room, RoomSummary } from "../services/api";
 import { ChatMessage, GuessResult } from "../types";
 import type {
-  GameStatus,
-  Listing,
-  OnlinePlayer,
-  Player,
-  Question,
-  RoundEndScore,
+    GameStatus,
+    Listing,
+    OnlinePlayer,
+    Player,
+    Question,
+    RoundEndScore,
 } from "../types/socket";
 
 interface GameState {
@@ -36,6 +36,7 @@ interface GameState {
   roomSummary: RoomSummary | null;
   maxRounds: number;
   roundNumber: number;
+  showRoomFullModal: boolean;
   setGameStatus: (status: GameStatus) => void;
   setCurrentListing: (listing: Listing | null) => void;
   setCurrentQuestion: (question: Question | null) => void;
@@ -60,6 +61,7 @@ interface GameState {
   setRoomSummary: (roomSummary: RoomSummary | null) => void;
   setMaxRounds: (maxRounds: number) => void;
   setRoundNumber: (roundNumber: number) => void;
+  setShowRoomFullModal: (show: boolean) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -87,6 +89,7 @@ export const useGameStore = create<GameState>()(
     roomSummary: null,
     maxRounds: 0,
     roundNumber: 0,
+    showRoomFullModal: false,
     setGameStatus: (status) =>
       set({
         status,
@@ -146,5 +149,6 @@ export const useGameStore = create<GameState>()(
     setRoomSummary: (roomSummary) => set({ roomSummary }),
     setMaxRounds: (maxRounds) => set({ maxRounds }),
     setRoundNumber: (roundNumber) => set({ roundNumber }),
+    setShowRoomFullModal: (show) => set({ showRoomFullModal: show }),
   }))
 );

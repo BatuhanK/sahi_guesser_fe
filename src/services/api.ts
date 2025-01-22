@@ -173,6 +173,20 @@ export interface CreatePrivateRoomRequest {
   roundCount: number;
 }
 
+export interface CreatePublicRoomRequest {
+  categoryIds: number[];
+  roundDurationSeconds: number;
+  maxGuessesPerRound: number;
+  minPrice?: number;
+  maxPrice?: number;
+  roundCount: number;
+
+  maxPlayers: number; // max 50
+  publicName: string; // min 3 char
+  publicDescription: string; // min 10 char
+}
+
+
 export const categoryApi = {
   getAll: async () => {
     const response = await api.get<{
@@ -199,6 +213,16 @@ export const roomApi = {
   create: async (data: CreatePrivateRoomRequest) => {
     const response = await api.post("/private-game-rooms/create", data);
     return response.data.privateRoom;
+  },
+
+  createPublic: async (data: CreatePublicRoomRequest) => {
+    const response = await api.post("/public-game-rooms/create", data);
+    return response.data.publicRoom;
+  },
+
+  getPublicRooms: async () => {
+    const response = await api.get("/public-game-rooms");
+    return response.data;
   },
 
   getLivekitRoom: async (

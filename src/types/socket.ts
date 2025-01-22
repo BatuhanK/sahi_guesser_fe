@@ -117,6 +117,7 @@ export interface ServerToClientEvents {
     roundStartTime: Date;
     roundDuration: number;
   }) => void;
+  roomFull: () => void;
   roomEnd: () => void;
   roomEnded: () => void;
   serverShutdown: () => void;

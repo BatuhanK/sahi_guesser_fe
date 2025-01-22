@@ -21,6 +21,7 @@ interface CreatePrivateRoomModalProps {
   isOpen: boolean;
   onClose: () => void;
   categories: Category[];
+  defaultPublic?: boolean;
 }
 
 interface SuccessModalProps {
@@ -121,6 +122,7 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
   isOpen,
   onClose,
   categories,
+  defaultPublic = false,
 }) => {
   const [formData, setFormData] = useState<CreatePrivateRoomRequest>({
     categoryIds: [],
@@ -129,6 +131,13 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
     minPrice: undefined,
     maxPrice: undefined,
     roundCount: 20,
+  });
+
+  const [isPublic, setIsPublic] = useState(defaultPublic);
+  const [publicData, setPublicData] = useState({
+    maxPlayers: 10,
+    publicName: "",
+    publicDescription: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -188,6 +197,20 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
       return "Birden fazla kategori seçiminde fiyat filtreleri kullanılamaz";
     }
 
+    if (isPublic) {
+      if (publicData.maxPlayers < 2 || publicData.maxPlayers > 50) {
+        return "Maksimum oyuncu sayısı 2-50 arasında olmalıdır";
+      }
+
+      if (publicData.publicName.length < 3) {
+        return "Oda adı en az 3 karakter olmalıdır";
+      }
+
+      if (publicData.publicDescription.length < 10) {
+        return "Oda açıklaması en az 10 karakter olmalıdır";
+      }
+    }
+
     return null;
   };
 
@@ -202,8 +225,16 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
 
     try {
       setLoading(true);
-      const response = await roomApi.create(formData);
-      setCreatedRoom(response);
+      if (isPublic) {
+        const response = await roomApi.createPublic({
+          ...formData,
+          ...publicData,
+        });
+        setCreatedRoom(response);
+      } else {
+        const response = await roomApi.create(formData);
+        setCreatedRoom(response);
+      }
       setShowSuccessModal(true);
     } finally {
       setLoading(false);
@@ -255,10 +286,89 @@ export const CreatePrivateRoomModal: React.FC<CreatePrivateRoomModalProps> = ({
             </button>
 
             <h2 className="text-2xl font-bold mb-6 text-[var(--text-primary)]">
-              Özel Oda Oluştur
+              {isPublic ? "Açık Oda Oluştur" : "Özel Oda Oluştur"}
             </h2>
 
             <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="p-4 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-color)]">
+                <label className="flex items-center justify-between cursor-pointer">
+                  <div>
+                    <div className="font-medium text-[var(--text-primary)]">Dışarıya açık olsun</div>
+                    <div className="text-sm text-[var(--text-secondary)]">
+                      Diğer oyuncular odanızı görebilir ve katılabilir
+                    </div>
+                  </div>
+                  <input
+                    type="checkbox"
+                    id="isPublic"
+                    checked={isPublic}
+                    onChange={(e) => setIsPublic(e.target.checked)}
+                    className="w-5 h-5 rounded border-[var(--border-color)] bg-[var(--bg-tertiary)] text-[var(--accent-color)]"
+                  />
+                </label>
+              </div>
+
+              {isPublic && (
+                <div className="space-y-4 p-4 bg-[var(--bg-tertiary)] rounded-lg border border-[var(--border-color)]">
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">
+                      Oda Adı
+                    </label>
+                    <input
+                      type="text"
+                      value={publicData.publicName}
+                      onChange={(e) =>
+                        setPublicData({
+                          ...publicData,
+                          publicName: e.target.value,
+                        })
+                      }
+                      placeholder="Örn: Hızlı Oyun"
+                      className="w-full px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+                      minLength={3}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">
+                      Oda Açıklaması
+                    </label>
+                    <textarea
+                      value={publicData.publicDescription}
+                      onChange={(e) =>
+                        setPublicData({
+                          ...publicData,
+                          publicDescription: e.target.value,
+                        })
+                      }
+                      placeholder="Oda hakkında kısa bir açıklama yazın"
+                      className="w-full px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)] resize-none"
+                      rows={3}
+                      minLength={10}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block mb-2 text-sm font-medium text-[var(--text-primary)]">
+                      Maksimum Oyuncu Sayısı
+                    </label>
+                    <input
+                      type="number"
+                      value={publicData.maxPlayers}
+                      onChange={(e) =>
+                        setPublicData({
+                          ...publicData,
+                          maxPlayers: parseInt(e.target.value),
+                        })
+                      }
+                      className="w-full px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)]"
+                      min={2}
+                      max={50}
+                    />
+                  </div>
+                </div>
+              )}
+
               <div>
                 <label className="block mb-2 font-medium text-[var(--text-primary)]">
                   Kategoriler
