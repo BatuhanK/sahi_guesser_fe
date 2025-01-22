@@ -28,6 +28,7 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({ totalScore }) => {
         isOpen={showLeaderboard}
         onClose={() => setShowLeaderboard(false)}
         title="Lider Tablosu"
+        childrenClassName="!overflow-hidden !max-h-[100vh]"
       >
         <LeaderboardTable />
       </Modal>

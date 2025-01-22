@@ -256,14 +256,14 @@ export function LeaderboardTable({
   const displayedLeaderboard = showAll ? leaderboard : leaderboard.slice(0, 5);
 
   return (
-    <div className="leaderboard space-y-4 mb-8">
+    <div className="leaderboard space-y-4 mb-8 mt-4 mx-2">
       <CategorySelector />
-      <div className="border-2 border-[var(--accent-color)] rounded-lg shadow-md p-4 bg-[var(--bg-secondary)]">
+      <div className="border-2  overflow-y-auto max-h-[70vh]  border-[var(--accent-color)] rounded-lg shadow-md p-4 bg-[var(--bg-secondary)]">
         {isLoading ? (
           <LeaderboardSkeleton />
         ) : (
           <>
-            <div className="space-y-2">
+            <div className="space-y-2 ">
               {displayedLeaderboard.map((entry, index) => (
                 <div
                   key={entry.username}

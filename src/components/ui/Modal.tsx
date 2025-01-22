@@ -6,14 +6,21 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   title?: string;
+  childrenClassName: string;
 }
 
-export function Modal({ isOpen, onClose, children, title }: ModalProps) {
+export function Modal({
+  isOpen,
+  onClose,
+  children,
+  title,
+  childrenClassName,
+}: ModalProps) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="fixed inset-0 bg-black/50" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center ">
+      <div className="fixed inset-0 bg-black/50 " />
       <div className="relative z-50 w-full max-w-lg mx-4">
         <div className="bg-[var(--bg-primary)] rounded-lg shadow-lg">
           <div className="flex items-center justify-between p-4 border-b border-[var(--border-color)]">
@@ -27,7 +34,9 @@ export function Modal({ isOpen, onClose, children, title }: ModalProps) {
               <X size={20} />
             </button>
           </div>
-          <div className="overflow-y-auto max-h-[80vh]">{children}</div>
+          <div className={`overflow-y-auto max-h-[80vh] ${childrenClassName}`}>
+            {children}
+          </div>
         </div>
       </div>
     </div>
