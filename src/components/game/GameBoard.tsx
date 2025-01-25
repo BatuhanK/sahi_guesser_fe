@@ -174,14 +174,7 @@ export const GameBoard: React.FC = () => {
     (message: string): void => {
       if (!isAuthenticated || !roomId || !user?.id) return;
 
-      try {
-        window.sa_event?.("chat_message", {
-          user_id: user.id,
-          room_id: roomId,
-        });
-      } catch (e) {
-        console.error("Error sending chat message:", e);
-      }
+   
 
       socketService.sendMessage(roomId, message);
     },

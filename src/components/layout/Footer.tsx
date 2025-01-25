@@ -46,6 +46,7 @@ export const Footer = () => {
           <Link to="/indir" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
             Uygulamalar
           </Link>
+
         </div>
       </div>
     </FooterContainer>

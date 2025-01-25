@@ -41,14 +41,6 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
         return;
       }
 
-      try {
-        window.sa_event("audio_chat_connect", {
-          user_id: userId,
-          room_id: roomId,
-        });
-      } catch (e) {
-        console.error(e);
-      }
 
       if (isIOS) {
         initializeIOSAudio();
