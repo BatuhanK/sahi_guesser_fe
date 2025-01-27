@@ -16,6 +16,9 @@ interface ChatMessage {
   username: string;
   message: string;
   timestamp: Date;
+  isPremium: boolean;
+  premiumLevel: number;
+  role: string;
 }
 
 class SocketService {
@@ -81,19 +84,18 @@ class SocketService {
 
     this.socket.on(
       "gameState",
-      ({ status, listing, question, roundStartTime, roundDuration }) => {
-        useGameStore.getState().setGameStatus(status);
+      ({ status, listing, question, roundStartTime, roundDuration, userMaxGuessesPerRound }) => {
+        const state = useGameStore.getState();
+        state.setGameStatus(status);
+        state.setRoomMaxGuessesPerRound(userMaxGuessesPerRound)
         if (listing) {
-          useGameStore.getState().setCurrentListing(listing);
+          state.setCurrentListing(listing);
         }
         if (question) {
-          useGameStore.getState().setCurrentQuestion(question);
+          state.setCurrentQuestion(question);
         }
-        useGameStore
-          .getState()
-          .setRoundInfo(new Date(roundStartTime), roundDuration);
-
-        useGameStore.getState().setRoomSummary(null);
+        state.setRoundInfo(new Date(roundStartTime), roundDuration);
+        state.setRoomSummary(null);
         if (listing) {
           analyticsService.trackRoundStart(
             listing.id.toString(),
@@ -210,11 +212,13 @@ class SocketService {
       { leading: true, trailing: false }
     );
 
-    this.socket.on("guessResult", ({ direction, guessCount }) => {
+    this.socket.on("guessResult", ({ direction, guessCount, userMaxGuessesPerRound, remainingGuesses }) => {
       const state = useGameStore.getState();
       debouncedGuessResult(direction);
 
       state.setGuessCount(guessCount);
+      state.setRoomMaxGuessesPerRound(userMaxGuessesPerRound);
+      console.log("remainingGuesses", remainingGuesses);
     });
 
     this.socket.on("correctGuess", ({ userId, playerId, username }) => {
@@ -281,7 +285,7 @@ class SocketService {
       }
     }, 100);
 
-    this.socket.on("chatMessage", ({ userId, username, message }) => {
+    this.socket.on("chatMessage", ({ userId, username, message, isPremium, premiumLevel, role }) => {
       const state = useGameStore.getState();
 
       // Handle system message rejection
@@ -307,6 +311,9 @@ class SocketService {
           username,
           message,
           timestamp: new Date(),
+          isPremium,
+          premiumLevel,
+          role,
         });
         flushChatMessages();
         return;
@@ -337,6 +344,9 @@ class SocketService {
           username,
           message,
           timestamp: new Date(),
+          isPremium,
+          premiumLevel,
+          role,
         };
 
         useGameStore
@@ -349,6 +359,9 @@ class SocketService {
           username,
           message,
           timestamp: new Date(),
+          isPremium,
+          premiumLevel,
+          role,
         });
         flushChatMessages();
       }
@@ -360,7 +373,7 @@ class SocketService {
 
     this.socket.on(
       "playerJoined",
-      ({ userId, playerId, username, roomScore }) => {
+      ({ userId, playerId, username, roomScore, isPremium, premiumLevel, role }) => {
         const onlinePlayers = useGameStore.getState().onlinePlayers;
         // check online players and add the new player if not exists.
         const isExists = onlinePlayers.some(
@@ -373,7 +386,7 @@ class SocketService {
           .getState()
           .setOnlinePlayers([
             ...onlinePlayers,
-            { userId, playerId, username, roomScore, totalScore: 0 },
+            { userId, playerId, username, roomScore, totalScore: 0, isPremium, premiumLevel, role },
           ]);
       }
     );

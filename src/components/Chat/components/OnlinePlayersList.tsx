@@ -1,5 +1,7 @@
 import { X } from "lucide-react";
 import React from "react";
+import { getPremiumIndicator } from "../../../lib/user-indicators";
+import { cn } from "../../../lib/utils";
 import { OnlinePlayersListProps } from "../types";
 
 export const OnlinePlayersList: React.FC<OnlinePlayersListProps> = ({
@@ -27,12 +29,23 @@ export const OnlinePlayersList: React.FC<OnlinePlayersListProps> = ({
           {players.map((player) => (
             <div
               key={player.username}
-              className="flex items-center gap-3 p-3 hover:bg-[var(--hover-color)] rounded-lg text-[var(--text-primary)]"
+              className={cn(
+                "flex items-center gap-3 p-3 hover:bg-[var(--hover-color)] rounded-lg text-[var(--text-primary)]",
+                player.isPremium && "bg-gradient-to-r from-transparent via-yellow-500/5 to-transparent"
+              )}
             >
-              <div className="w-8 h-8 rounded-full bg-[var(--accent-muted)] flex items-center justify-center text-[var(--accent-color)] font-medium">
+              <div className={cn(
+                "w-8 h-8 rounded-full flex items-center justify-center font-medium",
+                player.isPremium 
+                  ? "bg-gradient-to-br from-yellow-200 to-yellow-500 text-yellow-900"
+                  : "bg-[var(--accent-muted)] text-[var(--accent-color)]"
+              )}>
                 {player.username.charAt(0).toUpperCase()}
               </div>
-              <span className="flex-1">{player.username}</span>
+              <div className="flex items-center gap-2 flex-1">
+                <span>{player.username}</span>
+                {getPremiumIndicator(player.isPremium, player.premiumLevel, false)}
+              </div>
             </div>
           ))}
         </div>

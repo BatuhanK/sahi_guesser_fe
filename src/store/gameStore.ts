@@ -4,12 +4,12 @@ import { devtools } from "zustand/middleware";
 import { Room, RoomSummary } from "../services/api";
 import { ChatMessage, GuessResult } from "../types";
 import type {
-    GameStatus,
-    Listing,
-    OnlinePlayer,
-    Player,
-    Question,
-    RoundEndScore,
+  GameStatus,
+  Listing,
+  OnlinePlayer,
+  Player,
+  Question,
+  RoundEndScore,
 } from "../types/socket";
 
 interface GameState {
@@ -62,6 +62,7 @@ interface GameState {
   setMaxRounds: (maxRounds: number) => void;
   setRoundNumber: (roundNumber: number) => void;
   setShowRoomFullModal: (show: boolean) => void;
+  setRoomMaxGuessesPerRound: (maxGuessesPerRound: number) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -150,5 +151,18 @@ export const useGameStore = create<GameState>()(
     setMaxRounds: (maxRounds) => set({ maxRounds }),
     setRoundNumber: (roundNumber) => set({ roundNumber }),
     setShowRoomFullModal: (show) => set({ showRoomFullModal: show }),
+    setRoomMaxGuessesPerRound: (maxGuessesPerRound) => {
+      const room = useGameStore.getState().room;
+      if (room?.roomSettings) {
+        const updatedRoom = {
+          ...room,
+          roomSettings: {
+            ...room.roomSettings,
+            maxGuessesPerRound
+          }
+        };
+        set({ room: updatedRoom });
+      }
+    }
   }))
 );

@@ -1,6 +1,7 @@
 import { Ban } from "lucide-react";
 import React, { useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
+import { getPremiumIndicator, getScoreBasedEffects, getUserBackgroundClass } from "../../../lib/user-indicators";
 import { cn } from "../../../lib/utils";
 import { useGameStore } from "../../../store/gameStore";
 import { ChatMention, ChatMessageProps } from "../types";
@@ -62,60 +63,6 @@ const renderMessageWithMentions = (
   );
 };
 
-// Function to get score-based effects for username
-const getScoreBasedEffects = (score: number) => {
-  if (score >= 1_000_000) {
-    return {
-      className: cn(
-        "font-black text-transparent bg-clip-text",
-        "bg-[linear-gradient(45deg,#FF0000,#FF4500,#FF8C00,#FFD700,#FF0000)]",
-        "bg-[length:200%_auto] animate-flow-fast",
-        "hover:scale-110 transform transition-transform",
-        "drop-shadow-[0_0_10px_rgba(255,69,0,0.5)]"
-      ),
-      prefix: "🔥",
-      suffix: "🔥",
-    };
-  }
-  if (score >= 500_000) {
-    return {
-      className:
-        "font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-yellow-400 to-orange-500 animate-shimmer hover:scale-105 transform transition-transform",
-      prefix: "⭐",
-      suffix: "⭐",
-    };
-  }
-  if (score >= 100_000) {
-    return {
-      className:
-        "font-bold text-transparent bg-clip-text animate-pulse bg-gradient-to-r from-emerald-400 to-cyan-400 hover:scale-105 transform transition-transform",
-      prefix: "💎",
-      suffix: "💎",
-    };
-  }
-  if (score >= 30_000) {
-    return {
-      className:
-        "font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-400 hover:scale-105 transform transition-transform",
-      prefix: "🌟",
-      suffix: "🌟",
-    };
-  }
-  if (score > 0) {
-    return {
-      className:
-        "font-medium text-transparent bg-clip-text bg-gradient-to-r from-slate-500 to-slate-700 hover:scale-105 transform transition-transform",
-      prefix: "⚡",
-      suffix: "",
-    };
-  }
-  return {
-    className: "text-[#F1C40F] hover:scale-105 transform transition-transform",
-    prefix: "🎮",
-    suffix: "",
-  };
-};
-
 export const ChatMessage: React.FC<ChatMessageProps> = ({
   message,
   currentUsername,
@@ -125,8 +72,8 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
   const { user } = useAuth();
   const isStaff = user?.role === "admin" || user?.role === "moderator";
   const onlinePlayers = useGameStore((state) => state.onlinePlayers);
-  const isAdmin = message.username === "batuhan";
-  const isTucik = message.username === "Tucik";
+  const isAdmin = message.role === "admin";
+  const isModerator = message.role === "moderator";
   const isSystem = message.username === "system";
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [banDuration, setBanDuration] = useState<number | 'perma'>(5);
@@ -147,9 +94,10 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
     }
   };
 
-  const playerScore =
-    onlinePlayers.find((player) => player.username === message.username)
-      ?.totalScore || 0;
+  const playerData = onlinePlayers.find((player) => player.username === message.username);
+  const playerScore = playerData?.totalScore || 0;
+  const isPremium = playerData?.isPremium || false;
+  const premiumLevel = playerData?.premiumLevel || 0;
 
   const scoreEffects = getScoreBasedEffects(playerScore);
 
@@ -176,7 +124,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   return (
     <>
-      <div className="flex flex-col mb-1">
+      <div className={getUserBackgroundClass(isAdmin, isModerator, isPremium, premiumLevel)}>
         <div className="flex items-center gap-2">
           {isStaff && message.username !== user?.username && !isSystem && (
             <button
@@ -191,26 +139,23 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
               "font-medium text-sm cursor-pointer break-all",
               isAdmin
                 ? "text-[var(--error-text)] font-bold text-base"
-                : isTucik
-                ? "text-[var(--accent-color)] font-bold text-base"
                 : scoreEffects.className,
+              isPremium && "drop-shadow-[0_0_3px_rgba(255,215,0,0.5)]",
               "hover:opacity-80 transition-opacity"
             )}
             onClick={() => onMentionClick?.(message.username)}
             role="button"
             tabIndex={0}
-            title={`${message.username} (${playerScore.toLocaleString()} puan)`}
+            title={`${message.username} (${playerScore.toLocaleString()} puan)${isPremium ? ` - Premium Seviye ${premiumLevel}` : ""}`}
           >
             {isAdmin
               ? `👑👑 ${message.username}`
-              : isTucik
-              ? `💜 ${message.username} 💜`
-              : `${scoreEffects.prefix} ${message.username} ${scoreEffects.suffix}`}
+              : `${scoreEffects.prefix} ${getPremiumIndicator(isPremium, premiumLevel, true)}${message.username} ${scoreEffects.suffix}`}
           </span>
           <span
             className={cn(
               "text-[var(--text-primary)] break-words flex-1",
-              isAdmin || isTucik ? "text-base font-medium" : "text-sm",
+              isAdmin ? "text-base font-medium" : "text-sm",
               message.isRejected && "line-through opacity-50"
             )}
           >

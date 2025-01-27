@@ -95,6 +95,9 @@ export interface OnlinePlayer {
   username: string;
   roomScore: number;
   totalScore: number;
+  isPremium: boolean;
+  premiumLevel: number;
+  role: string;
 }
 
 export interface RoundEndScore {
@@ -116,6 +119,7 @@ export interface ServerToClientEvents {
     question: Question | null;
     roundStartTime: Date;
     roundDuration: number;
+    userMaxGuessesPerRound: number;
   }) => void;
   roomFull: () => void;
   roomEnd: () => void;
@@ -133,11 +137,16 @@ export interface ServerToClientEvents {
     roomId: number;
     direction: "correct" | "go_higher" | "go_lower";
     guessCount: number;
+    userMaxGuessesPerRound: number;
+    remainingGuesses: number;
   }) => void;
   chatMessage: (data: {
     userId: string;
     username: string;
     message: string;
+    isPremium: boolean;
+    premiumLevel: number;
+    role: string;
   }) => void;
   intermissionStart: (data: {
     duration: number;
@@ -164,6 +173,9 @@ export interface ServerToClientEvents {
     playerId: number;
     username: string;
     roomScore: number;
+    isPremium: boolean;
+    premiumLevel: number;
+    role: string
   }) => void;
 
   playerLeft: (data: {
@@ -187,5 +199,5 @@ export interface ClientToServerEvents {
   joinRoom: (data: { roomId: number }) => void;
   leaveRoom: (data: { roomId: number }) => void;
   submitGuess: (data: { roomId: number; price: number }) => void;
-  chatMessage: (data: { roomId: number; message: string }) => void;
+  chatMessage: (data: { roomId: number; message: string; }) => void;
 }

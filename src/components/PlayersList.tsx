@@ -4,10 +4,61 @@ import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 
 import { useMediaQuery } from "../hooks/useMediaQuery";
+import { getPremiumIndicator } from "../lib/user-indicators";
 import { cn } from "../lib/utils";
 import { useGameStore } from "../store/gameStore";
 import { GuessResult } from "../types";
 import { OnlinePlayer } from "../types/socket";
+
+const PlayerItem: React.FC<{
+  player: OnlinePlayer;
+  score: number;
+  isCorrect?: boolean;
+  scoreClassName?: string;
+}> = ({ player, score, isCorrect, scoreClassName }) => {
+  const isAdmin = player.role === "admin";
+  const isModerator = player.role === "moderator";
+
+  return (
+    <div
+      className={cn(
+        "flex items-center justify-between p-2 rounded-lg transition-colors mb-2",
+        isCorrect 
+          ? "bg-[var(--success-muted)] hover:bg-[var(--success-hover)]" 
+          : "bg-[var(--bg-tertiary)] hover:bg-[var(--hover-color)]"
+      )}
+    >
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        {isCorrect && (
+          <Check size={16} className="text-[var(--success-text)] shrink-0" />
+        )}
+        <span className={cn(
+          "font-medium truncate",
+          isAdmin 
+            ? "text-[var(--error-text)]" 
+            : isModerator 
+            ? "text-purple-500 dark:text-purple-400"
+            : "text-[var(--text-primary)]",
+        )}>
+          {isAdmin 
+            ? `${player.username} 👑`
+            : isModerator
+            ? `${player.username} 🛡️`
+            : player.isPremium
+            ? `${player.username} ${getPremiumIndicator(player.isPremium, player.premiumLevel, true)}`
+            : player.username
+          }
+        </span>
+      </div>
+      <span className={cn(
+        "text-sm px-2 py-1 rounded-full shrink-0 ml-2",
+        scoreClassName || "bg-[var(--accent-muted)] text-[var(--accent-color)]"
+      )}>
+        {score} puan
+      </span>
+    </div>
+  );
+};
 
 interface PlayersListProps {
   onlinePlayers: OnlinePlayer[];
@@ -102,20 +153,13 @@ export const PlayersList: React.FC<PlayersListProps> = ({
               <motion.div
                 key={player.playerId}
                 {...playerItemProps}
-                className="flex items-center justify-between bg-[var(--success-muted)] p-2 rounded-lg hover:bg-[var(--success-hover)] transition-colors mb-2"
               >
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <Check
-                    size={16}
-                    className="text-[var(--success-text)] shrink-0"
-                  />
-                  <span className="font-medium truncate text-[var(--text-primary)]">
-                    {player.username}
-                  </span>
-                </div>
-                <span className="text-sm px-2 py-1 bg-[var(--success-bg)] text-[var(--success-text)] rounded-full shrink-0 ml-2">
-                  {player.roomScore} puan
-                </span>
+                <PlayerItem 
+                  player={player} 
+                  score={player.roomScore} 
+                  isCorrect={true}
+                  scoreClassName="bg-[var(--success-bg)] text-[var(--success-text)]"
+                />
               </motion.div>
             ))}
 
@@ -124,14 +168,11 @@ export const PlayersList: React.FC<PlayersListProps> = ({
               <motion.div
                 key={player.playerId}
                 {...playerItemProps}
-                className="flex items-center justify-between bg-[var(--bg-tertiary)] p-2 rounded-lg hover:bg-[var(--hover-color)] transition-colors mb-2"
               >
-                <span className="font-medium truncate flex-1 min-w-0 text-[var(--text-primary)]">
-                  {player.username}
-                </span>
-                <span className="text-sm px-2 py-1 bg-[var(--accent-muted)] text-[var(--accent-color)] rounded-full shrink-0 ml-2">
-                  {player.roomScore} puan
-                </span>
+                <PlayerItem 
+                  player={player} 
+                  score={player.roomScore}
+                />
               </motion.div>
             ))}
           </AnimatePresence>
@@ -156,6 +197,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             {lastGuesses?.map((guess, index) => {
               const guessId =
                 guess.playerId + (guess.isCorrect ? "y" : "n") + index;
+              const player = onlinePlayers.find(p => p.playerId === guess.playerId);
+
+              if (!player) return null;
 
               return (
                 <motion.div
@@ -194,26 +238,16 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                           }
                         : {}
                     }
-                    className={cn(
-                      "flex items-center justify-between p-3 rounded-lg transition-colors",
-                      guess.isCorrect
-                        ? "bg-[var(--success-muted)] hover:bg-[var(--success-hover)]"
-                        : "bg-[var(--error-muted)] hover:bg-[var(--error-hover)]"
-                    )}
                   >
-                    <span className="font-medium truncate flex-1 mr-2 text-[var(--text-primary)]">
-                      {guess.username}
-                    </span>
-                    <span
-                      className={cn(
-                        "text-sm px-2 py-1 rounded-full shrink-0",
-                        guess.isCorrect
-                          ? "bg-[var(--success-bg)] text-[var(--success-text)]"
-                          : "bg-[var(--error-bg)] text-[var(--error-text)]"
-                      )}
-                    >
-                      {guess.isCorrect ? "Doğru Tahmin" : "Yanlış Tahmin"}
-                    </span>
+                    <PlayerItem 
+                      player={player}
+                      score={player.roomScore}
+                      isCorrect={guess.isCorrect}
+                      scoreClassName={guess.isCorrect 
+                        ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+                        : "bg-[var(--error-bg)] text-[var(--error-text)]"
+                      }
+                    />
                   </motion.div>
                 </motion.div>
               );

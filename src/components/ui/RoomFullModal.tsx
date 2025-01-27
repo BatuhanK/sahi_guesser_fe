@@ -10,7 +10,6 @@ export const RoomFullModal: React.FC<RoomFullModalProps> = ({
   isOpen,
   onClose,
 }) => {
-  console.log("RoomFullModal props:", { isOpen });
   const navigate = useNavigate();
 
   const handleClose = () => {

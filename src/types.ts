@@ -32,6 +32,9 @@ export interface ChatMessage {
   userId: string;
   username: string;
   message: string;
+  isPremium: boolean;
+  premiumLevel: number;
+  role: string;
   timestamp: Date;
   mentions?: ChatMention[];
   isRejected?: boolean;
