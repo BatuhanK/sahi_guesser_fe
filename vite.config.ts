@@ -7,7 +7,11 @@ import path from "path";
 export default defineConfig({
   base: "/",
   plugins: [
-    react(),
+    react({
+      babel: {
+        plugins: [['babel-plugin-react-compiler', { target: '18' }]]
+      }
+    }),
     viteStaticCopy({
       targets: [
         { src: "src/public", dest: "assets" },
