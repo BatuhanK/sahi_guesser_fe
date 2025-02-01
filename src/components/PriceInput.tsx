@@ -1,8 +1,8 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-  formatPrice,
-  formatPriceWithCurrency,
-  parsePrice,
+    formatPrice,
+    formatPriceWithCurrency,
+    parsePrice,
 } from "../utils/priceFormatter";
 
 interface PriceInputProps {
@@ -19,10 +19,14 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   listingId,
 }) => {
   const [price, setPrice] = useState(0);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setPrice(0);
-  }, [listingId]);
+    if (!disabled && inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, [listingId, disabled]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPrice(parsePrice(e.target.value));
@@ -96,6 +100,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
             </span>
           </div>
           <input
+            ref={inputRef}
             type="text"
             value={formatPrice(price)}
             onChange={handleInputChange}
