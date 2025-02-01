@@ -65,7 +65,8 @@ export const authApi = {
   register: async (
     username: string,
     password: string,
-    email: string
+    email: string,
+    recaptchaResponse: string
   ) => {
     let fingerprint = localStorage.getItem("fingerprint");
     if (!fingerprint) {
@@ -77,6 +78,7 @@ export const authApi = {
       password,
       email,
       fingerprint,
+      recaptchaResponse,
     });
     return response.data;
   },
@@ -140,6 +142,7 @@ export type Room = {
   isSystemRoom: boolean;
   roomSettings: {
     maxGuessesPerRound: number;
+    questionType: "price" | "text";
   };
 };
 

@@ -1,12 +1,13 @@
 import { Dialog, Transition } from "@headlessui/react";
 import { X } from "lucide-react";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import ReCAPTCHA from "react-google-recaptcha";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   type: "login" | "register";
-  onAuth: (username: string, password: string, email?: string) => void;
+  onAuth: (username: string, password: string, email?: string, recaptchaResponse?: string) => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -22,7 +23,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     email?: string;
     username?: string;
     password?: string;
+    recaptcha?: string;
   }>({});
+  const recaptchaRef = useRef<ReCAPTCHA>(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -30,6 +33,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
       setPassword("");
       setEmail("");
       setErrors({});
+      if (recaptchaRef.current) {
+        recaptchaRef.current.reset();
+      }
     }
   }, [isOpen]);
 
@@ -41,6 +47,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         newErrors.email = "E-posta adresi gereklidir";
       } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         newErrors.email = "Geçerli bir e-posta adresi giriniz";
+      }
+
+      // Validate reCAPTCHA for register form
+      if (!recaptchaRef.current?.getValue()) {
+        newErrors.recaptcha = "Lütfen robot olmadığınızı doğrulayın";
       }
     }
 
@@ -63,7 +74,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     e.preventDefault();
     if (validateForm()) {
       if (type === "register") {
-        onAuth(username, password, email);
+        const recaptchaResponse = recaptchaRef.current?.getValue();
+        onAuth(username, password, email, recaptchaResponse || "");
       } else {
         onAuth(username, password);
       }
@@ -204,6 +216,29 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 </div>
 
                 <div className="mt-6">
+                  {type === "register" && (
+                    <div className="mb-4">
+                      <ReCAPTCHA
+                        ref={recaptchaRef}
+                        sitekey="6LeqFsoqAAAAAIJtaF1-NFlFUv8qn3g0k5JQJHgI"
+                        theme="light"
+                        size="normal"
+                        lang="tr"
+                        onChange={(value) => {
+                          if (!value) {
+                            setErrors(prev => ({...prev, recaptcha: "Lütfen robot olmadığınızı doğrulayın"}));
+                          } else {
+                            setErrors(prev => ({...prev, recaptcha: undefined}));
+                          }
+                        }}
+                      />
+                      {errors.recaptcha && (
+                        <p className="mt-1 text-sm text-[var(--error-text)]">
+                          {errors.recaptcha}
+                        </p>
+                      )}
+                    </div>
+                  )}
                   <button
                     type="submit"
                     className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[var(--accent-color)] transition-colors"

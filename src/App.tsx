@@ -252,7 +252,8 @@ function App() {
   const handleAuth = async (
     username: string,
     password: string,
-    email?: string
+    email?: string,
+    recaptchaResponse?: string
   ) => {
     try {
       if (authModalType === "login") {
@@ -262,7 +263,10 @@ function App() {
         if (!email) {
           throw new Error("Email is required for registration");
         }
-        await register(username, password, email);
+        if (!recaptchaResponse) {
+          throw new Error("reCAPTCHA doğrulaması gereklidir");
+        }
+        await register(username, password, email, recaptchaResponse);
         analyticsService.trackRegistration();
       }
       setIsAuthModalOpen(false);

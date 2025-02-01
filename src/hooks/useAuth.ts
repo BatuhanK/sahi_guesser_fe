@@ -38,9 +38,10 @@ export function useAuth() {
   const register = async (
     username: string,
     password: string,
-    email: string
+    email: string,
+    recaptchaResponse: string
   ) => {
-    const { user, token } = await authApi.register(username, password, email);
+    const { user, token } = await authApi.register(username, password, email, recaptchaResponse);
     setUser(user);
     setToken(token.token);
 
