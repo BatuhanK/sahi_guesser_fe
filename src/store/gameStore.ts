@@ -12,6 +12,8 @@ import type {
   RoundEndScore,
 } from "../types/socket";
 
+type FeedbackType = "correct" | "go_higher" | "go_lower" | "not_correct" | null;
+
 interface GameState {
   status: GameStatus;
   currentListing: Listing | null;
@@ -21,7 +23,7 @@ interface GameState {
   players: Player[];
   roomId: number | null;
   room: Room | null;
-  feedback: "correct" | "go_higher" | "go_lower" | null;
+  feedback: FeedbackType;
   hasCorrectGuess: boolean;
   chatMessages: ChatMessage[];
   onlinePlayers: OnlinePlayer[];
@@ -44,7 +46,7 @@ interface GameState {
   setPlayers: (players: Player[]) => void;
   setRoomId: (roomId: number | null) => void;
   setRoom: (room: Room | null) => void;
-  setFeedback: (feedback: "correct" | "go_higher" | "go_lower" | null) => void;
+  setFeedback: (feedback: FeedbackType) => void;
   setHasCorrectGuess: (hasCorrectGuess: boolean) => void;
   setChatMessages: (chatMessages: ChatMessage[]) => void;
   setOnlinePlayers: (onlinePlayers: OnlinePlayer[]) => void;

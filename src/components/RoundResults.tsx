@@ -1,12 +1,9 @@
 import { AnimatePresence, motion } from "framer-motion";
 import { Medal } from "lucide-react";
 import React, { useEffect, useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { useGameStore } from "../store/gameStore";
 import { Listing, RoundEndScore } from "../types/socket";
-import { formatPriceWithCurrency } from "../utils/priceFormatter";
-import AdPlaceholder from "./game/components/AdPlaceholder";
+import { formatPrice } from "../utils/priceFormatter";
 
 interface RoundResultsProps {
   scores: RoundEndScore[];
@@ -16,6 +13,8 @@ interface RoundResultsProps {
   maxRounds?: number;
   roundNumber?: number;
   shouldShowRoundInfo?: boolean;
+  hideCurrency?: boolean;
+  currency?: string;
 }
 
 export const RoundResults: React.FC<RoundResultsProps> = ({
@@ -26,6 +25,8 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   maxRounds,
   roundNumber,
   shouldShowRoundInfo,
+  hideCurrency,
+  currency,
 }) => {
   const scoresWithAccuracy = scores
     .filter((score) => score.roundScore)
@@ -106,14 +107,6 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   };
 
   const { user } = useAuth();
-  const navigate = useNavigate();
-  const room = useGameStore((state) => state.room);
-
-  let adIdentifier = `tur-sonu-reklam-${room?.id}`;
-  if (!room?.isSystemRoom) {
-    adIdentifier = `tur-sonu-reklam-ozel-odalar`;
-  }
-
   const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
 
   return (
@@ -140,36 +133,27 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       </div>
                     )}
                   </h2>
-                  <AdPlaceholder
-                    width={728}
-                    height={90}
-                    identifier={adIdentifier}
-                    onClick={() => {
-                      navigate("/iletisim", {
-                        state: {
-                          preSelectedType: "advertisement",
-                          message: "Tur sonu reklam vermek istiyorum.\n",
-                        },
-                      });
-                    }}
-                  >
-                    <p className="text-center p-4">
-                      Bu alana reklam verebilirsiniz
-                    </p>
-                    <button className="bg-[var(--accent-color)] text-white rounded-lg px-4 py-2">
-                      Reklam ver
-                    </button>
-                  </AdPlaceholder>
                   <div className="flex flex-col gap-2">
                     <p className="text-[var(--text-secondary)] text-lg">
                       {listing.title}
                     </p>
                     <p className="text-2xl font-semibold text-[var(--success-text)]">
-                      Gerçek Fiyat:{" "}
-                      {formatPriceWithCurrency(
+
+                    {hideCurrency ? (
+                      <>
+                        Cevap: {formatPrice(correctPrice)}
+                      </>
+                    ) : (
+                      <>
+                       Gerçek Fiyat:{" "}
+                      {formatPrice(
                         correctPrice,
-                        listing.details.type
-                      )}
+                      ) + " " + (currency || listing.details.type === "sports-player-listing" ? "€" : "₺")}
+                      </>
+                    )}
+
+
+                     
                     </p>
                   </div>
                 </div>
@@ -216,9 +200,12 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
 
                       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
                         <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
-                          {formatPriceWithCurrency(
-                            score.guess,
-                            listing.details.type
+                          {hideCurrency ? (
+                            formatPrice(score.guess)
+                          ) : (
+                            formatPrice(
+                              score.guess,
+                            ) + " " + (currency || listing.details.type === "sports-player-listing" ? "€" : "₺")
                           )}
                         </span>
                         <div className="shrink-0">
@@ -279,9 +266,13 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
 
                       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
                         <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
-                          {formatPriceWithCurrency(
-                            sortedScores[userRank].guess,
-                            listing.details.type
+                          {hideCurrency ? (
+                            formatPrice(sortedScores[userRank].guess)
+                          ) : (
+                            formatPrice(
+                              sortedScores[userRank].guess,
+                            ) + " " + (currency || listing.details.type === "sports-player-listing" ? "€" : "₺")
+                            
                           )}
                         </span>
                         <div className="shrink-0">

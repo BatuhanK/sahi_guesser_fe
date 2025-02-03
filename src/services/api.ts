@@ -143,6 +143,8 @@ export type Room = {
   roomSettings: {
     maxGuessesPerRound: number;
     questionType: "price" | "text";
+    hideCurrency?: boolean;
+    isVideoQuestionRoom?: boolean;
   };
 };
 

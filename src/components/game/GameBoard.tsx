@@ -28,6 +28,7 @@ import {
   PropertyDetails,
   SportsPlayerDetails,
 } from "./components/ListingDetails";
+import { TextInput } from "./components/TextInput";
 import { GameOver } from "./GameOver";
 
 // Constants
@@ -130,16 +131,24 @@ export const GameBoard: React.FC = () => {
   }, [showResults, correctPrice, roundEndScores, currentListing, user?.id]);
 
   const handleGuess = useCallback(
-    (guess: number) => {
+    (guess: number | string) => {
       if (!currentListing || !isAuthenticated || !roomId) return;
-      socketService.submitGuess(roomId, guess);
-      analyticsService.trackGuess(
-        currentListing.id.toString(),
-        false,
-        guessCount + 1
-      );
+      
+      if (room?.roomSettings?.questionType === "text") {
+        socketService.submitTextGuess(roomId, guess as string);
+      } else {
+        socketService.submitGuess(roomId, guess as number);
+      }
+
+      if (currentListing) {
+        analyticsService.trackGuess(
+          currentListing.id.toString(),
+          false,
+          guessCount + 1
+        );
+      }
     },
-    [currentListing, isAuthenticated, roomId, guessCount]
+    [currentListing, isAuthenticated, roomId, guessCount, room?.roomSettings?.questionType]
   );
 
   const imageHandlers = useMemo(
@@ -237,6 +246,13 @@ export const GameBoard: React.FC = () => {
               maxRounds={maxRounds}
               roundNumber={roundNumber}
               shouldShowRoundInfo={shouldShowRoundInfo}
+              hideCurrency={
+                currentListing?.details.hideCurrency ||
+                room?.roomSettings?.hideCurrency
+              }
+              currency={
+                currentListing?.details.currency
+              }
             />
           ) : (
             <>
@@ -253,14 +269,16 @@ export const GameBoard: React.FC = () => {
                       alt="Listing image"
                       className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
                     />
-                    <ImageNavigation
-                      currentIndex={currentImageIndex}
-                      totalImages={
-                        currentListing?.details.imageUrls.length ?? 0
-                      }
+                    {currentListing?.details.imageUrls?.length && currentListing?.details.imageUrls?.length > 1 && (
+                      <ImageNavigation
+                        currentIndex={currentImageIndex}
+                        totalImages={
+                          currentListing?.details.imageUrls.length ?? 0
+                        }
                       onPrev={imageHandlers.handlePrevImage}
                       onNext={imageHandlers.handleNextImage}
-                    />
+                      />
+                    )}
                   </div>
                 </div>
                 {/* Details Section - Moved outside of image container */}
@@ -306,24 +324,42 @@ export const GameBoard: React.FC = () => {
                   </div>
                 ) : null}
 
-                {/* Price Guess Section */}
+                {/* Price/Text Guess Section */}
                 <div className="p-4 lg:p-6 border-t-2 border-[var(--border-color)]">
                   <div className="flex flex-col items-center">
-                    {currentListing ? (
-                      <PriceInput
-                        onGuess={handleGuess}
-                        disabled={
-                          !isAuthenticated ||
-                          hasCorrectGuess ||
-                          showResults ||
-                          maxGuessExceeded
-                        }
-                        listingType={
-                          currentListing?.details.type || "generative"
-                        }
-                        listingId={currentListing?.id || 0}
-                      />
-                    ) : null}
+                    {currentListing && (
+                      room?.roomSettings?.questionType === "text" ? (
+                        <TextInput
+                          onGuess={handleGuess}
+                          disabled={
+                            !isAuthenticated ||
+                            hasCorrectGuess ||
+                            showResults ||
+                            maxGuessExceeded
+                          }
+                        />
+                      ) : (
+                        <PriceInput
+                          onGuess={handleGuess}
+                          disabled={
+                            !isAuthenticated ||
+                            hasCorrectGuess ||
+                            showResults ||
+                            maxGuessExceeded
+                          }
+                          listingType={
+                            currentListing?.details.type || "generative"
+                          }
+                          hideCurrency={
+                            currentListing?.details.hideCurrency ?? 
+                            room?.roomSettings?.hideCurrency}
+                          currency={
+                            currentListing?.details.currency
+                          }
+                          listingId={currentListing?.id || 0}
+                        />
+                      )
+                    )}
 
                     <div className="w-full max-w-md space-y-2 lg:space-y-4 mt-4">
                       {room?.roomSettings.maxGuessesPerRound && (
@@ -341,13 +377,7 @@ export const GameBoard: React.FC = () => {
                           />
                         ) : (
                           <FeedbackMessage
-                            feedback={
-                              feedback as
-                                | "correct"
-                                | "go_higher"
-                                | "go_lower"
-                                | null
-                            }
+                            feedback={feedback}
                             showResults={showResults}
                           />
                         )}

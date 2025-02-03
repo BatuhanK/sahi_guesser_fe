@@ -1,5 +1,12 @@
 export type GameStatus = "WAITING" | "PLAYING" | "INTERMISSION" | "FINISHED";
 
+// Define a base interface for currency details
+interface CurrencyDetails {
+  currency?: string;
+  hideCurrency?: boolean;
+}
+
+// Extend existing types with CurrencyDetails
 export type HotelsListingDetails = {
   type: "hotels";
   title: string;
@@ -9,7 +16,7 @@ export type HotelsListingDetails = {
   nightlyPrice: number;
   imageUrls: string[];
   keyValues: Record<string, string>;
-};
+} & CurrencyDetails; // Extend with CurrencyDetails
 
 export type CarListingDetails = {
   type: "car";
@@ -20,7 +27,7 @@ export type CarListingDetails = {
   fuelType: string;
   transmission: string;
   imageUrls: string[];
-};
+} & CurrencyDetails; // Extend with CurrencyDetails
 
 export type HouseForRentListingDetails = {
   type: "house-for-rent";
@@ -31,7 +38,7 @@ export type HouseForRentListingDetails = {
   city: string;
   district: string;
   imageUrls: string[];
-};
+} & CurrencyDetails; // Extend with CurrencyDetails
 
 export type HouseForSaleListingDetails = {
   type: "house-for-sale";
@@ -42,7 +49,7 @@ export type HouseForSaleListingDetails = {
   city: string;
   district: string;
   imageUrls: string[];
-};
+} & CurrencyDetails; // Extend with CurrencyDetails
 
 export type LetgoListingDetails = {
   type: "letgo";
@@ -52,7 +59,7 @@ export type LetgoListingDetails = {
   city: string;
   brand: string;
   keyValues: Record<string, string>;
-};
+} & CurrencyDetails; // Extend with CurrencyDetails
 
 export type SportsPlayerListingDetails = {
   type: "sports-player-listing";
@@ -60,7 +67,7 @@ export type SportsPlayerListingDetails = {
   team: string;
   imageUrls: string[];
   keyValues: Record<string, string>;
-};
+} & CurrencyDetails; // Extend with CurrencyDetails
 
 export interface Listing {
   id: number;
@@ -71,7 +78,7 @@ export interface Listing {
     | HouseForSaleListingDetails
     | LetgoListingDetails
     | HotelsListingDetails
-    | SportsPlayerListingDetails;
+    | SportsPlayerListingDetails
 }
 
 export interface Player {
@@ -112,6 +119,7 @@ export interface RoundEndScore {
   userScore: number;
 }
 
+
 export interface ServerToClientEvents {
   gameState: (data: {
     status: GameStatus;
@@ -135,7 +143,7 @@ export interface ServerToClientEvents {
   }) => void;
   guessResult: (data: {
     roomId: number;
-    direction: "correct" | "go_higher" | "go_lower";
+    direction: "correct" | "go_higher" | "go_lower" | "not_correct";
     guessCount: number;
     userMaxGuessesPerRound: number;
     remainingGuesses: number;
@@ -198,6 +206,6 @@ export interface ServerToClientEvents {
 export interface ClientToServerEvents {
   joinRoom: (data: { roomId: number }) => void;
   leaveRoom: (data: { roomId: number }) => void;
-  submitGuess: (data: { roomId: number; price: number }) => void;
+  submitGuess: (data: { roomId: number; price?: number; textAnswer?: string }) => void;
   chatMessage: (data: { roomId: number; message: string; }) => void;
 }

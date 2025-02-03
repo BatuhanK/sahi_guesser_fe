@@ -1,8 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
-    formatPrice,
-    formatPriceWithCurrency,
-    parsePrice,
+  formatPrice,
+  parsePrice
 } from "../utils/priceFormatter";
 
 interface PriceInputProps {
@@ -10,6 +9,8 @@ interface PriceInputProps {
   disabled?: boolean;
   listingType: string;
   listingId: number;
+  hideCurrency?: boolean;
+  currency?: string;
 }
 
 export const PriceInput: React.FC<PriceInputProps> = ({
@@ -17,6 +18,8 @@ export const PriceInput: React.FC<PriceInputProps> = ({
   disabled,
   listingType,
   listingId,
+  hideCurrency,
+  currency,
 }) => {
   const [price, setPrice] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -96,7 +99,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         <div className="relative mb-4">
           <div className="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
             <span className="text-[var(--text-secondary)] text-base lg:text-lg font-medium">
-              {listingType === "sports-player-listing" ? "€" : "₺"}
+              {hideCurrency ? "" : (currency ?? (listingType === "sports-player-listing" ? "€" : "₺"))}
             </span>
           </div>
           <input
@@ -144,8 +147,9 @@ export const PriceInput: React.FC<PriceInputProps> = ({
         </div>
       </form>
 
-      <div className="grid grid-cols-1 gap-4">
-        <div className="grid grid-cols-3 gap-2">
+      {!hideCurrency && (
+        <div className="grid grid-cols-1 gap-4">
+          <div className="grid grid-cols-3 gap-2">
           {getAdjustmentAmounts().map((amount) => (
             <button
               key={`pos-${amount}`}
@@ -172,7 +176,7 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               >
                 <path d="M12 5v14M5 12h14" />
               </svg>
-              {formatPriceWithCurrency(amount, listingType)}
+              {formatPrice(amount)} {currency ?? (listingType === "sports-player-listing" ? "€" : "₺")}
             </button>
           ))}
         </div>
@@ -203,11 +207,12 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               >
                 <path d="M5 12h14" />
               </svg>
-              {formatPriceWithCurrency(amount, listingType)}
+              {formatPrice(amount)} {currency ?? (listingType === "sports-player-listing" ? "€" : "₺")}
             </button>
           ))}
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

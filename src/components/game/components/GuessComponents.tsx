@@ -1,6 +1,5 @@
 import { motion } from "framer-motion";
 import React from "react";
-import { GuessStatus } from "../../GuessStatus";
 
 export const GuessProgressBar: React.FC<{
   current: number;
@@ -46,7 +45,41 @@ export const GuessMessage: React.FC<{
   return null;
 };
 
-type FeedbackType = "correct" | "go_higher" | "go_lower";
+type FeedbackType = "correct" | "go_higher" | "go_lower" | "not_correct";
+
+interface GuessStatusProps {
+  feedback: FeedbackType;
+  type: "success" | "error";
+}
+
+export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
+  const getFeedbackText = (feedback: FeedbackType) => {
+    switch (feedback) {
+      case "correct":
+        return "Doğru!";
+      case "go_higher":
+        return "Daha yüksek!";
+      case "go_lower":
+        return "Daha düşük!";
+      case "not_correct":
+        return "Doğru değil!";
+      default:
+        return "";
+    }
+  };
+
+  return (
+    <div
+      className={`px-4 py-2 rounded-lg text-sm font-medium ${
+        type === "success"
+          ? "bg-[var(--success-bg)] text-[var(--success-text)]"
+          : "bg-[var(--error-bg)] text-[var(--error-text)]"
+      }`}
+    >
+      {getFeedbackText(feedback)}
+    </div>
+  );
+};
 
 export const FeedbackMessage: React.FC<{
   feedback: FeedbackType | null;

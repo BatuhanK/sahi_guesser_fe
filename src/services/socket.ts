@@ -199,7 +199,7 @@ class SocketService {
 
     // Debounce the guess result handler
     const debouncedGuessResult = debounce(
-      (direction: "correct" | "go_higher" | "go_lower") => {
+      (direction: "correct" | "go_higher" | "go_lower" | "not_correct") => {
         useGameStore.getState().setFeedback(direction);
         if (direction === "correct") {
           useGameStore.getState().setHasCorrectGuess(true);
@@ -491,6 +491,9 @@ class SocketService {
         username: user.username,
         message,
         timestamp: new Date(),
+        isPremium: false,
+        premiumLevel: 0,
+        role: user.role || "user"
       };
 
       // Track the optimistic message ID
@@ -520,7 +523,13 @@ class SocketService {
   }
 
   submitGuess(roomId: number, price: number): void {
-    this.socket?.emit("submitGuess", { roomId, price });
+    if (!this.socket) return;
+    this.socket.emit("submitGuess", { roomId, price });
+  }
+
+  submitTextGuess(roomId: number, answer: string): void {
+    if (!this.socket) return;
+    this.socket.emit("submitGuess", { roomId, textAnswer: answer });
   }
 
   disconnect(): void {
