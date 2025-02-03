@@ -8,6 +8,7 @@ import {
   LucideIcon,
   PersonStanding,
   ShoppingBasket,
+  UsersRound,
 } from "lucide-react";
 
 export const iconMap: Record<string, LucideIcon> = {
@@ -19,4 +20,5 @@ export const iconMap: Record<string, LucideIcon> = {
   "house-plus": HousePlus,
   flower: Flower,
   football: PersonStanding,
+  usersRound: UsersRound,
 };
