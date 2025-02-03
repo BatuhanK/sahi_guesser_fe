@@ -1,4 +1,3 @@
-
 import { Home } from "lucide-react";
 import React, { useState } from "react";
 import { toast } from "react-hot-toast";
@@ -43,8 +42,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       </h2>
       <div className="flex flex-wrap justify-center gap-3 md:gap-6 px-4">
         {categories.map((category) => {
-          const IconComponent =
-            iconMap[category.icon?.toLowerCase() || "home"] || Home;
+          const IconComponent = iconMap[category.icon || "home"] || Home;
           return (
             <button
               key={category.id}
@@ -88,7 +86,6 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           {notSystemOnlinePlayerCount === 0 && ""}
         </span>
       </div>
-
 
       <CreatePrivateRoomModal
         isOpen={isCreatePrivateRoomModalOpen}

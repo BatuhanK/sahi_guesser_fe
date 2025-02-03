@@ -192,8 +192,7 @@ export function LeaderboardTable({
                 <span>Genel</span>
               </button>
               {categories.map((category) => {
-                const IconComponent =
-                  iconMap[category.icon?.toLowerCase() || "home"] || Home;
+                const IconComponent = iconMap[category.icon || "home"] || Home;
                 return (
                   <button
                     key={category.id}
@@ -232,8 +231,7 @@ export function LeaderboardTable({
           <span>Genel</span>
         </button>
         {categories.map((category) => {
-          const IconComponent =
-            iconMap[category.icon?.toLowerCase() || "home"] || Home;
+          const IconComponent = iconMap[category.icon || "home"] || Home;
           return (
             <button
               key={category.id}
