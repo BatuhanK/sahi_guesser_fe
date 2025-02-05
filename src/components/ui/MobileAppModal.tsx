@@ -10,21 +10,26 @@ interface MobileAppModalProps {
 const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent);
 const isAndroid = /Android/.test(navigator.userAgent);
 
-const DAILY_SHOW_LIMIT = 8;
+const DAILY_SHOW_LIMIT = 1;
 
 const getDailyShowCount = () => {
   const lastResetTimestamp = localStorage.getItem("mobileAppModalLastReset");
   const now = Date.now();
 
   // If no last reset timestamp or it's a new day, reset the counter
-  if (!lastResetTimestamp || now - parseInt(lastResetTimestamp) >= 24 * 60 * 60 * 1000) {
+  if (
+    !lastResetTimestamp ||
+    now - parseInt(lastResetTimestamp) >= 7 * 24 * 60 * 60 * 1000
+  ) {
     localStorage.setItem("mobileAppModalLastReset", now.toString());
     localStorage.setItem("mobileAppModalShows", DAILY_SHOW_LIMIT.toString());
     return DAILY_SHOW_LIMIT;
   }
 
   // Return current count for today
-  return parseInt(localStorage.getItem("mobileAppModalShows") || DAILY_SHOW_LIMIT.toString());
+  return parseInt(
+    localStorage.getItem("mobileAppModalShows") || DAILY_SHOW_LIMIT.toString()
+  );
 };
 
 export const MobileAppModal: React.FC<MobileAppModalProps> = ({
@@ -33,10 +38,10 @@ export const MobileAppModal: React.FC<MobileAppModalProps> = ({
 }) => {
   const [remainingShows, setRemainingShows] = useState(getDailyShowCount);
   const [canDismiss, setCanDismiss] = useState(false);
-  const [dismissTimer, setDismissTimer] = useState(5);
+  const [dismissTimer, setDismissTimer] = useState(2);
 
   useEffect(() => {
-    if (!isOpen || !isIOS && !isAndroid) return;
+    if (!isOpen || (!isIOS && !isAndroid)) return;
 
     // Check and update daily counter
     const currentCount = getDailyShowCount();
@@ -67,7 +72,8 @@ export const MobileAppModal: React.FC<MobileAppModalProps> = ({
   if (remainingShows <= 0) return null;
 
   const appStoreUrl = "https://apps.apple.com/app/id6740282799";
-  const playStoreUrl = "https://play.google.com/store/apps/details?id=com.sahikaca.tr";
+  const playStoreUrl =
+    "https://play.google.com/store/apps/details?id=com.sahikaca.tr";
 
   const handleAppStoreClick = () => {
     window.location.href = isIOS ? appStoreUrl : playStoreUrl;
@@ -99,7 +105,9 @@ export const MobileAppModal: React.FC<MobileAppModalProps> = ({
         </DialogHeader>
         <div className="grid gap-4 py-4">
           <p className="text-[var(--text-primary)]">
-            Daha iyi bir deneyim için mobil uygulamamızı indirin! {isIOS ? "iOS" : "Android"} cihazınızda en iyi performansı yakalayın.
+            Daha iyi bir deneyim için mobil uygulamamızı indirin!{" "}
+            {isIOS ? "iOS" : "Android"} cihazınızda en iyi performansı
+            yakalayın.
           </p>
           <div className="flex justify-end gap-3">
             <button
@@ -124,4 +132,4 @@ export const MobileAppModal: React.FC<MobileAppModalProps> = ({
       </DialogContent>
     </Dialog>
   );
-}; 
+};
