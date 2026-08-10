@@ -1,30 +1,36 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { authApi } from "../services/api";
 import { socketService } from "../services/socket";
 import { useAuthStore } from "../store/authStore";
 
+let fetchUserPromise: Promise<void> | null = null;
+
+function fetchCurrentUser() {
+  if (!fetchUserPromise) {
+    fetchUserPromise = authApi
+      .getCurrentUser()
+      .then(({ user, email }) => {
+        user.email = email;
+        useAuthStore.getState().setUser(user);
+      })
+      .catch((error) => {
+        console.log("auth error", error);
+      })
+      .finally(() => {
+        fetchUserPromise = null;
+      });
+  }
+  return fetchUserPromise;
+}
+
 export function useAuth() {
   const { user, token, setUser, setToken, logout } = useAuthStore();
-  const isLoadingRef = useRef(false);
 
   useEffect(() => {
-    if (token && !user && !isLoadingRef.current) {
-      isLoadingRef.current = true;
-
-      authApi
-        .getCurrentUser()
-        .then(({ user, email }) => {
-          user.email = email;
-          setUser(user);
-        })
-        .catch((error) => {
-          console.log("auth error", error);
-        })
-        .finally(() => {
-          isLoadingRef.current = false;
-        });
+    if (token && !user) {
+      fetchCurrentUser();
     }
-  }, [token, user, logout, setUser]);
+  }, [token, user]);
 
   const login = async (username: string, password: string) => {
     const { user, token, email } = await authApi.login(username, password);
