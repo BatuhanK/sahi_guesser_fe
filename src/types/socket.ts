@@ -1,4 +1,4 @@
-export type GameStatus = "WAITING" | "PLAYING" | "INTERMISSION" | "FINISHED";
+export type GameStatus = "WAITING" | "PLAYING" | "INTERMISSION" | "ENDED";
 
 // Define a base interface for currency details
 interface CurrencyDetails {
@@ -96,116 +96,141 @@ export interface Question {
   }[];
   imagePrompt: string;
 }
+
+export interface RoomSettings {
+  minPrice?: number | null;
+  maxPrice?: number | null;
+  roundDurationSeconds?: number;
+  maxGuessesPerRound?: number;
+  isDuel?: boolean;
+  currency?: string;
+  hideCurrency?: boolean;
+}
+
 export interface OnlinePlayer {
-  playerId: number;
   userId: number;
   username: string;
   roomScore: number;
-  totalScore: number;
-  isPremium: boolean;
-  premiumLevel: number;
-  role: string;
+}
+
+export interface RoundEndScoreDetail {
+  guess: number | null;
+  guessAt?: string | null;
+  elapsedTimeMs?: number | null;
+  direction?: "correct" | "go_higher" | "go_lower" | null;
+  correctPrice: number;
 }
 
 export interface RoundEndScore {
-  playerId: number;
+  player_id: number;
+  username: string;
+  score: number;
+  room_score_total: number;
+  detail: RoundEndScoreDetail;
+}
+
+export interface GameStatePayload {
+  phase: GameStatus;
+  roundNumber: number;
+  maxRounds: number | null;
+  remainingDuration: number; // milliseconds
+  onlinePlayers: OnlinePlayer[];
+  /** Büyük odalarda `onlinePlayers` kırpılır (ilk ~100); gerçek toplam burada. */
+  onlinePlayersCount?: number;
+  settings: RoomSettings;
+  content?: Listing | null;
+}
+
+export interface RoundStartPayload {
+  content: Listing | null;
+  duration: number; // milliseconds
+  roundNumber: number;
+  maxRounds: number | null;
+}
+
+export interface IntermissionStartPayload {
+  duration: number; // milliseconds
+  roundNumber: number;
+  maxRounds: number | null;
+}
+
+export interface RoundEndPayload {
+  scores: RoundEndScore[];
+  roundNumber: number;
+}
+
+export interface GuessResultPayload {
+  direction: "correct" | "go_higher" | "go_lower";
+  guessCount: number;
+  remainingGuesses: number;
+  userMaxGuessesPerRound: number;
+}
+
+export interface MaxGuessesReachedPayload {
+  userMaxGuessesPerRound: number;
+}
+
+export interface GuessBroadcastPayload {
   userId: number;
   username: string;
-  guess: number;
-  guessAt?: string | null;
-  elapsedTime?: number | null;
-  roundScore?: number | undefined;
-  roomScore: number;
-  userScore: number;
+  guessCount: number;
 }
 
-
-export interface ServerToClientEvents {
-  gameState: (data: {
-    status: GameStatus;
-    listing: Listing | null;
-    question: Question | null;
-    roundStartTime: Date;
-    roundDuration: number;
-    userMaxGuessesPerRound: number;
-  }) => void;
-  roomFull: () => void;
-  roomEnd: () => void;
-  roomEnded: () => void;
-  serverShutdown: () => void;
-  onlinePlayers: (data: { players: OnlinePlayer[] }) => void;
-  roundStart: (data: {
-    listing: Listing | null;
-    question: Question | null;
-    duration: number;
-    maxRounds: number;
-    roundNumber: number;
-  }) => void;
-  guessResult: (data: {
-    roomId: number;
-    direction: "correct" | "go_higher" | "go_lower" | "not_correct";
-    guessCount: number;
-    userMaxGuessesPerRound: number;
-    remainingGuesses: number;
-  }) => void;
-  chatMessage: (data: {
-    userId: string;
-    username: string;
-    message: string;
-    isPremium: boolean;
-    premiumLevel: number;
-    role: string;
-  }) => void;
-  intermissionStart: (data: {
-    duration: number;
-    maxRounds: number;
-    roundNumber: number;
-  }) => void;
-  roundEnd: (data: { correctPrice: number; scores: RoundEndScore[] }) => void;
-  roomCompleted: (data: { roomId: number }) => void;
-  correctGuess: (data: {
+export interface PlayerJoinedPayload {
+  user: {
     userId: number;
-    playerId: number;
     username: string;
-    guessCount: number;
-  }) => void;
-  incorrectGuess: (data: {
-    userId: number;
-    playerId: number;
-    username: string;
-    guessCount: number;
-  }) => void;
-
-  playerJoined: (data: {
-    userId: number;
-    playerId: number;
-    username: string;
-    roomScore: number;
-    isPremium: boolean;
-    premiumLevel: number;
-    role: string
-  }) => void;
-
-  playerLeft: (data: {
-    userId: number;
-    playerId: number;
-    username: string;
-  }) => void;
-
-  livekitRoomUpdate: (data: {
-    roomId: number;
-    participants: string[];
-    onlineCount: number;
-  }) => void;
-
-  userBanned: (data: { userId: number; roomId: number }) => void;
-
-  reconnectRequired: () => void;
+  };
 }
 
-export interface ClientToServerEvents {
-  joinRoom: (data: { roomId: number }) => void;
-  leaveRoom: (data: { roomId: number }) => void;
-  submitGuess: (data: { roomId: number; price?: number; textAnswer?: string }) => void;
-  chatMessage: (data: { roomId: number; message: string; }) => void;
+export interface PlayerLeftPayload {
+  userId: number;
+}
+
+/** Büyük odalarda join/leave'ler tek tek yerine bu event'te toplanır. */
+export interface PresenceBatchPayload {
+  joined: Array<{ userId: number; username: string }>;
+  left: number[];
+  onlinePlayers: number;
+}
+
+/** Büyük odalarda correctGuess/incorrectGuess yayınları bu event'te toplanır. */
+export interface GuessFeedItem extends GuessBroadcastPayload {
+  type: "correctGuess" | "incorrectGuess";
+}
+
+export interface GuessFeedPayload {
+  guesses: GuessFeedItem[];
+}
+
+export interface ChatMessagePayload {
+  userId: number;
+  username: string;
+  message: string;
+  sentAt: string;
+}
+
+export interface RoomFullPayload {
+  roomId: number;
+}
+
+export interface RoomCompletedPayload {
+  roundNumber: number;
+  maxRounds: number;
+}
+
+export interface ReconnectRequiredPayload {
+  roundNumber: number;
+  remainingDuration: number; // milliseconds
+}
+
+export interface ErrorPayload {
+  message: string;
+}
+
+// Inbound messages are wrapped in a `{type, payload}` envelope and
+// dispatched on `type`.
+export interface ServerMessage {
+  type: string;
+  payload: unknown;
 }

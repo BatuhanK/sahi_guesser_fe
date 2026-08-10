@@ -32,9 +32,6 @@ export interface ChatMessage {
   userId: string;
   username: string;
   message: string;
-  isPremium: boolean;
-  premiumLevel: number;
-  role: string;
   timestamp: Date;
   mentions?: ChatMention[];
   isRejected?: boolean;
@@ -42,7 +39,6 @@ export interface ChatMessage {
 
 export interface GuessResult {
   userId: number;
-  playerId: number;
   username: string;
   isCorrect: boolean;
 }

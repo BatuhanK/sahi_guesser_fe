@@ -13,7 +13,6 @@ import { RoomFullModal } from "./components/ui/RoomFullModal";
 import { useAuth } from "./hooks/useAuth";
 import { ApplicationLanding } from "./pages/ApplicationLanding";
 import { Contact } from "./pages/Contact";
-import { EmailVerification } from "./pages/EmailVerification";
 import { LogosPage } from "./pages/LogosPage";
 import { PublicRooms } from "./pages/PublicRooms";
 import { Terms } from "./pages/Terms";
@@ -63,7 +62,6 @@ function FingerprintWrapper({ children }: { children: React.ReactNode }) {
 
 // Email verification wrapper component
 function EmailVerificationWrapper({ children }: { children: React.ReactNode }) {
-  const location = useLocation();
   const { user } = useAuth();
   const [showEmailModal, setShowEmailModal] = useState(false);
   const [emailModalType, setEmailModalType] = useState<"verify" | "set">(
@@ -71,11 +69,6 @@ function EmailVerificationWrapper({ children }: { children: React.ReactNode }) {
   );
 
   useEffect(() => {
-    // Don't show verification modal if user is on the verification page
-    if (location.pathname === "/email-dogrula") {
-      return;
-    }
-
     if (user) {
       const modalShownCount = parseInt(
         localStorage.getItem(`emailModal_${user.id}`) || "0"
@@ -101,7 +94,7 @@ function EmailVerificationWrapper({ children }: { children: React.ReactNode }) {
         );
       }
     }
-  }, [user, location.pathname]);
+  }, [user]);
 
   return (
     <>
@@ -340,10 +333,6 @@ function App() {
                       <Route path="/logolar" element={<LogosPage />} />
                       <Route path="/indir" element={<ApplicationLanding />} />
                       <Route path="/kullanici-odalari" element={<PublicRooms />} />
-                      <Route
-                        path="/email-dogrula"
-                        element={<EmailVerification />}
-                      />
                       <Route path="/sozlesmeler" element={<Terms />} />
                     </Routes>
                   </main>

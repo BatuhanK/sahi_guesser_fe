@@ -171,7 +171,7 @@ export const Header: React.FC<HeaderProps> = ({
 
   const handleLeaveRoom = (redirectTo: string = "/") => {
     if (roomId) {
-      socketService.leaveRoom(roomId);
+      socketService.leaveRoom();
     }
     setRoom(null);
     setRoomId(null);
@@ -268,20 +268,16 @@ export const Header: React.FC<HeaderProps> = ({
                               <LogOut size={20} />
                               <span>Çıkış Yap</span>
                             </button>
-                            {!user?.isAnonymous && (
-                              <>
-                                <button
-                                  onClick={() => {
-                                    setShowProfileEditModal(true);
-                                    setShowUserMenu(false);
-                                  }}
-                                  className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
-                                >
-                                  <Settings size={20} />
-                                  <span>Profil Düzenle</span>
-                                </button>
-                              </>
-                            )}
+                            <button
+                              onClick={() => {
+                                setShowProfileEditModal(true);
+                                setShowUserMenu(false);
+                              }}
+                              className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                            >
+                              <Settings size={20} />
+                              <span>Profil Düzenle</span>
+                            </button>
                             <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
                               <Volume2
                                 size={20}
@@ -444,32 +440,16 @@ export const Header: React.FC<HeaderProps> = ({
                         <LogOut size={20} />
                         <span>Çıkış Yap</span>
                       </button>
-                      {!user.isAnonymous && (
-                        <>
-                          <button
-                            onClick={() => {
-                              setShowProfileEditModal(true);
-                              setShowUserMenu(false);
-                            }}
-                            className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
-                          >
-                            <Settings size={20} />
-                            <span>Profil Düzenle</span>
-                          </button>
-                        </>
-                      )}
-
-                      {user.isAnonymous && (
-                        <>
-                          <button
-                            onClick={() => onOpenAuth("register")}
-                            className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
-                          >
-                            <UserPlus size={20} />
-                            <span>Kayıt ol</span>
-                          </button>
-                        </>
-                      )}
+                      <button
+                        onClick={() => {
+                          setShowProfileEditModal(true);
+                          setShowUserMenu(false);
+                        }}
+                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                      >
+                        <Settings size={20} />
+                        <span>Profil Düzenle</span>
+                      </button>
                       <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
                         <Volume2
                           size={20}

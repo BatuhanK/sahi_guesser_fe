@@ -27,11 +27,6 @@ api.interceptors.response.use(
   (
     error: AxiosError<{
       message?: string;
-      error?: {
-        response?: {
-          availableIn?: number;
-        };
-      };
     }>
   ) => {
     const notShowToastUrls = ["/auth/me"];
@@ -40,10 +35,9 @@ api.interceptors.response.use(
     }
 
     if (error.response?.status === 429) {
-      const availableIn =
-        error.response?.data?.error?.response?.availableIn || 0;
       toast.error(
-        `Aksiyon engellendi. ${availableIn} saniye sonra tekrar deneyin`
+        error.response?.data?.message ||
+          "Çok fazla istek. Lütfen daha sonra tekrar deneyin."
       );
       return Promise.reject(error);
     }
@@ -83,15 +77,22 @@ export const authApi = {
     return response.data;
   },
 
-  anonymousLogin: async (fingerprint: string) => {
-    const response = await api.get(
-      "/auth/anonymous?fingerprint=" + fingerprint
-    );
+  verifyEmail: async (code: string) => {
+    const response = await api.post("/auth/verify-email", { code });
     return response.data;
   },
 
-  verifyEmail: async (code: string) => {
-    const response = await api.post("/auth/verify-email", { code });
+  forgotPassword: async (email: string) => {
+    const response = await api.post("/auth/forgot-password", { email });
+    return response.data;
+  },
+
+  resetPassword: async (email: string, code: string, newPassword: string) => {
+    const response = await api.post("/auth/reset-password", {
+      email,
+      code,
+      newPassword,
+    });
     return response.data;
   },
 
@@ -102,7 +103,7 @@ export const authApi = {
 
   getLiveKitToken: async (roomId: string): Promise<string> => {
     const response = await api.get(`/auth/livekit-token/${roomId}`);
-    return response.data;
+    return response.data.token;
   },
 
   changePassword: async (password: string) => {
@@ -139,12 +140,15 @@ export type Room = {
   name: string;
   slug: string;
   status: string;
-  isSystemRoom: boolean;
-  roomSettings: {
-    maxGuessesPerRound: number;
-    questionType: "price" | "text";
+  isSystem: boolean;
+  settings: {
+    minPrice?: number | null;
+    maxPrice?: number | null;
+    roundDurationSeconds?: number;
+    maxGuessesPerRound?: number;
+    isDuel?: boolean;
+    currency?: string;
     hideCurrency?: boolean;
-    isVideoQuestionRoom?: boolean;
   };
 };
 
@@ -230,23 +234,12 @@ export const roomApi = {
     return response.data;
   },
 
-  getLivekitRoom: async (
-    id: number
-  ): Promise<{
-    name: string;
-    onlineCount: number;
-    participants: string[];
-  }> => {
-    const response = await api.get(`/livekit-rooms/${id}`);
-    return response.data;
-  },
-
   getRoomSummary: async (slug: string): Promise<RoomSummary> => {
     const response = await api.get<RoomSummary>(`/rooms/${slug}/summary`);
     return response.data;
   },
 
-  recreateRoom: async (slug: string): Promise<RoomSummary> => {
+  recreateRoom: async (slug: string): Promise<{ message: string }> => {
     const response = await api.post(`/rooms/${slug}/recreate`);
     return response.data;
   },

@@ -12,9 +12,11 @@ import api from "../services/api";
 import { iconMap } from "./ui/iconmap";
 
 interface LeaderboardEntry {
+  userId: number;
   username: string;
-  score: number;
-  createdAt: string;
+  score?: number;
+  totalScore?: number;
+  createdAt?: string;
 }
 
 interface Category {
@@ -278,11 +280,13 @@ export function LeaderboardTable({
                     </span>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-xs text-[var(--text-tertiary)] hidden sm:inline">
-                      {getDaysAgo(entry.createdAt)}
-                    </span>
+                    {entry.createdAt && (
+                      <span className="text-xs text-[var(--text-tertiary)] hidden sm:inline">
+                        {getDaysAgo(entry.createdAt)}
+                      </span>
+                    )}
                     <span className="font-bold text-[var(--success-text)] text-sm">
-                      {entry.score.toLocaleString("tr-TR")} puan
+                      {(entry.score ?? entry.totalScore ?? 0).toLocaleString("tr-TR")} puan
                     </span>
                   </div>
                 </div>

@@ -1,9 +1,7 @@
 import { Ban } from "lucide-react";
 import React, { useState } from "react";
 import { useAuth } from "../../../hooks/useAuth";
-import { getPremiumIndicator, getScoreBasedEffects, getUserBackgroundClass } from "../../../lib/user-indicators";
 import { cn } from "../../../lib/utils";
-import { useGameStore } from "../../../store/gameStore";
 import { ChatMention, ChatMessageProps } from "../types";
 import { maskNumbers } from "../utils";
 
@@ -71,9 +69,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 }) => {
   const { user } = useAuth();
   const isStaff = user?.role === "admin" || user?.role === "moderator";
-  const onlinePlayers = useGameStore((state) => state.onlinePlayers);
-  const isAdmin = message.role === "admin";
-  const isModerator = message.role === "moderator";
   const isSystem = message.username === "system";
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
   const [banDuration, setBanDuration] = useState<number | 'perma'>(5);
@@ -93,13 +88,6 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
       setSelectedUser(null);
     }
   };
-
-  const playerData = onlinePlayers.find((player) => player.username === message.username);
-  const playerScore = playerData?.totalScore || 0;
-  const isPremium = playerData?.isPremium || false;
-  const premiumLevel = playerData?.premiumLevel || 0;
-
-  const scoreEffects = getScoreBasedEffects(playerScore);
 
   if (isSystem) {
     return (
@@ -124,7 +112,7 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
 
   return (
     <>
-      <div className={getUserBackgroundClass(isAdmin, isModerator, isPremium, premiumLevel)}>
+      <div className="px-2 py-1 rounded-md">
         <div className="flex items-center gap-2">
           {isStaff && message.username !== user?.username && !isSystem && (
             <button
@@ -137,25 +125,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({
           <span
             className={cn(
               "font-medium text-sm cursor-pointer break-all",
-              isAdmin
-                ? "text-[var(--error-text)] font-bold text-base"
-                : scoreEffects.className,
-              isPremium && "drop-shadow-[0_0_3px_rgba(255,215,0,0.5)]",
+              "text-[var(--text-primary)]",
               "hover:opacity-80 transition-opacity"
             )}
             onClick={() => onMentionClick?.(message.username)}
             role="button"
             tabIndex={0}
-            title={`${message.username} (${playerScore.toLocaleString()} puan)${isPremium ? ` - Premium Seviye ${premiumLevel}` : ""}`}
           >
-            {isAdmin
-              ? `👑👑 ${message.username}`
-              : `${scoreEffects.prefix} ${getPremiumIndicator(isPremium, premiumLevel, true)}${message.username} ${scoreEffects.suffix}`}
+            {message.username}
           </span>
           <span
             className={cn(
               "text-[var(--text-primary)] break-words flex-1",
-              isAdmin ? "text-base font-medium" : "text-sm",
+              "text-sm",
               message.isRejected && "line-through opacity-50"
             )}
           >

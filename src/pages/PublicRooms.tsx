@@ -1,4 +1,4 @@
-import { Clock, DollarSign, Plus, Trophy, Users } from "lucide-react";
+import { Clock, DollarSign, Plus, Users } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { CreatePrivateRoomModal } from "../components/CreatePrivateRoomModal";
@@ -7,19 +7,13 @@ import { iconMap } from "../components/ui/iconmap";
 import { Category, categoryApi, roomApi } from "../services/api";
 import { socketService } from "../services/socket";
 
-interface RoomOwner {
-  id: number;
-  username: string;
-  score: number;
-}
-
 interface PublicRoom {
   id: number;
   name: string;
   slug: string;
   status: string;
-  isSystemRoom: boolean;
-  maxRounds: number;
+  isSystem: boolean;
+  maxRounds: number | null;
   categoryIds: number[];
   state: {
     roundNumber: number;
@@ -29,18 +23,17 @@ interface PublicRoom {
   };
   createdAt: string;
   updatedAt: string;
-  roomSettings: {
-    maxPrice: number;
-    minPrice: number;
-    maxGuessesPerRound: number;
-    roundDurationSeconds: number;
+  settings: {
+    maxPrice?: number | null;
+    minPrice?: number | null;
+    maxGuessesPerRound?: number;
+    roundDurationSeconds?: number;
   };
   isPublic: boolean;
   maxPlayers: number;
-  ownerId: number;
+  ownerId: number | null;
   publicName: string;
   publicDescription: string;
-  owner: RoomOwner;
 }
 
 interface PublicRoomsResponse {
@@ -180,23 +173,9 @@ export const PublicRooms = () => {
                 )}
               </div>
 
-              {/* Owner Info Section */}
+              {/* Room Info Section */}
               <div className="px-6 py-4 bg-[var(--bg-tertiary)] border-b border-[var(--border-color)]">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-[var(--accent-color)] flex items-center justify-center text-[var(--bg-secondary)] font-semibold">
-                      {room.owner.username.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                      <div className="text-[var(--text-primary)] font-medium">
-                        {room.owner.username}
-                      </div>
-                      <div className="flex items-center gap-1 text-[var(--text-secondary)] text-sm">
-                        <Trophy className="w-3.5 h-3.5" />
-                        <span>{room.owner.score.toLocaleString('tr-TR')}</span>
-                      </div>
-                    </div>
-                  </div>
+                <div className="flex items-center justify-end">
                   <div className="flex items-center gap-1 text-[var(--text-secondary)] bg-[var(--bg-secondary)] px-3 py-1 rounded-full text-sm">
                     <Users className="w-4 h-4" />
                     <span>{data.onlineCounts[room.slug] || 0} / {room.maxPlayers}</span>
@@ -209,14 +188,14 @@ export const PublicRooms = () => {
                 <div className="space-y-3">
                   <div className="flex items-center text-[var(--text-secondary)]">
                     <Clock className="w-5 h-5 mr-3 text-[var(--accent-color)]" />
-                    <span>{room.roomSettings.roundDurationSeconds} saniye/tur</span>
+                    <span>{room.settings.roundDurationSeconds} saniye/tur</span>
                   </div>
                   
-                  {room.roomSettings.minPrice && room.roomSettings.maxPrice && (
+                  {room.settings.minPrice && room.settings.maxPrice && (
                     <div className="flex items-center text-[var(--text-secondary)]">
                       <DollarSign className="w-5 h-5 mr-3 text-[var(--accent-color)]" />
                       <span>
-                        {room.roomSettings.minPrice.toLocaleString('tr-TR')} ₺ - {room.roomSettings.maxPrice.toLocaleString('tr-TR')} ₺
+                        {room.settings.minPrice.toLocaleString('tr-TR')} ₺ - {room.settings.maxPrice.toLocaleString('tr-TR')} ₺
                       </span>
                     </div>
                   )}

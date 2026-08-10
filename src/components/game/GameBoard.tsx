@@ -28,7 +28,6 @@ import {
   PropertyDetails,
   SportsPlayerDetails,
 } from "./components/ListingDetails";
-import { TextInput } from "./components/TextInput";
 import { GameOver } from "./GameOver";
 
 // Constants
@@ -38,7 +37,7 @@ const CONFETTI_DURATION = 5000;
 export const GameBoard: React.FC = () => {
   const [showConfetti, setShowConfetti] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const slideshowTimerRef = useRef<NodeJS.Timeout>();
+  const slideshowTimerRef = useRef<ReturnType<typeof setInterval>>();
 
   const {
     currentListing,
@@ -73,7 +72,7 @@ export const GameBoard: React.FC = () => {
       setCurrentImageIndex((prevIndex) =>
         prevIndex === (currentListing.details.imageUrls?.length ?? 1) - 1
           ? 0
-          : prevIndex + 1
+          : prevIndex + 1,
       );
     }, SLIDESHOW_INTERVAL);
   }, [currentListing]);
@@ -90,7 +89,7 @@ export const GameBoard: React.FC = () => {
   useEffect(() => {
     if (!currentListing?.details.imageUrls?.length) return;
     setCurrentImageIndex(
-      Math.floor(Math.random() * currentListing.details.imageUrls?.length)
+      Math.floor(Math.random() * currentListing.details.imageUrls?.length),
     );
   }, [currentListing?.id, currentListing?.details.imageUrls?.length]);
 
@@ -107,7 +106,7 @@ export const GameBoard: React.FC = () => {
         analyticsService.trackGuess(
           currentListing.id.toString(),
           true,
-          guessCount
+          guessCount,
         );
       }
       const timer = setTimeout(() => setShowConfetti(false), CONFETTI_DURATION);
@@ -118,37 +117,33 @@ export const GameBoard: React.FC = () => {
   useEffect(() => {
     if (showResults && correctPrice && roundEndScores.length > 0) {
       const userScore =
-        roundEndScores.find((score) => score.playerId === user?.id)
-          ?.userScore || 0;
+        roundEndScores.find((score) => score.player_id === user?.id)?.score ||
+        0;
       if (currentListing) {
         analyticsService.trackRoundEnd(
           currentListing.id.toString(),
           correctPrice,
-          userScore
+          userScore,
         );
       }
     }
   }, [showResults, correctPrice, roundEndScores, currentListing, user?.id]);
 
   const handleGuess = useCallback(
-    (guess: number | string) => {
+    (guess: number) => {
       if (!currentListing || !isAuthenticated || !roomId) return;
-      
-      if (room?.roomSettings?.questionType === "text") {
-        socketService.submitTextGuess(roomId, guess as string);
-      } else {
-        socketService.submitGuess(roomId, guess as number);
-      }
+
+      socketService.submitGuess(guess);
 
       if (currentListing) {
         analyticsService.trackGuess(
           currentListing.id.toString(),
           false,
-          guessCount + 1
+          guessCount + 1,
         );
       }
     },
-    [currentListing, isAuthenticated, roomId, guessCount, room?.roomSettings?.questionType]
+    [currentListing, isAuthenticated, roomId, guessCount],
   );
 
   const imageHandlers = useMemo(
@@ -157,7 +152,7 @@ export const GameBoard: React.FC = () => {
         setCurrentImageIndex((prevIndex) =>
           prevIndex === 0
             ? (currentListing?.details.imageUrls?.length ?? 1) - 1
-            : prevIndex - 1
+            : prevIndex - 1,
         );
         if (currentListing) {
           analyticsService.trackImageNavigation(currentListing.id.toString());
@@ -168,7 +163,7 @@ export const GameBoard: React.FC = () => {
         setCurrentImageIndex((prevIndex) =>
           prevIndex === (currentListing?.details.imageUrls?.length ?? 1) - 1
             ? 0
-            : prevIndex + 1
+            : prevIndex + 1,
         );
         if (currentListing) {
           analyticsService.trackImageNavigation(currentListing.id.toString());
@@ -176,18 +171,16 @@ export const GameBoard: React.FC = () => {
         startSlideshow();
       },
     }),
-    [currentListing, startSlideshow]
+    [currentListing, startSlideshow],
   );
 
   const handleSendMessage = useCallback(
     (message: string): void => {
       if (!isAuthenticated || !roomId || !user?.id) return;
 
-   
-
-      socketService.sendMessage(roomId, message);
+      socketService.sendMessage(message);
     },
-    [isAuthenticated, roomId, user?.id]
+    [isAuthenticated, roomId, user?.id],
   );
 
   const renderListingDetails = useCallback(() => {
@@ -214,18 +207,18 @@ export const GameBoard: React.FC = () => {
   if (!currentListing && !currentQuestion) return null;
 
   const maxGuessExceeded =
-    guessCount >= (room?.roomSettings.maxGuessesPerRound ?? 20);
-
+    guessCount >= (room?.settings.maxGuessesPerRound ?? 20);
+  console.log(room?.settings);
   if (roomSummary) {
     return <GameOver />;
   }
 
   const shouldShowRoundInfo = Boolean(
     Number.isSafeInteger(maxRounds) &&
-      maxRounds !== 9999999 &&
-      maxRounds !== 0 &&
-      roundNumber &&
-      roundNumber !== 0
+    maxRounds !== 9999999 &&
+    maxRounds !== 0 &&
+    roundNumber &&
+    roundNumber !== 0,
   );
 
   return (
@@ -248,11 +241,9 @@ export const GameBoard: React.FC = () => {
               shouldShowRoundInfo={shouldShowRoundInfo}
               hideCurrency={
                 currentListing?.details.hideCurrency ||
-                room?.roomSettings?.hideCurrency
+                room?.settings?.hideCurrency
               }
-              currency={
-                currentListing?.details.currency
-              }
+              currency={currentListing?.details.currency}
             />
           ) : (
             <>
@@ -269,16 +260,17 @@ export const GameBoard: React.FC = () => {
                       alt="Listing image"
                       className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
                     />
-                    {currentListing?.details.imageUrls?.length && currentListing?.details.imageUrls?.length > 1 && (
-                      <ImageNavigation
-                        currentIndex={currentImageIndex}
-                        totalImages={
-                          currentListing?.details.imageUrls.length ?? 0
-                        }
-                      onPrev={imageHandlers.handlePrevImage}
-                      onNext={imageHandlers.handleNextImage}
-                      />
-                    )}
+                    {currentListing?.details.imageUrls?.length &&
+                      currentListing?.details.imageUrls?.length > 1 && (
+                        <ImageNavigation
+                          currentIndex={currentImageIndex}
+                          totalImages={
+                            currentListing?.details.imageUrls.length ?? 0
+                          }
+                          onPrev={imageHandlers.handlePrevImage}
+                          onNext={imageHandlers.handleNextImage}
+                        />
+                      )}
                   </div>
                 </div>
                 {/* Details Section - Moved outside of image container */}
@@ -328,44 +320,31 @@ export const GameBoard: React.FC = () => {
                 <div className="p-4 lg:p-6 border-t-2 border-[var(--border-color)]">
                   <div className="flex flex-col items-center">
                     {currentListing && (
-                      room?.roomSettings?.questionType === "text" ? (
-                        <TextInput
-                          onGuess={handleGuess}
-                          disabled={
-                            !isAuthenticated ||
-                            hasCorrectGuess ||
-                            showResults ||
-                            maxGuessExceeded
-                          }
-                        />
-                      ) : (
-                        <PriceInput
-                          onGuess={handleGuess}
-                          disabled={
-                            !isAuthenticated ||
-                            hasCorrectGuess ||
-                            showResults ||
-                            maxGuessExceeded
-                          }
-                          listingType={
-                            currentListing?.details.type || "generative"
-                          }
-                          hideCurrency={
-                            currentListing?.details.hideCurrency ?? 
-                            room?.roomSettings?.hideCurrency}
-                          currency={
-                            currentListing?.details.currency
-                          }
-                          listingId={currentListing?.id || 0}
-                        />
-                      )
+                      <PriceInput
+                        onGuess={handleGuess}
+                        disabled={
+                          !isAuthenticated ||
+                          hasCorrectGuess ||
+                          showResults ||
+                          maxGuessExceeded
+                        }
+                        listingType={
+                          currentListing?.details.type || "generative"
+                        }
+                        hideCurrency={
+                          currentListing?.details.hideCurrency ??
+                          room?.settings?.hideCurrency
+                        }
+                        currency={currentListing?.details.currency}
+                        listingId={currentListing?.id || 0}
+                      />
                     )}
 
                     <div className="w-full max-w-md space-y-2 lg:space-y-4 mt-4">
-                      {room?.roomSettings.maxGuessesPerRound && (
+                      {room?.settings.maxGuessesPerRound && (
                         <GuessProgressBar
                           current={guessCount}
-                          max={room.roomSettings.maxGuessesPerRound}
+                          max={room.settings.maxGuessesPerRound}
                         />
                       )}
 

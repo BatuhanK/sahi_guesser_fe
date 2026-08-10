@@ -29,7 +29,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   currency,
 }) => {
   const scoresWithAccuracy = scores
-    .filter((score) => score.roundScore)
+    .filter((score) => score.score)
     .map((score) => {
       return {
         ...score,
@@ -37,7 +37,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
           100 -
           Number(
             (
-              (Math.abs(score.guess - correctPrice) / correctPrice) *
+              (Math.abs((score.detail.guess ?? 0) - correctPrice) / correctPrice) *
               100
             ).toFixed(1)
           ),
@@ -76,8 +76,8 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
 
   const sortedScores = useMemo(() => {
     return [...scoresWithAccuracy]
-      .filter((score) => score.roundScore)
-      .sort((a, b) => b.roundScore! - a.roundScore!);
+      .filter((score) => score.score)
+      .sort((a, b) => b.score! - a.score!);
   }, [scoresWithAccuracy]);
 
   const getMedalColor = (index: number): string => {
@@ -107,7 +107,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   };
 
   const { user } = useAuth();
-  const userRank = sortedScores.findIndex((score) => score.userId === user?.id);
+  const userRank = sortedScores.findIndex((score) => score.player_id === user?.id);
 
   return (
     <div className="h-full lg:p-6 rounded-xl" style={{ padding: 0 }}>
@@ -164,7 +164,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      key={score.userId}
+                      key={score.player_id}
                       className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
                         index
                       )} backdrop-blur-sm backdrop-filter`}
@@ -201,10 +201,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
                         <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
                           {hideCurrency ? (
-                            formatPrice(score.guess)
+                            formatPrice(score.detail.guess ?? 0)
                           ) : (
                             formatPrice(
-                              score.guess,
+                              score.detail.guess ?? 0,
                             ) + " " + (currency || listing.details.type === "sports-player-listing" ? "€" : "₺")
                           )}
                         </span>
@@ -230,7 +230,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                           transition={{ delay: index * 0.1 + 0.3 }}
                           className="font-bold text-[var(--success-text)] text-sm sm:text-base shrink-0 min-w-[60px] text-right"
                         >
-                          +{score.roundScore}
+                          +{score.score}
                         </motion.span>
                       </div>
                     </motion.div>
@@ -250,7 +250,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 }}
-                      key={sortedScores[userRank].userId}
+                      key={sortedScores[userRank].player_id}
                       className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
                         userRank
                       )} backdrop-blur-sm backdrop-filter`}
@@ -267,10 +267,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-6 shrink-0 w-full sm:w-auto sm:ml-auto">
                         <span className="text-[var(--text-secondary)] font-medium text-sm sm:text-base whitespace-nowrap">
                           {hideCurrency ? (
-                            formatPrice(sortedScores[userRank].guess)
+                            formatPrice(sortedScores[userRank].detail.guess ?? 0)
                           ) : (
                             formatPrice(
-                              sortedScores[userRank].guess,
+                              sortedScores[userRank].detail.guess ?? 0,
                             ) + " " + (currency || listing.details.type === "sports-player-listing" ? "€" : "₺")
                             
                           )}
@@ -297,7 +297,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                           transition={{ delay: 0.6 }}
                           className="font-bold text-[var(--success-text)] text-sm sm:text-base shrink-0 min-w-[60px] text-right"
                         >
-                          +{sortedScores[userRank].roundScore}
+                          +{sortedScores[userRank].score}
                         </motion.span>
                       </div>
                     </motion.div>

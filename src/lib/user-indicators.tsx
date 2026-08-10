@@ -1,4 +1,3 @@
-import React from 'react';
 import { cn } from "./utils";
 
 export const getPremiumIndicator = (isPremium: boolean, premiumLevel: number, asEmoji = true) => {

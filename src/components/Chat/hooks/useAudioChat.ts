@@ -214,7 +214,7 @@ export const useAudioChat = (roomId: string | null, userId: string | null) => {
     source.connect(analyser);
 
     const dataArray = new Uint8Array(analyser.frequencyBinCount);
-    let speakingTimeout: NodeJS.Timeout;
+    let speakingTimeout: ReturnType<typeof setTimeout>;
 
     const checkAudioLevel = () => {
       analyser.getByteFrequencyData(dataArray);

@@ -27,6 +27,8 @@ interface GameState {
   hasCorrectGuess: boolean;
   chatMessages: ChatMessage[];
   onlinePlayers: OnlinePlayer[];
+  /** Büyük odada `onlinePlayers` kırpılmış olabilir; gerçek toplam burada. */
+  onlinePlayersCount: number;
   correctGuesses: GuessResult[];
   incorrectGuesses: GuessResult[];
   correctPrice: number | null;
@@ -50,6 +52,7 @@ interface GameState {
   setHasCorrectGuess: (hasCorrectGuess: boolean) => void;
   setChatMessages: (chatMessages: ChatMessage[]) => void;
   setOnlinePlayers: (onlinePlayers: OnlinePlayer[]) => void;
+  setOnlinePlayersCount: (count: number) => void;
   addCorrectGuess: (guess: GuessResult) => void;
   addIncorrectGuess: (guess: GuessResult) => void;
   setCorrectPrice: (correctPrice: number | null) => void;
@@ -85,6 +88,7 @@ export const useGameStore = create<GameState>()(
     lastGuesses: [],
     chatMessages: [],
     onlinePlayers: [],
+    onlinePlayersCount: 0,
     correctPrice: null,
     roundEndScores: [],
     showResults: false,
@@ -130,6 +134,7 @@ export const useGameStore = create<GameState>()(
     setHasCorrectGuess: (hasCorrectGuess) => set({ hasCorrectGuess }),
     setChatMessages: (chatMessages) => set({ chatMessages }),
     setOnlinePlayers: (onlinePlayers) => set({ onlinePlayers }),
+    setOnlinePlayersCount: (count) => set({ onlinePlayersCount: count }),
     addCorrectGuess: (guess) =>
       set((state) => ({
         correctGuesses: [...state.correctGuesses, guess],
@@ -155,11 +160,11 @@ export const useGameStore = create<GameState>()(
     setShowRoomFullModal: (show) => set({ showRoomFullModal: show }),
     setRoomMaxGuessesPerRound: (maxGuessesPerRound) => {
       const room = useGameStore.getState().room;
-      if (room?.roomSettings) {
+      if (room?.settings) {
         const updatedRoom = {
           ...room,
-          roomSettings: {
-            ...room.roomSettings,
+          settings: {
+            ...room.settings,
             maxGuessesPerRound
           }
         };

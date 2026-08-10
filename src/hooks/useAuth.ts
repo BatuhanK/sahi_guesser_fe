@@ -30,7 +30,7 @@ export function useAuth() {
     const { user, token, email } = await authApi.login(username, password);
     user.email = email;
     setUser(user);
-    setToken(token.token);
+    setToken(token);
 
     socketService.reconnect();
   };
@@ -43,7 +43,7 @@ export function useAuth() {
   ) => {
     const { user, token } = await authApi.register(username, password, email, recaptchaResponse);
     setUser(user);
-    setToken(token.token);
+    setToken(token);
 
     window.location.reload();
 

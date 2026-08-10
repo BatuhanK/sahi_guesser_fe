@@ -4,7 +4,6 @@ import React, { useEffect, useState } from "react";
 import Confetti from "react-confetti";
 
 import { useMediaQuery } from "../hooks/useMediaQuery";
-import { getPremiumIndicator } from "../lib/user-indicators";
 import { cn } from "../lib/utils";
 import { useGameStore } from "../store/gameStore";
 import { GuessResult } from "../types";
@@ -16,9 +15,6 @@ const PlayerItem: React.FC<{
   isCorrect?: boolean;
   scoreClassName?: string;
 }> = ({ player, score, isCorrect, scoreClassName }) => {
-  const isAdmin = player.role === "admin";
-  const isModerator = player.role === "moderator";
-
   return (
     <div
       className={cn(
@@ -32,22 +28,8 @@ const PlayerItem: React.FC<{
         {isCorrect && (
           <Check size={16} className="text-[var(--success-text)] shrink-0" />
         )}
-        <span className={cn(
-          "font-medium truncate",
-          isAdmin 
-            ? "text-[var(--error-text)]" 
-            : isModerator 
-            ? "text-purple-500 dark:text-purple-400"
-            : "text-[var(--text-primary)]",
-        )}>
-          {isAdmin 
-            ? `${player.username} 👑`
-            : isModerator
-            ? `${player.username} 🛡️`
-            : player.isPremium
-            ? `${player.username} ${getPremiumIndicator(player.isPremium, player.premiumLevel, true)}`
-            : player.username
-          }
+        <span className="font-medium truncate text-[var(--text-primary)]">
+          {player.username}
         </span>
       </div>
       <span className={cn(
@@ -71,6 +53,9 @@ export const PlayersList: React.FC<PlayersListProps> = ({
 }) => {
   const isDesktop = useMediaQuery("(min-width: 1024px)");
   const correctGuesses = useGameStore((state) => state.correctGuesses);
+  const onlinePlayersCount = useGameStore(
+    (state) => state.onlinePlayersCount
+  );
 
   const [confettiGuessId, setConfettiGuessId] = useState<string | null>(null);
   const [animatingGuesses, setAnimatingGuesses] = useState<Set<string>>(
@@ -84,7 +69,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
   const groupedPlayers = onlinePlayers.reduce(
     (acc, player) => {
       const hasCorrectGuess = correctGuesses.some(
-        (guess) => guess.playerId === player.playerId
+        (guess) => guess.userId === player.userId
       );
       if (hasCorrectGuess) {
         acc.correct.push(player);
@@ -102,7 +87,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
 
     const latestGuess = lastGuesses[0];
     const guessId =
-      latestGuess.playerId + (latestGuess.isCorrect ? "y" : "n") + "0";
+      latestGuess.userId + (latestGuess.isCorrect ? "y" : "n") + "0";
 
     if (!animatingGuesses.has(guessId)) {
       setAnimatingGuesses((prev) => new Set(prev).add(guessId));
@@ -143,7 +128,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             </h3>
           </div>
           <span className="text-xs lg:text-sm px-2 py-1 bg-[var(--accent-muted)] text-[var(--accent-color)] rounded-full">
-            {onlinePlayers.length}
+            {onlinePlayersCount || onlinePlayers.length}
           </span>
         </div>
         <div className="overflow-y-auto h-[calc(100%-48px)] p-3 scrollbar-hide">
@@ -151,7 +136,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             {/* Correct guesses group */}
             {groupedPlayers.correct.map((player) => (
               <motion.div
-                key={player.playerId}
+                key={player.userId}
                 {...playerItemProps}
               >
                 <PlayerItem 
@@ -166,7 +151,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
             {/* Incorrect/waiting group */}
             {groupedPlayers.incorrect.map((player) => (
               <motion.div
-                key={player.playerId}
+                key={player.userId}
                 {...playerItemProps}
               >
                 <PlayerItem 
@@ -196,8 +181,8 @@ export const PlayersList: React.FC<PlayersListProps> = ({
           <AnimatePresence mode="popLayout">
             {lastGuesses?.map((guess, index) => {
               const guessId =
-                guess.playerId + (guess.isCorrect ? "y" : "n") + index;
-              const player = onlinePlayers.find(p => p.playerId === guess.playerId);
+                guess.userId + (guess.isCorrect ? "y" : "n") + index;
+              const player = onlinePlayers.find(p => p.userId === guess.userId);
 
               if (!player) return null;
 
