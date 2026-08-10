@@ -25,4 +25,17 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ["lucide-react"],
   },
+  build: {
+    chunkSizeWarningLimit: 700,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          react: ["react", "react-dom", "react-router-dom"],
+          "framer-motion": ["framer-motion"],
+          livekit: ["livekit-client"],
+          "emoji-mart": ["@emoji-mart/data", "@emoji-mart/react"],
+        },
+      },
+    },
+  },
 });

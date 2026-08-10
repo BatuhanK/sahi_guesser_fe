@@ -1,13 +1,23 @@
-import { default as data } from "@emoji-mart/data";
-import Picker from "@emoji-mart/react";
 import { Send, Smile } from "lucide-react";
-import React, { useRef, useState } from "react";
+import React, { lazy, Suspense, useRef, useState } from "react";
 import { EmojiHelp } from ".";
 import { cn } from "../../../lib/utils";
 import { useGameStore } from "../../../store/gameStore";
 import { useMentions } from "../hooks/useMentions";
 import { ChatInputProps } from "../types";
 import { convertEmojis } from "../utils";
+
+const EmojiPicker = lazy(async () => {
+  const [{ default: Picker }, { default: data }] = await Promise.all([
+    import("@emoji-mart/react"),
+    import("@emoji-mart/data"),
+  ]);
+  return {
+    default: (props: { onEmojiSelect: (emoji: { native: string }) => void }) => (
+      <Picker data={data} onEmojiSelect={props.onEmojiSelect} />
+    ),
+  };
+});
 
 export const ChatInput: React.FC<ChatInputProps> = ({
   onSubmit,
@@ -65,7 +75,9 @@ export const ChatInput: React.FC<ChatInputProps> = ({
     <div className="relative">
       {showEmojiPicker && (
         <div className="absolute bottom-full right-0 mb-2 scroll-enabled">
-          <Picker data={data} onEmojiSelect={handleEmojiSelect} />
+          <Suspense fallback={null}>
+            <EmojiPicker onEmojiSelect={handleEmojiSelect} />
+          </Suspense>
         </div>
       )}
 

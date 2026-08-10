@@ -1,4 +1,4 @@
-import { debounce } from "lodash";
+import debounce from "lodash/debounce";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../store/authStore";
 import { useGameStore } from "../store/gameStore";

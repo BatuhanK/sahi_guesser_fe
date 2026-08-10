@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, lazy, Suspense } from "react";
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from "react-hot-toast";
 import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
@@ -11,15 +11,26 @@ import { Header } from "./components/layout/Header";
 import { MobileAppModal } from "./components/ui/MobileAppModal";
 import { RoomFullModal } from "./components/ui/RoomFullModal";
 import { useAuth } from "./hooks/useAuth";
-import { ApplicationLanding } from "./pages/ApplicationLanding";
-import { Contact } from "./pages/Contact";
-import { LogosPage } from "./pages/LogosPage";
-import { PublicRooms } from "./pages/PublicRooms";
-import { Terms } from "./pages/Terms";
 import { analyticsService } from "./services/analytics";
 import { useAuthStore } from "./store/authStore";
 import { useGameStore } from "./store/gameStore";
 import "./styles/app-icon.css";
+
+const ApplicationLanding = lazy(() =>
+  import("./pages/ApplicationLanding").then((m) => ({ default: m.ApplicationLanding }))
+);
+const Contact = lazy(() =>
+  import("./pages/Contact").then((m) => ({ default: m.Contact }))
+);
+const LogosPage = lazy(() =>
+  import("./pages/LogosPage").then((m) => ({ default: m.LogosPage }))
+);
+const PublicRooms = lazy(() =>
+  import("./pages/PublicRooms").then((m) => ({ default: m.PublicRooms }))
+);
+const Terms = lazy(() =>
+  import("./pages/Terms").then((m) => ({ default: m.Terms }))
+);
 
 // Initialize GA4
 analyticsService.initialize(
@@ -326,15 +337,17 @@ function App() {
                     className="flex-1 mx-auto w-full p-4"
                     style={{ maxWidth: "95rem" }}
                   >
-                    <Routes>
-                      <Route path="/" element={<GameContainer />} />
-                      <Route path="/oda/:slug" element={<GameContainer />} />
-                      <Route path="/iletisim" element={<Contact />} />
-                      <Route path="/logolar" element={<LogosPage />} />
-                      <Route path="/indir" element={<ApplicationLanding />} />
-                      <Route path="/kullanici-odalari" element={<PublicRooms />} />
-                      <Route path="/sozlesmeler" element={<Terms />} />
-                    </Routes>
+                    <Suspense fallback={null}>
+                      <Routes>
+                        <Route path="/" element={<GameContainer />} />
+                        <Route path="/oda/:slug" element={<GameContainer />} />
+                        <Route path="/iletisim" element={<Contact />} />
+                        <Route path="/logolar" element={<LogosPage />} />
+                        <Route path="/indir" element={<ApplicationLanding />} />
+                        <Route path="/kullanici-odalari" element={<PublicRooms />} />
+                        <Route path="/sozlesmeler" element={<Terms />} />
+                      </Routes>
+                    </Suspense>
                   </main>
                   <Footer />
                   <AuthModal

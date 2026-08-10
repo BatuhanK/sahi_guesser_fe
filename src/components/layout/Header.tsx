@@ -16,7 +16,7 @@ import {
   Volume2
 } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { LazyMarkdown } from "../ui/LazyMarkdown";
 import { useNavigate } from "react-router-dom";
 
 import { useAuth } from "../../hooks/useAuth";
@@ -362,7 +362,7 @@ export const Header: React.FC<HeaderProps> = ({
                                         {announcement.title}
                                       </h4>
                                       <div className="text-[var(--text-secondary)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
-                                        <ReactMarkdown>{announcement.content}</ReactMarkdown>
+                                        <LazyMarkdown>{announcement.content}</LazyMarkdown>
                                       </div>
                                       <div className="flex justify-between items-center mt-3">
                                         <span className="text-xs text-[var(--text-tertiary)]">
@@ -531,7 +531,7 @@ export const Header: React.FC<HeaderProps> = ({
                                   {announcement.title}
                                 </h4>
                                 <div className="text-[var(--text-secondary)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
-                                  <ReactMarkdown>{announcement.content}</ReactMarkdown>
+                                  <LazyMarkdown>{announcement.content}</LazyMarkdown>
                                 </div>
                                 <div className="flex justify-between items-center mt-3">
                                   <span className="text-xs text-[var(--text-tertiary)]">

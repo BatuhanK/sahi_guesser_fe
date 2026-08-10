@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import toast from "react-hot-toast";
-import ReactMarkdown from "react-markdown";
+import { LazyMarkdown } from "../ui/LazyMarkdown";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { X } from "lucide-react";
@@ -136,7 +136,7 @@ export const GameContainer: React.FC = () => {
                   {latestAnnouncement.title}
                 </h4>
                 <div className={`text-[var(--${latestAnnouncement.type}-text)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3`}>
-                  <ReactMarkdown>{latestAnnouncement.content}</ReactMarkdown>
+                  <LazyMarkdown>{latestAnnouncement.content}</LazyMarkdown>
                 </div>
               </div>
             </div>
@@ -185,7 +185,7 @@ export const GameContainer: React.FC = () => {
                 {latestAnnouncement.title}
               </h4>
               <div className={`text-[var(--${latestAnnouncement.type}-text)]/90 prose prose-invert max-w-none`}>
-                <ReactMarkdown>{latestAnnouncement.content}</ReactMarkdown>
+                <LazyMarkdown>{latestAnnouncement.content}</LazyMarkdown>
               </div>
             </div>
           </div>

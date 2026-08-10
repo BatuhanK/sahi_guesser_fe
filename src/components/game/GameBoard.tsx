@@ -1,4 +1,6 @@
 import React, {
+  lazy,
+  Suspense,
   useCallback,
   useEffect,
   useMemo,
@@ -10,7 +12,6 @@ import { useAuth } from "../../hooks/useAuth";
 import { analyticsService } from "../../services/analytics";
 import { socketService } from "../../services/socket";
 import { useGameStore } from "../../store/gameStore";
-import { Chat } from "../Chat";
 import { PlayersList } from "../PlayersList";
 import { Popover } from "../Popover";
 import { PriceInput } from "../PriceInput";
@@ -28,6 +29,10 @@ import {
   PropertyDetails,
   SportsPlayerDetails,
 } from "./components/ListingDetails";
+
+const Chat = lazy(() =>
+  import("../Chat").then((m) => ({ default: m.Chat }))
+);
 import { GameOver } from "./GameOver";
 
 // Constants
@@ -384,7 +389,9 @@ export const GameBoard: React.FC = () => {
 
       {/* Bottom - Chat */}
       <div>
-        <Chat messages={chatMessages} onSendMessage={handleSendMessage} />
+        <Suspense fallback={null}>
+          <Chat messages={chatMessages} onSendMessage={handleSendMessage} />
+        </Suspense>
       </div>
     </div>
   );
