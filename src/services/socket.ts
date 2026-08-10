@@ -451,7 +451,7 @@ class SocketService {
     }
     const next = [
       ...onlinePlayers,
-      { userId: user.userId, username: user.username, roomScore: 0 },
+      { userId: user.userId, username: user.username, roomScore: user.roomScore ?? 0 },
     ];
     const state = useGameStore.getState();
     state.setOnlinePlayers(next);
@@ -477,7 +477,7 @@ class SocketService {
     const kept = state.onlinePlayers.filter((p) => !leftSet.has(p.userId));
     const added = payload.joined
       .filter((u) => !existing.has(u.userId) && !leftSet.has(u.userId))
-      .map((u) => ({ userId: u.userId, username: u.username, roomScore: 0 }));
+      .map((u) => ({ userId: u.userId, username: u.username, roomScore: u.roomScore ?? 0 }));
     state.setOnlinePlayers([...kept, ...added]);
     state.setOnlinePlayersCount(payload.onlinePlayers);
   }

@@ -180,6 +180,7 @@ export interface PlayerJoinedPayload {
   user: {
     userId: number;
     username: string;
+    roomScore?: number;
   };
 }
 
@@ -189,7 +190,7 @@ export interface PlayerLeftPayload {
 
 /** Büyük odalarda join/leave'ler tek tek yerine bu event'te toplanır. */
 export interface PresenceBatchPayload {
-  joined: Array<{ userId: number; username: string }>;
+  joined: Array<{ userId: number; username: string; roomScore?: number }>;
   left: number[];
   onlinePlayers: number;
 }
