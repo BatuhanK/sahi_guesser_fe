@@ -8,7 +8,7 @@ import {
   Trophy,
 } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import api from "../services/api";
+import api, { categoryApi } from "../services/api";
 import { iconMap } from "./ui/iconmap";
 
 interface LeaderboardEntry {
@@ -65,8 +65,8 @@ export function LeaderboardTable({
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const response = await api.get("/categories");
-        setCategories(response.data.categories);
+        const response = await categoryApi.getAll();
+        setCategories(response.categories);
       } catch (error) {
         console.error("Failed to fetch categories:", error);
       }

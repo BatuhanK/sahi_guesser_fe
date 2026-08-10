@@ -196,13 +196,25 @@ export interface CreatePublicRoomRequest {
 }
 
 
+let getAllCategoriesPromise: Promise<{
+  categories: Category[];
+  notSystemOnlinePlayerCount: number;
+}> | null = null;
+
 export const categoryApi = {
   getAll: async () => {
-    const response = await api.get<{
-      categories: Category[];
-      notSystemOnlinePlayerCount: number;
-    }>("/categories");
-    return response.data;
+    if (!getAllCategoriesPromise) {
+      getAllCategoriesPromise = api
+        .get<{
+          categories: Category[];
+          notSystemOnlinePlayerCount: number;
+        }>("/categories")
+        .then((response) => response.data)
+        .finally(() => {
+          getAllCategoriesPromise = null;
+        });
+    }
+    return getAllCategoriesPromise;
   },
 
   getRooms: async (slug: string) => {
