@@ -108,14 +108,14 @@ export const PriceInput: React.FC<PriceInputProps> = ({
             value={formatPrice(price)}
             onChange={handleInputChange}
             disabled={disabled}
-            className={`w-full pl-10 pr-20 py-4 text-lg lg:text-xl bg-[var(--bg-secondary)] border-2 
+            className={`w-full pl-10 pr-20 py-4 text-lg lg:text-xl bg-[var(--bg-tertiary)] border
               ${
                 disabled
-                  ? "border-[var(--border-color)] bg-[var(--bg-tertiary)]"
-                  : "border-[var(--accent-color)]"
+                  ? "border-[var(--border-color)]"
+                  : "border-[var(--accent-color)] shadow-[0_0_24px_rgba(var(--accent-rgb),0.15)]"
               }
-              rounded-xl focus:outline-none focus:border-[var(--accent-hover)] transition-colors
-              font-medium text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)]`}
+              rounded-2xl focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)] transition-all
+              font-semibold tabular-nums text-[var(--text-primary)] placeholder:font-normal placeholder:text-[var(--text-tertiary)]`}
             placeholder="Tahmin et..."
           />
           <button
@@ -125,9 +125,9 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               ${
                 disabled || price === 0
                   ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
-                  : "bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] active:scale-95 text-white"
+                  : "bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] active:scale-95 text-white shadow-md"
               }
-              p-3 lg:p-2 rounded-lg transition-all touch-manipulation`}
+              p-3 lg:p-2.5 rounded-xl transition-all touch-manipulation`}
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -155,11 +155,11 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               key={`pos-${amount}`}
               onClick={() => adjustPrice(amount)}
               disabled={disabled}
-              className={`flex items-center justify-center gap-1 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+              className={`flex items-center justify-center gap-1 px-3 py-2.5 rounded-xl text-sm font-semibold tabular-nums transition-all
                 ${
                   disabled
                     ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
-                    : "bg-[var(--success-bg)] text-[var(--success-text)] hover:bg-[var(--success-bg)]/80 active:scale-95"
+                    : "bg-[var(--success-bg)] text-[var(--success-text)] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-95"
                 }`}
             >
               <svg
@@ -186,11 +186,11 @@ export const PriceInput: React.FC<PriceInputProps> = ({
               key={`neg-${amount}`}
               onClick={() => adjustPrice(-amount)}
               disabled={disabled}
-              className={`flex items-center justify-center gap-1 px-3 py-2.5 rounded-lg text-sm font-medium transition-all
+              className={`flex items-center justify-center gap-1 px-3 py-2.5 rounded-xl text-sm font-semibold tabular-nums transition-all
                 ${
                   disabled
                     ? "bg-[var(--bg-tertiary)] text-[var(--text-tertiary)]"
-                    : "bg-[var(--error-bg)] text-[var(--error-text)] hover:bg-[var(--error-bg)]/80 active:scale-95"
+                    : "bg-[var(--error-bg)] text-[var(--error-text)] hover:-translate-y-0.5 hover:shadow-md active:translate-y-0 active:scale-95"
                 }`}
             >
               <svg

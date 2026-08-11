@@ -146,7 +146,7 @@ export const ApplicationLanding = () => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="text-4xl md:text-6xl font-bold mb-6"
+            className="text-4xl md:text-6xl font-extrabold tracking-tight mb-6"
           >
             Mobil Uygulamamızı Keşfedin
           </motion.h1>
@@ -225,7 +225,7 @@ export const ApplicationLanding = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 0.6 + index * 0.1 }}
-                className="p-6 bg-bg-secondary rounded-xl"
+                className="surface-card p-6 transition-transform duration-300 hover:-translate-y-1"
               >
                 <h3 className="text-xl font-semibold mb-3">{feature.title}</h3>
                 <p className="text-text-secondary">{feature.description}</p>

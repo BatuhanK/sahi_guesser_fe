@@ -1,7 +1,7 @@
 import { useEffect, useState, lazy, Suspense } from "react";
 import { HelmetProvider } from 'react-helmet-async';
 import { Toaster } from "react-hot-toast";
-import { BrowserRouter, Route, Routes, useLocation } from "react-router-dom";
+import { BrowserRouter, Outlet, Route, Routes, useLocation } from "react-router-dom";
 import { v4 as uuidv4 } from 'uuid';
 import { AuthModal } from "./components/auth/AuthModals";
 import { EmailVerificationModal } from "./components/auth/EmailVerificationModal";
@@ -28,8 +28,14 @@ const LogosPage = lazy(() =>
 const PublicRooms = lazy(() =>
   import("./pages/PublicRooms").then((m) => ({ default: m.PublicRooms }))
 );
+const CarGuessLanding = lazy(() =>
+  import("./pages/CarGuessLanding").then((m) => ({ default: m.CarGuessLanding }))
+);
 const Terms = lazy(() =>
   import("./pages/Terms").then((m) => ({ default: m.Terms }))
+);
+const AdminLayout = lazy(() =>
+  import("./pages/admin/AdminLayout").then((m) => ({ default: m.AdminLayout }))
 );
 
 // Initialize GA4
@@ -184,6 +190,32 @@ const setThemeColors = (isDark: boolean) => {
   }
 };
 
+// Layout for the public/game pages: Header + main + Footer chrome.
+// /admin uses its own AdminLayout without this chrome.
+function SiteLayout({
+  onOpenAuth,
+  isDarkMode,
+  onToggleTheme,
+}: {
+  onOpenAuth: (type: "login" | "register") => void;
+  isDarkMode: boolean;
+  onToggleTheme: () => void;
+}) {
+  return (
+    <>
+      <Header
+        onOpenAuth={onOpenAuth}
+        isDarkMode={isDarkMode}
+        onToggleTheme={onToggleTheme}
+      />
+      <main className="flex-1 mx-auto w-full p-4 lg:px-8">
+        <Outlet />
+      </main>
+      <Footer />
+    </>
+  );
+}
+
 // App wrapper component to handle route-specific modals
 function AppWrapper({ children }: { children: React.ReactNode }) {
   const location = useLocation();
@@ -328,28 +360,29 @@ function App() {
                     color: "var(--text-primary)",
                   }}
                 >
-                  <Header
-                    onOpenAuth={handleOpenAuthModal}
-                    isDarkMode={isDarkMode}
-                    onToggleTheme={toggleTheme}
-                  />
-                  <main
-                    className="flex-1 mx-auto w-full p-4"
-                    style={{ maxWidth: "95rem" }}
-                  >
-                    <Suspense fallback={null}>
-                      <Routes>
+                  <Suspense fallback={null}>
+                    <Routes>
+                      <Route
+                        element={
+                          <SiteLayout
+                            onOpenAuth={handleOpenAuthModal}
+                            isDarkMode={isDarkMode}
+                            onToggleTheme={toggleTheme}
+                          />
+                        }
+                      >
                         <Route path="/" element={<GameContainer />} />
                         <Route path="/oda/:slug" element={<GameContainer />} />
+                        <Route path="/araba-tahmin" element={<CarGuessLanding />} />
                         <Route path="/iletisim" element={<Contact />} />
                         <Route path="/logolar" element={<LogosPage />} />
                         <Route path="/indir" element={<ApplicationLanding />} />
                         <Route path="/kullanici-odalari" element={<PublicRooms />} />
                         <Route path="/sozlesmeler" element={<Terms />} />
-                      </Routes>
-                    </Suspense>
-                  </main>
-                  <Footer />
+                      </Route>
+                      <Route path="/admin/*" element={<AdminLayout />} />
+                    </Routes>
+                  </Suspense>
                   <AuthModal
                     isOpen={isAuthModalOpen}
                     onClose={() => setIsAuthModalOpen(false)}

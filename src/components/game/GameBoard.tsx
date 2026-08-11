@@ -227,14 +227,14 @@ export const GameBoard: React.FC = () => {
   );
 
   return (
-    <div className="game-board max-w-[1920px] mx-auto px-4 lg:px-8 flex flex-col">
+    <div className="game-board w-full mx-auto flex flex-col">
       <div className="flex-1 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-10 gap-6 lg:gap-8 mb-6">
         {showConfetti && (
           <ReactConfetti recycle={false} numberOfPieces={200} gravity={0.3} />
         )}
 
         {/* Center - Main Content */}
-        <div className="md:col-span-2 lg:col-span-2 xl:col-span-6 space-y-4 lg:space-y-6 order-1 xl:order-1">
+        <div className="md:col-span-2 lg:col-span-2 xl:col-span-7 space-y-4 lg:space-y-6 order-1 xl:order-1">
           {showResults && intermissionDuration && currentListing ? (
             <RoundResults
               scores={roundEndScores}
@@ -252,7 +252,7 @@ export const GameBoard: React.FC = () => {
             />
           ) : (
             <>
-              <div className="bg-[var(--bg-secondary)] rounded-xl shadow-lg transition-colors">
+              <div className="surface-card overflow-hidden">
                 {/* Image Section */}
                 <div className="relative">
                   <div className="relative aspect-[16/10] w-full max-h-[500px]">
@@ -263,7 +263,7 @@ export const GameBoard: React.FC = () => {
                       referrerPolicy="no-referrer"
                       onContextMenu={(e) => e.preventDefault()}
                       alt="Listing image"
-                      className="w-full h-full object-contain transition-opacity duration-500 rounded-t-xl"
+                      className="w-full h-full object-contain transition-opacity duration-500 rounded-t-2xl"
                     />
                     {currentListing?.details.imageUrls?.length &&
                       currentListing?.details.imageUrls?.length > 1 && (
@@ -280,28 +280,28 @@ export const GameBoard: React.FC = () => {
                 </div>
                 {/* Details Section - Moved outside of image container */}
                 {currentListing ? (
-                  <div className="p-3 lg:p-4 space-y-2">
+                  <div className="p-4 lg:p-5 space-y-2.5">
                     {currentListing.title &&
                       (currentListing.details.type === "letgo" ? (
                         <Popover
                           key={currentListing.id}
                           content={currentListing.details.description}
                         >
-                          <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
+                          <h2 className="text-lg lg:text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">
                             {currentListing.title}
                           </h2>
                         </Popover>
                       ) : (
-                        <h2 className="text-lg lg:text-2xl font-bold text-[var(--text-primary)] bg-[var(--bg-secondary)] px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg inline-block">
+                        <h2 className="text-lg lg:text-2xl font-extrabold tracking-tight text-[var(--text-primary)]">
                           {currentListing.title}
                         </h2>
                       ))}
-                    <div className="text-sm lg:text-base bg-[var(--bg-secondary)] px-3 py-2 lg:px-4 lg:py-3 rounded-lg">
+                    <div className="text-sm lg:text-base rounded-xl border border-[var(--border-color)] bg-[var(--bg-tertiary)] px-3 py-2 lg:px-4 lg:py-3">
                       {renderListingDetails()}
 
                       {shouldShowRoundInfo && (
                         <div className="mt-3 flex items-center justify-center">
-                          <div className="inline-flex items-center bg-[var(--bg-primary)] rounded-full px-4 py-1.5 shadow-sm">
+                          <div className="inline-flex items-center rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-1.5 shadow-sm">
                             <span className="text-xs lg:text-sm font-medium text-[var(--text-primary)]">
                               Tur
                             </span>
@@ -322,7 +322,7 @@ export const GameBoard: React.FC = () => {
                 ) : null}
 
                 {/* Price/Text Guess Section */}
-                <div className="p-4 lg:p-6 border-t-2 border-[var(--border-color)]">
+                <div className="p-4 lg:p-6 border-t border-[var(--border-color)]">
                   <div className="flex flex-col items-center">
                     {currentListing && (
                       <PriceInput
@@ -375,9 +375,9 @@ export const GameBoard: React.FC = () => {
         </div>
 
         {/* Left Side - Players List */}
-        <div className="hidden xl:block xl:col-span-4 order-3 xl:order-3">
+        <div className="hidden xl:block xl:col-span-3 order-3 xl:order-3">
           <div className="xl:sticky xl:top-6">
-            <div className="bg-white rounded-xl shadow-lg overflow-auto h-[calc(100vh-15rem)] scrollbar-hide">
+            <div className="surface-card overflow-auto h-[calc(100vh-15rem)] scrollbar-hide">
               <PlayersList
                 onlinePlayers={onlinePlayers}
                 lastGuesses={lastGuesses}

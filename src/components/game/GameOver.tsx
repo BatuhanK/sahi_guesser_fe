@@ -158,24 +158,26 @@ export const GameOver: React.FC = () => {
           </motion.div>
         )}
 
-        <motion.button
-          onClick={handleRestart}
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 1 }}
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="flex items-center gap-2 mx-auto bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300"
-        >
-          Anasayfaya Dön
-        </motion.button>
-
-        <motion.button
-          onClick={recreateRoom}
-          className="flex items-center gap-2 mx-auto bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg transition-all duration-300"
-        >
-          Oyunu Tekrar Oyna
-        </motion.button>
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <motion.button
+            onClick={recreateRoom}
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1 }}
+            className="btn-accent px-8 py-3.5 text-lg"
+          >
+            Oyunu Tekrar Oyna
+          </motion.button>
+          <motion.button
+            onClick={handleRestart}
+            initial={{ y: 50, opacity: 0 }}
+            animate={{ y: 0, opacity: 1 }}
+            transition={{ delay: 1.1 }}
+            className="btn-ghost px-8 py-3.5 text-lg"
+          >
+            Anasayfaya Dön
+          </motion.button>
+        </div>
       </motion.div>
     </>
   );

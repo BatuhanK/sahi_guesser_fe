@@ -28,7 +28,7 @@ export const GuessMessage: React.FC<{
 }> = ({ isAuthenticated, maxGuessExceeded }) => {
   if (!isAuthenticated) {
     return (
-      <p className="text-center text-[var(--error-text)] text-sm lg:text-base bg-[var(--error-bg)] p-1.5 lg:p-2 rounded-lg w-full">
+      <p className="text-center text-[var(--error-text)] text-sm lg:text-base bg-[var(--error-bg)] p-1.5 lg:p-2 rounded-xl w-full">
         Tahmin yapabilmek için giriş yapmalısınız
       </p>
     );
@@ -36,7 +36,7 @@ export const GuessMessage: React.FC<{
 
   if (maxGuessExceeded) {
     return (
-      <p className="text-center text-[var(--error-text)] text-sm lg:text-base bg-[var(--error-bg)] p-1.5 lg:p-2 rounded-lg w-full">
+      <p className="text-center text-[var(--error-text)] text-sm lg:text-base bg-[var(--error-bg)] p-1.5 lg:p-2 rounded-xl w-full">
         Bu tur için maksimum tahmin hakkınızı kullandınız
       </p>
     );
@@ -70,7 +70,7 @@ export const GuessStatus: React.FC<GuessStatusProps> = ({ feedback, type }) => {
 
   return (
     <div
-      className={`px-4 py-2 rounded-lg text-sm font-medium ${
+      className={`px-4 py-2 rounded-full text-sm font-semibold shadow-sm ${
         type === "success"
           ? "bg-[var(--success-bg)] text-[var(--success-text)]"
           : "bg-[var(--error-bg)] text-[var(--error-text)]"

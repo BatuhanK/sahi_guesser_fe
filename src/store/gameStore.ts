@@ -4,6 +4,9 @@ import { devtools } from "zustand/middleware";
 import { Room, RoomSummary } from "../services/api";
 import { ChatMessage, GuessResult } from "../types";
 import type {
+  CarGuessContent,
+  CarGuessCorrectAnswers,
+  CarGuessKind,
   GameStatus,
   Listing,
   OnlinePlayer,
@@ -41,6 +44,14 @@ interface GameState {
   maxRounds: number;
   roundNumber: number;
   showRoomFullModal: boolean;
+  /** car-guess round içeriği (10 marka / 10 model / 5 yıl seçenekleri). */
+  carContent: CarGuessContent | null;
+  /** car-guess: bu round'daki kendi tahminlerim (parça başına tek hak). */
+  carGuesses: { brand?: string; model?: string; year?: number };
+  /** car-guess: tahmin sonuçlarım (carGuessResult event'i). */
+  carResults: { brand?: boolean; model?: boolean; year?: boolean };
+  /** car-guess: round sonunda açıklanan doğru cevaplar. */
+  carCorrectAnswers: CarGuessCorrectAnswers | null;
   setGameStatus: (status: GameStatus) => void;
   setCurrentListing: (listing: Listing | null) => void;
   setCurrentQuestion: (question: Question | null) => void;
@@ -55,6 +66,9 @@ interface GameState {
   setOnlinePlayersCount: (count: number) => void;
   addCorrectGuess: (guess: GuessResult) => void;
   addIncorrectGuess: (guess: GuessResult) => void;
+  /** car-guess tahmin yayını: son tahminlere düşer, doğruysa oyuncuyu
+   * "doğru bilenler" grubuna da taşır. */
+  addCarGuess: (guess: GuessResult) => void;
   setCorrectPrice: (correctPrice: number | null) => void;
   setRoundEndScores: (roundEndScores: RoundEndScore[]) => void;
   setShowResults: (showResults: boolean) => void;
@@ -68,6 +82,10 @@ interface GameState {
   setRoundNumber: (roundNumber: number) => void;
   setShowRoomFullModal: (show: boolean) => void;
   setRoomMaxGuessesPerRound: (maxGuessesPerRound: number) => void;
+  setCarContent: (content: CarGuessContent | null) => void;
+  setCarGuess: (kind: CarGuessKind, value: string | number) => void;
+  setCarResult: (kind: CarGuessKind, correct: boolean) => void;
+  setCarCorrectAnswers: (answers: CarGuessCorrectAnswers | null) => void;
 }
 
 export const useGameStore = create<GameState>()(
@@ -97,6 +115,10 @@ export const useGameStore = create<GameState>()(
     maxRounds: 0,
     roundNumber: 0,
     showRoomFullModal: false,
+    carContent: null,
+    carGuesses: {},
+    carResults: {},
+    carCorrectAnswers: null,
     setGameStatus: (status) =>
       set({
         status,
@@ -145,6 +167,13 @@ export const useGameStore = create<GameState>()(
         incorrectGuesses: [...state.incorrectGuesses, guess],
         lastGuesses: [guess, ...state.lastGuesses].slice(0, 5),
       })),
+    addCarGuess: (guess) =>
+      set((state) => ({
+        lastGuesses: [guess, ...state.lastGuesses].slice(0, 5),
+        correctGuesses: guess.isCorrect
+          ? [...state.correctGuesses, guess]
+          : state.correctGuesses,
+      })),
 
     setCorrectGuesses: (correctGuesses) => set({ correctGuesses }),
     setIncorrectGuesses: (incorrectGuesses) => set({ incorrectGuesses }),
@@ -158,6 +187,22 @@ export const useGameStore = create<GameState>()(
     setMaxRounds: (maxRounds) => set({ maxRounds }),
     setRoundNumber: (roundNumber) => set({ roundNumber }),
     setShowRoomFullModal: (show) => set({ showRoomFullModal: show }),
+    setCarContent: (carContent) =>
+      set({
+        carContent,
+        carGuesses: {},
+        carResults: {},
+        carCorrectAnswers: null,
+        correctGuesses: [],
+        incorrectGuesses: [],
+        showResults: false,
+        roundEndScores: [],
+      }),
+    setCarGuess: (kind, value) =>
+      set((state) => ({ carGuesses: { ...state.carGuesses, [kind]: value } })),
+    setCarResult: (kind, correct) =>
+      set((state) => ({ carResults: { ...state.carResults, [kind]: correct } })),
+    setCarCorrectAnswers: (carCorrectAnswers) => set({ carCorrectAnswers }),
     setRoomMaxGuessesPerRound: (maxGuessesPerRound) => {
       const room = useGameStore.getState().room;
       if (room?.settings) {

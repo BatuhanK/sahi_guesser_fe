@@ -41,6 +41,8 @@ export interface GuessResult {
   userId: number;
   username: string;
   isCorrect: boolean;
+  /** car-guess tahminlerinde dolu: hangi parça tahmin edildi. */
+  kind?: "brand" | "model" | "year";
 }
 
 export interface RoundGuess {

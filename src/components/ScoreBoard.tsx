@@ -12,12 +12,12 @@ export const ScoreBoard: React.FC<ScoreBoardProps> = ({ totalScore }) => {
   return (
     <>
       <button
-        className="flex items-center gap-6 bg-[var(--bg-secondary)] p-4 rounded-xl hover:bg-[var(--hover-color)] transition-all relative shine-button"
+        className="shine-button relative flex items-center gap-2 rounded-full border border-[var(--border-color)] px-3.5 py-1.5 transition-all hover:border-[var(--accent-color)]"
         onClick={() => setShowLeaderboard(true)}
       >
-        <div className="flex items-center gap-2 z-10">
-          <Trophy className="text-yellow-400" size={24} />
-          <span className="text-xl font-bold text-[var(--text-primary)]">
+        <div className="flex items-center gap-1.5 z-10">
+          <Trophy className="text-[var(--accent-color)]" size={18} />
+          <span className="text-base font-bold tabular-nums text-[var(--text-primary)]">
             {totalScore}
           </span>
         </div>

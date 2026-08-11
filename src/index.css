@@ -8,6 +8,36 @@
   }
 }
 
+@layer components {
+  .surface-card {
+    @apply rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] shadow-sm transition-all duration-300;
+  }
+
+  .surface-card-interactive {
+    @apply surface-card hover:-translate-y-1 hover:border-[var(--accent-color)] hover:shadow-[0_12px_36px_rgba(var(--accent-rgb),0.18)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-color)] active:translate-y-0 active:scale-[0.99];
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center gap-2 rounded-full bg-[var(--accent-color)] px-6 py-2.5 font-semibold text-white shadow-lg transition-all duration-300 hover:-translate-y-0.5 hover:bg-[var(--accent-hover)] hover:shadow-[0_12px_32px_rgba(var(--accent-rgb),0.35)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-color)] active:translate-y-0;
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-5 py-2.5 font-medium text-[var(--text-primary)] transition-all duration-300 hover:border-[var(--accent-color)] hover:text-[var(--accent-color)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-color)];
+  }
+
+  .icon-btn {
+    @apply inline-flex items-center justify-center rounded-full p-2 text-[var(--text-secondary)] transition-colors hover:bg-[var(--hover-color)] hover:text-[var(--text-primary)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--accent-color)];
+  }
+
+  .chip-tab {
+    @apply inline-flex items-center gap-2 rounded-full border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-2 text-sm font-medium text-[var(--text-primary)] transition-all duration-200 hover:border-[var(--accent-color)] hover:text-[var(--accent-color)];
+  }
+
+  .chip-tab-active {
+    @apply border-[var(--accent-color)] bg-[var(--accent-color)] text-white hover:text-white;
+  }
+}
+
 * {
   -webkit-tap-highlight-color: transparent;
 }

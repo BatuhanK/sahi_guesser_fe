@@ -3,9 +3,9 @@ export const Terms = () => {
     <div className="max-w-4xl mx-auto py-8 px-4">
       <div className="space-y-8">
         {/* Privacy Policy Section */}
-        <section>
-          <h1 className="text-3xl font-bold mb-6 text-[var(--text-primary)]">GİZLİLİK SÖZLEŞMESİ</h1>
-          <p className="text-sm text-[var(--text-secondary)] mb-6">Son Güncelleme Tarihi: 23.01.2025</p>
+        <section className="surface-card p-6 md:p-8">
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-[var(--text-primary)]">Gizlilik Sözleşmesi</h1>
+          <p className="text-xs text-[var(--text-tertiary)] mb-6">Son Güncelleme Tarihi: 23.01.2025</p>
           <p className="text-[var(--text-primary)] mb-6">
             Sahikaca uygulamasını kullanarak, aşağıdaki gizlilik politikamızı kabul etmiş olursunuz. Gizliliğiniz bizim için önemlidir ve kişisel bilgilerinizin korunması için özen göstermekteyiz.
           </p>
@@ -48,9 +48,9 @@ export const Terms = () => {
         </section>
 
         {/* Terms of Service Section */}
-        <section className="mt-12">
-          <h1 className="text-3xl font-bold mb-6 text-[var(--text-primary)]">KULLANIM KOŞULLARI</h1>
-          <p className="text-sm text-[var(--text-secondary)] mb-6">Son Güncelleme Tarihi: 08.01.2025</p>
+        <section className="surface-card p-6 md:p-8">
+          <h1 className="text-2xl md:text-3xl font-extrabold tracking-tight mb-2 text-[var(--text-primary)]">Kullanım Koşulları</h1>
+          <p className="text-xs text-[var(--text-tertiary)] mb-6">Son Güncelleme Tarihi: 08.01.2025</p>
           <p className="text-[var(--text-primary)] mb-6">
             Sahikaca oyununu indirerek veya kullanarak aşağıdaki şartları kabul etmiş sayılırsınız.
           </p>

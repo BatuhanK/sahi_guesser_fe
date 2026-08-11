@@ -115,13 +115,13 @@ export function LeaderboardTable({
   const getRowStyle = (index: number): string => {
     switch (index) {
       case 0:
-        return "bg-[var(--warning-bg)] border-2 border-[var(--accent-color)]";
+        return "bg-[var(--warning-bg)] border border-[var(--accent-color)]";
       case 1:
-        return "bg-[var(--bg-tertiary)] border-2 border-[var(--text-tertiary)]";
+        return "bg-[var(--bg-tertiary)] border border-[var(--text-tertiary)]";
       case 2:
-        return "bg-[var(--warning-bg)] border-2 border-[var(--warning-text)]";
+        return "bg-[var(--warning-bg)] border border-[var(--warning-text)]";
       default:
-        return "bg-[var(--bg-secondary)] border border-[var(--border-color)]";
+        return "bg-[var(--bg-tertiary)] border border-[var(--border-color)]";
     }
   };
 
@@ -139,7 +139,7 @@ export function LeaderboardTable({
       {[...Array(5)].map((_, index) => (
         <div
           key={index}
-          className={`flex items-center justify-between p-2 rounded-lg ${getRowStyle(
+          className={`flex items-center justify-between p-2.5 px-3 rounded-xl ${getRowStyle(
             index
           )} animate-pulse`}
         >
@@ -162,7 +162,7 @@ export function LeaderboardTable({
         <div className="relative">
           <button
             onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
-            className="w-full px-4 py-2 rounded-lg flex items-center justify-between bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-all"
+            className="chip-tab w-full justify-between"
           >
             <div className="flex items-center gap-2">
               <ListFilter size={20} />
@@ -180,13 +180,13 @@ export function LeaderboardTable({
             />
           </button>
           {showCategoryDropdown && (
-            <div className="absolute z-50 mt-1 w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-lg shadow-lg py-1">
+            <div className="absolute z-50 mt-1 w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] rounded-xl shadow-xl py-1">
               <button
                 onClick={() => {
                   setSelectedCategory(null);
                   setShowCategoryDropdown(false);
                 }}
-                className={`w-full px-4 py-2 flex items-center gap-2 hover:bg-[var(--bg-tertiary)] ${
+                className={`w-full px-4 py-2 flex items-center gap-2 hover:bg-[var(--hover-color)] ${
                   selectedCategory === null ? "text-[var(--accent-color)]" : ""
                 }`}
               >
@@ -202,7 +202,7 @@ export function LeaderboardTable({
                       setSelectedCategory(category.slug);
                       setShowCategoryDropdown(false);
                     }}
-                    className={`w-full px-4 py-2 flex items-center gap-2 hover:bg-[var(--bg-tertiary)] ${
+                    className={`w-full px-4 py-2 flex items-center gap-2 hover:bg-[var(--hover-color)] ${
                       selectedCategory === category.slug
                         ? "text-[var(--accent-color)]"
                         : ""
@@ -223,13 +223,9 @@ export function LeaderboardTable({
       <div className="flex flex-wrap gap-2 justify-center">
         <button
           onClick={() => setSelectedCategory(null)}
-          className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
-            selectedCategory === null
-              ? "bg-[var(--accent-color)] text-white"
-              : "bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]"
-          }`}
+          className={`chip-tab ${selectedCategory === null ? "chip-tab-active" : ""}`}
         >
-          <Trophy size={20} />
+          <Trophy size={18} />
           <span>Genel</span>
         </button>
         {categories.map((category) => {
@@ -238,13 +234,9 @@ export function LeaderboardTable({
             <button
               key={category.id}
               onClick={() => setSelectedCategory(category.slug)}
-              className={`px-4 py-2 rounded-lg flex items-center gap-2 transition-all ${
-                selectedCategory === category.slug
-                  ? "bg-[var(--accent-color)] text-white"
-                  : "bg-[var(--bg-secondary)] text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)]"
-              }`}
+              className={`chip-tab ${selectedCategory === category.slug ? "chip-tab-active" : ""}`}
             >
-              <IconComponent size={20} />
+              <IconComponent size={18} />
               <span>{category.name}</span>
             </button>
           );
@@ -258,7 +250,7 @@ export function LeaderboardTable({
   return (
     <div className="leaderboard space-y-4 mb-8 mt-4 mx-2">
       <CategorySelector />
-      <div className="border-2  overflow-y-auto max-h-[70vh]  border-[var(--accent-color)] rounded-lg shadow-md p-4 bg-[var(--bg-secondary)]">
+      <div className="surface-card overflow-y-auto max-h-[70vh] p-4 md:p-5">
         {isLoading ? (
           <LeaderboardSkeleton />
         ) : (
@@ -267,7 +259,7 @@ export function LeaderboardTable({
               {displayedLeaderboard.map((entry, index) => (
                 <div
                   key={entry.username}
-                  className={`flex items-center justify-between p-2 rounded-lg transition-all hover:scale-[1.01] ${getRowStyle(
+                  className={`flex items-center justify-between p-2.5 px-3 rounded-xl transition-all hover:scale-[1.01] ${getRowStyle(
                     index
                   )}`}
                 >

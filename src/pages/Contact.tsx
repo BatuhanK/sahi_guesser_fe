@@ -128,8 +128,8 @@ export const Contact = () => {
         <X size={18} className="text-[var(--text-secondary)]" />
       </button>
 
-      <h1 className="text-3xl font-bold mb-6">İletişim</h1>
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <h1 className="text-3xl font-extrabold tracking-tight mb-6">İletişim</h1>
+      <form onSubmit={handleSubmit} className="surface-card p-6 md:p-8 space-y-6">
         <div>
           <label
             htmlFor="email"
@@ -144,7 +144,7 @@ export const Contact = () => {
             required
             value={formData.email}
             onChange={handleChange}
-            className={`w-full px-4 py-2 rounded-lg border ${
+            className={`w-full px-4 py-2.5 rounded-xl border ${
               errors.email
                 ? "border-[var(--error-text)]"
                 : "border-[var(--border-color)]"
@@ -170,7 +170,7 @@ export const Contact = () => {
             required
             value={formData.type}
             onChange={handleChange}
-            className="w-full px-4 py-2 rounded-lg border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
+            className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-color)] bg-[var(--bg-secondary)] text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--accent-color)]"
           >
             <option value="feedback">Genel Geri Bildirim</option>
             <option value="bug">Hata Bildirimi</option>
@@ -194,7 +194,7 @@ export const Contact = () => {
             onChange={handleChange}
             rows={6}
             minLength={MIN_MESSAGE_LENGTH}
-            className={`w-full px-4 py-2 rounded-lg border ${
+            className={`w-full px-4 py-2.5 rounded-xl border ${
               errors.message
                 ? "border-[var(--error-text)]"
                 : "border-[var(--border-color)]"
@@ -210,7 +210,7 @@ export const Contact = () => {
         <button
           type="submit"
           disabled={isSubmitting || !isFormValid}
-          className="w-full bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-black font-medium py-2 px-4 rounded-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="btn-accent w-full disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:translate-y-0"
         >
           {isSubmitting ? "Gönderiliyor..." : "Gönder"}
         </button>

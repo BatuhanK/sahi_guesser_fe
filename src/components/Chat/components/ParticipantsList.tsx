@@ -82,8 +82,8 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
           {listeners && listeners.size > 0 && (
             <div className="mt-3">
               <div className="flex items-center gap-2 mb-2">
-                <Headphones className="w-4 h-4 text-gray-500" />
-                <span className="text-sm text-gray-600">
+                <Headphones className="w-4 h-4 text-[var(--text-tertiary)]" />
+                <span className="text-sm text-[var(--text-secondary)]">
                   Dinleyeciler ({listeners.size})
                 </span>
               </div>
@@ -92,7 +92,7 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
                   key={listener}
                   className="flex items-center text-sm pl-6 py-1"
                 >
-                  <span className="text-gray-600">{listener}</span>
+                  <span className="text-[var(--text-secondary)]">{listener}</span>
                 </div>
               ))}
             </div>
@@ -102,7 +102,7 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
 
       {selectedUser && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-          <div className="bg-white rounded-lg p-6 max-w-sm w-full mx-4">
+          <div className="surface-card p-6 max-w-sm w-full mx-4">
             <h3 className="text-lg font-semibold mb-4">
               {selectedUser} adlı kullanıcı banlanacak
             </h3>
@@ -126,7 +126,7 @@ export const ParticipantsList: React.FC<ParticipantsListProps> = ({
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setSelectedUser(null)}
-                className="px-4 py-2 rounded-md bg-gray-100 hover:bg-gray-200 transition-colors"
+                className="px-4 py-2 rounded-lg bg-[var(--bg-tertiary)] hover:bg-[var(--hover-color)] text-[var(--text-primary)] transition-colors"
               >
                 İptal
               </button>

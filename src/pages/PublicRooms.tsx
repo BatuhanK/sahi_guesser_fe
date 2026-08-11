@@ -115,14 +115,15 @@ export const PublicRooms = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8 text-[var(--text-primary)]">Kullanıcı Odaları</h1>
-      
+      <h1 className="text-3xl font-extrabold tracking-tight mb-8 text-[var(--text-primary)]">Kullanıcı Odaları</h1>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {/* Create Room Box */}
-        <div className="bg-[var(--bg-secondary)] rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-200 border border-[var(--border-color)] border-dashed flex flex-col">
+        {data && data.publicRooms.length > 0 && (
+        <div className="surface-card border-dashed overflow-hidden flex flex-col">
           <div className="p-6 flex-1 flex flex-col items-center justify-center text-center space-y-4">
-            <div className="w-16 h-16 rounded-full bg-[var(--accent-color)] bg-opacity-10 flex items-center justify-center">
-              <Plus className="w-8 h-8 text-white" />
+            <div className="w-16 h-16 rounded-2xl bg-[var(--accent-muted)] flex items-center justify-center">
+              <Plus className="w-8 h-8 text-[var(--accent-color)]" />
             </div>
             <h2 className="text-xl font-semibold text-[var(--text-primary)]">
               Yeni Oda Oluştur
@@ -132,12 +133,13 @@ export const PublicRooms = () => {
             </p>
             <button
               onClick={handleShowCreateModal}
-              className="mt-4 px-6 py-2.5 bg-[var(--accent-color)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors font-medium"
+              className="btn-accent mt-4"
             >
               Oda Oluştur
             </button>
           </div>
         </div>
+        )}
 
         {data?.publicRooms.map((room) => {
           const categories = getCategoriesForRoom(room);
@@ -145,7 +147,7 @@ export const PublicRooms = () => {
           return (
             <div
               key={room.id}
-              className="bg-[var(--bg-secondary)] rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-200 border border-[var(--border-color)] flex flex-col"
+              className="surface-card-interactive overflow-hidden flex flex-col"
             >
               {/* Header Section */}
               <div className="p-6 border-b border-[var(--border-color)]">
@@ -206,7 +208,7 @@ export const PublicRooms = () => {
               <div className="px-6 pb-6">
                 <button
                   onClick={() => handleJoinRoom(room)}
-                  className="w-full bg-[var(--accent-color)] text-white py-2.5 rounded-lg hover:bg-[var(--accent-hover)] transition-colors font-medium"
+                  className="btn-accent w-full"
                 >
                   {room.status === "PLAYING" ? "İzle" : "Katıl"}
                 </button>
@@ -217,7 +219,7 @@ export const PublicRooms = () => {
 
         {data?.publicRooms.length === 0 && (
           <div className="col-span-full flex flex-col items-center justify-center py-16 px-4">
-            <div className="bg-[var(--bg-secondary)] rounded-lg p-8 border border-[var(--border-color)] text-center max-w-md w-full space-y-6">
+            <div className="surface-card p-8 text-center max-w-md w-full space-y-6">
               <div className="text-[var(--text-secondary)] text-lg">
                 Henüz açık oda bulunmuyor
               </div>
@@ -226,7 +228,7 @@ export const PublicRooms = () => {
               </div>
               <button
                 onClick={handleShowCreateModal}
-                className="px-6 py-2.5 bg-[var(--accent-color)] text-white rounded-lg hover:bg-[var(--accent-hover)] transition-colors font-medium w-full"
+                className="btn-accent w-full"
               >
                 Oda Oluştur
               </button>

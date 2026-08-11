@@ -14,11 +14,13 @@ const PlayerItem: React.FC<{
   score: number;
   isCorrect?: boolean;
   scoreClassName?: string;
-}> = ({ player, score, isCorrect, scoreClassName }) => {
+  /** car-guess son tahmin satırlarında: "markayı doğru bildi" gibi. */
+  guessLabel?: string;
+}> = ({ player, score, isCorrect, scoreClassName, guessLabel }) => {
   return (
     <div
       className={cn(
-        "flex items-center justify-between p-2 rounded-lg transition-colors mb-2",
+        "flex items-center justify-between p-2 rounded-xl transition-colors mb-2",
         isCorrect 
           ? "bg-[var(--success-muted)] hover:bg-[var(--success-hover)]" 
           : "bg-[var(--bg-tertiary)] hover:bg-[var(--hover-color)]"
@@ -28,9 +30,23 @@ const PlayerItem: React.FC<{
         {isCorrect && (
           <Check size={16} className="text-[var(--success-text)] shrink-0" />
         )}
-        <span className="font-medium truncate text-[var(--text-primary)]">
-          {player.username}
-        </span>
+        <div className="flex flex-col min-w-0">
+          <span className="font-medium truncate text-[var(--text-primary)]">
+            {player.username}
+          </span>
+          {guessLabel && (
+            <span
+              className={cn(
+                "text-xs truncate",
+                isCorrect
+                  ? "text-[var(--success-text)]"
+                  : "text-[var(--error-text)]"
+              )}
+            >
+              {guessLabel}
+            </span>
+          )}
+        </div>
       </div>
       <span className={cn(
         "text-sm px-2 py-1 rounded-full shrink-0 ml-2",
@@ -40,6 +56,12 @@ const PlayerItem: React.FC<{
       </span>
     </div>
   );
+};
+
+const CAR_GUESS_KIND_LABEL: Record<string, string> = {
+  brand: "markayı",
+  model: "modeli",
+  year: "yılı",
 };
 
 interface PlayersListProps {
@@ -114,7 +136,7 @@ export const PlayersList: React.FC<PlayersListProps> = ({
       };
 
   return (
-    <div className="flex flex-col h-full bg-[var(--bg-secondary)] rounded-lg">
+    <div className="flex flex-col h-full">
       {/* Çevrimiçi Oyuncular Bölümü - 50% */}
       <div className="h-1/2 border-b border-[var(--border-color)]">
         <div className="flex items-center justify-between border-b border-[var(--border-color)] pb-2 sticky top-0 bg-[var(--bg-secondary)] p-3">
@@ -228,6 +250,13 @@ export const PlayersList: React.FC<PlayersListProps> = ({
                       player={player}
                       score={player.roomScore}
                       isCorrect={guess.isCorrect}
+                      guessLabel={
+                        guess.kind
+                          ? `${CAR_GUESS_KIND_LABEL[guess.kind]} ${
+                              guess.isCorrect ? "doğru" : "yanlış"
+                            } bildi`
+                          : undefined
+                      }
                       scoreClassName={guess.isCorrect 
                         ? "bg-[var(--success-bg)] text-[var(--success-text)]"
                         : "bg-[var(--error-bg)] text-[var(--error-text)]"

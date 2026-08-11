@@ -4,6 +4,10 @@ import { useAuthStore } from "../store/authStore";
 import { useGameStore } from "../store/gameStore";
 import type { ChatMessage } from "../types";
 import type {
+  CarGuessBroadcastPayload,
+  CarGuessContent,
+  CarGuessKind,
+  CarGuessResultPayload,
   ChatMessagePayload,
   ErrorPayload,
   GameStatePayload,
@@ -24,6 +28,12 @@ import { soundService } from "./soundService";
 
 const RECONNECT_BASE_DELAY_MS = 1000;
 const RECONNECT_MAX_DELAY_MS = 30000;
+
+/** Round içeriği car-guess şeklinde mi? (seçenek listesi taşır) */
+const isCarGuessContent = (content: unknown): content is CarGuessContent =>
+  !!content &&
+  typeof content === "object" &&
+  Array.isArray((content as CarGuessContent).brands);
 
 // VITE_SOCKET_URL is a ws(s) base (http(s) is accepted and converted).
 // Defaults mirror VITE_API_URL handling: local backend in dev, same origin in prod.
@@ -167,6 +177,12 @@ class SocketService {
       case "guessResult":
         this.onGuessResult(payload);
         break;
+      case "carGuessResult":
+        this.onCarGuessResult(payload);
+        break;
+      case "carGuess":
+        this.onCarGuess(payload);
+        break;
       case "maxGuessesReached":
         this.onMaxGuessesReached(payload);
         break;
@@ -215,7 +231,11 @@ class SocketService {
       state.setRoomMaxGuessesPerRound(payload.settings.maxGuessesPerRound);
     }
     if (payload.content) {
-      state.setCurrentListing(payload.content);
+      if (isCarGuessContent(payload.content)) {
+        state.setCarContent(payload.content);
+      } else {
+        state.setCurrentListing(payload.content);
+      }
     }
     state.setOnlinePlayers(payload.onlinePlayers ?? []);
     // Büyük odada liste kırpılmış gelir; gerçek toplam ayrı alandan.
@@ -229,7 +249,7 @@ class SocketService {
     if (payload.content) {
       analyticsService.trackRoundStart(
         payload.content.id.toString(),
-        payload.content.details.type
+        isCarGuessContent(payload.content) ? "car-guess" : payload.content.details.type
       );
     }
   }
@@ -254,7 +274,11 @@ class SocketService {
     state.setHasCorrectGuess(false);
 
     if (payload.content) {
-      state.setCurrentListing(payload.content);
+      if (isCarGuessContent(payload.content)) {
+        state.setCarContent(payload.content);
+      } else {
+        state.setCurrentListing(payload.content);
+      }
     }
     state.setRoundInfo(new Date(), payload.duration);
     state.setShowResults(false);
@@ -270,7 +294,7 @@ class SocketService {
     if (payload.content) {
       analyticsService.trackRoundStart(
         payload.content.id.toString(),
-        payload.content.details.type
+        isCarGuessContent(payload.content) ? "car-guess" : payload.content.details.type
       );
     }
 
@@ -293,7 +317,36 @@ class SocketService {
     state.setCorrectPrice(scores[0]?.detail?.correctPrice ?? null);
     state.setRoundEndScores(scores);
 
+    // car-guess: doğru cevaplar her skorun detail'inde aynı şekilde taşınır.
+    const carAnswers = scores[0]?.detail?.correctAnswers;
+    if (carAnswers) {
+      state.setCarCorrectAnswers(carAnswers);
+    }
+
     state.setShowResults(true);
+  }
+
+  private onCarGuessResult(payload: CarGuessResultPayload): void {
+    useGameStore.getState().setCarResult(payload.kind, payload.correct);
+    if (payload.correct) {
+      soundService.playSuccess();
+    } else {
+      soundService.playFailure();
+    }
+  }
+
+  /** car-guess tahmin yayını — son tahminler akışına düşer. */
+  private onCarGuess(payload: CarGuessBroadcastPayload): void {
+    const authUser = useAuthStore.getState().user;
+    if (payload.correct && payload.userId !== authUser?.id) {
+      soundService.playOtherPlayerSuccess();
+    }
+    useGameStore.getState().addCarGuess({
+      userId: payload.userId,
+      username: payload.username,
+      isCorrect: payload.correct,
+      kind: payload.kind,
+    });
   }
 
   // Debounce the guess result handler
@@ -500,6 +553,7 @@ class SocketService {
     state.setRoom(null);
     state.setCurrentListing(null);
     state.setCurrentQuestion(null);
+    state.setCarContent(null);
     this.roomId = null;
   }
 
@@ -583,11 +637,17 @@ class SocketService {
 
     state.setCurrentListing(null);
     state.setCurrentQuestion(null);
+    state.setCarContent(null);
     soundService.clearCountdownTimeout();
   }
 
   submitGuess(price: number): void {
     this.send("answer", { data: { price } });
+  }
+
+  /** car-guess: tek parça tahmini (brand/model/year) — basıldığı an gönderilir. */
+  submitCarGuess(kind: CarGuessKind, value: string | number): void {
+    this.send("answer", { data: { kind, value } });
   }
 
   disconnect(): void {

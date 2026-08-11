@@ -81,6 +81,52 @@ export interface Listing {
     | SportsPlayerListingDetails
 }
 
+// --- car-guess (marka/model/yıl tahmini) ---
+
+export type CarGuessKind = "brand" | "model" | "year";
+
+/** car-guess roundStart/gameState içeriği — doğru cevaplar hiç taşınmaz. */
+export interface CarGuessContent {
+  id: number;
+  price: number;
+  mileage: number;
+  fuelType: string;
+  transmission: string;
+  imageUrls: string[];
+  /** 10 marka seçeneği. */
+  brands: string[];
+  /** 10 model seçeneği — models[i], brands[i]'nin "model (+ seri)" etiketi. */
+  models: string[];
+  /** 5 yıl seçeneği (yeniden eskiye). */
+  years: number[];
+}
+
+/** carGuessResult — sadece tahminciye gelir. */
+export interface CarGuessResultPayload {
+  kind: CarGuessKind;
+  correct: boolean;
+}
+
+/** carGuess — odaya yayınlanan tahmin duyurusu (son tahminler akışı). */
+export interface CarGuessBroadcastPayload {
+  userId: number;
+  username: string;
+  kind: CarGuessKind;
+  correct: boolean;
+}
+
+export interface CarGuessCorrectAnswers {
+  brand: string;
+  model: string;
+  year: number;
+}
+
+export interface CarGuessPartDetail {
+  guess: string | number | null;
+  correct: boolean;
+  score: number;
+}
+
 export interface Player {
   id: string;
   username: string;
@@ -118,7 +164,13 @@ export interface RoundEndScoreDetail {
   guessAt?: string | null;
   elapsedTimeMs?: number | null;
   direction?: "correct" | "go_higher" | "go_lower" | null;
-  correctPrice: number;
+  /** price-guess odalarında dolu. */
+  correctPrice?: number;
+  /** car-guess odalarında dolu (parça başına sonuç + doğru cevaplar). */
+  brand?: CarGuessPartDetail;
+  model?: CarGuessPartDetail;
+  year?: CarGuessPartDetail;
+  correctAnswers?: CarGuessCorrectAnswers;
 }
 
 export interface RoundEndScore {
@@ -138,11 +190,11 @@ export interface GameStatePayload {
   /** Büyük odalarda `onlinePlayers` kırpılır (ilk ~100); gerçek toplam burada. */
   onlinePlayersCount?: number;
   settings: RoomSettings;
-  content?: Listing | null;
+  content?: Listing | CarGuessContent | null;
 }
 
 export interface RoundStartPayload {
-  content: Listing | null;
+  content: Listing | CarGuessContent | null;
   duration: number; // milliseconds
   roundNumber: number;
   maxRounds: number | null;

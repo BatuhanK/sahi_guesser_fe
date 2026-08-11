@@ -96,13 +96,13 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
   const getRowBackground = (index: number): string => {
     switch (index) {
       case 0:
-        return "bg-[var(--warning-bg)] border-2 border-[var(--accent-color)]";
+        return "bg-[var(--warning-bg)] border border-[var(--accent-color)]";
       case 1:
-        return "bg-[var(--bg-tertiary)] border-2 border-[var(--text-tertiary)]";
+        return "bg-[var(--bg-tertiary)] border border-[var(--text-tertiary)]";
       case 2:
-        return "bg-[var(--warning-bg)] border-2 border-[var(--warning-text)]";
+        return "bg-[var(--warning-bg)] border border-[var(--warning-text)]";
       default:
-        return "bg-[var(--bg-tertiary)]";
+        return "bg-[var(--bg-tertiary)] border border-[var(--border-color)]";
     }
   };
 
@@ -119,11 +119,19 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
           transition={{ duration: 0.5, ease: "easeIn" }}
           className="h-full"
         >
-          <div className="round-results-container h-full rounded-xl bg-[var(--bg-secondary)]">
-            <div className="border-4 border-[var(--accent-color)] rounded-xl shadow-xl p-8 h-full flex flex-col">
-              <div className="space-y-8">
+          <div className="round-results-container h-full rounded-2xl bg-[var(--bg-secondary)]">
+            <div className="relative overflow-hidden surface-card shadow-xl p-6 md:p-8 h-full flex flex-col">
+              <div
+                aria-hidden
+                className="pointer-events-none absolute -top-24 left-1/2 h-48 w-96 max-w-full -translate-x-1/2 rounded-full blur-3xl"
+                style={{
+                  background:
+                    "radial-gradient(closest-side, rgba(var(--accent-rgb), 0.16), transparent)",
+                }}
+              />
+              <div className="relative space-y-8">
                 <div className="text-center">
-                  <h2 className="text-3xl font-bold mb-3 text-[var(--text-primary)]">
+                  <h2 className="text-3xl font-extrabold tracking-tight mb-3 text-[var(--text-primary)]">
                     Tur Sonuçları
                     {shouldShowRoundInfo && (
                       <div className="flex justify-center mt-2">
@@ -165,7 +173,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: index * 0.1 }}
                       key={score.player_id}
-                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
+                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-xl transition-all hover:scale-[1.02] ${getRowBackground(
                         index
                       )} backdrop-blur-sm backdrop-filter`}
                     >
@@ -251,7 +259,7 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                       animate={{ opacity: 1, x: 0 }}
                       transition={{ delay: 0.4 }}
                       key={sortedScores[userRank].player_id}
-                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-lg transition-all hover:scale-[1.02] ${getRowBackground(
+                      className={`flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 p-3 sm:p-5 rounded-xl transition-all hover:scale-[1.02] ${getRowBackground(
                         userRank
                       )} backdrop-blur-sm backdrop-filter`}
                     >
@@ -305,10 +313,10 @@ export const RoundResults: React.FC<RoundResultsProps> = ({
                 </div>
               </div>
 
-              <div className="w-full bg-[var(--accent-color)] text-white py-4 px-6 rounded-lg transition-all text-lg font-medium text-center mt-8 hover:bg-[var(--accent-hover)]">
+              <div className="relative w-full rounded-full bg-[var(--accent-color)] text-white py-3.5 px-6 text-base font-semibold text-center mt-8 shadow-lg">
                 Lütfen Bekleyiniz{" "}
                 {remainingSeconds > 0 && (
-                  <span className="text-sm">({remainingSeconds}s)</span>
+                  <span className="text-sm tabular-nums">({remainingSeconds}s)</span>
                 )}
               </div>
             </div>

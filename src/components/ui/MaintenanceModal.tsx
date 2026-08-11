@@ -54,7 +54,7 @@ export const MaintenanceModal: React.FC<MaintenanceModalProps> = ({
               ${
                 isEnabled
                   ? "bg-[var(--accent-color)] hover:bg-[var(--accent-hover)] text-white"
-                  : "bg-gray-400 cursor-not-allowed text-gray-200"
+                  : "bg-[var(--bg-tertiary)] cursor-not-allowed text-[var(--text-tertiary)]"
               }`}
           >
             Tamam {!isEnabled && `(${countdown})`}

@@ -31,22 +31,25 @@ export const Footer = () => {
 
   return (
     <FooterContainer isVisible={isVisible} className="py-4 px-6 border-t border-[var(--border-color)]">
-      <div className="max-w-7xl mx-auto flex flex-wrap justify-between items-center gap-4">
-        <div className="text-sm text-[var(--text-secondary)]">
-          © {new Date().getFullYear()} Sahikaca. Tüm hakları saklıdır.
+      <div className="mx-auto flex flex-wrap justify-between items-center gap-4">
+        <div className="flex items-center gap-2.5">
+          <span className="text-sm font-extrabold tracking-tight text-[var(--text-primary)]">
+            sahi <span className="text-[var(--accent-color)]">kaça?</span>
+          </span>
+          <span className="text-xs text-[var(--text-tertiary)]">
+            © {new Date().getFullYear()} — Tüm hakları saklıdır.
+          </span>
         </div>
-        <div className="flex gap-4 text-sm">
-          <Link to="/iletisim" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+        <div className="flex items-center gap-1 text-sm">
+          <Link to="/iletisim" className="rounded-full px-3 py-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--hover-color)] hover:text-[var(--text-primary)]">
             İletişim
           </Link>
-          <Link to="/sozlesmeler" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          <Link to="/sozlesmeler" className="rounded-full px-3 py-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--hover-color)] hover:text-[var(--text-primary)]">
             Gizlilik ve Kullanım Koşulları
           </Link>
-
-          <Link to="/indir" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)]">
+          <Link to="/indir" className="rounded-full px-3 py-1.5 text-[var(--text-secondary)] transition-colors hover:bg-[var(--hover-color)] hover:text-[var(--text-primary)]">
             Uygulamalar
           </Link>
-
         </div>
       </div>
     </FooterContainer>

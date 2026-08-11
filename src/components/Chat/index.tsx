@@ -25,7 +25,15 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
 
   useEffect(() => {
     const isMobile = window.innerWidth < 768;
-    setIsMinimized(isMobile);
+    if (isMobile) {
+      setIsMinimized(true);
+      return;
+    }
+    const hasSeenChat = localStorage.getItem("chat-auto-opened");
+    setIsMinimized(Boolean(hasSeenChat));
+    if (!hasSeenChat) {
+      localStorage.setItem("chat-auto-opened", "1");
+    }
   }, []);
 
   const {
@@ -84,7 +92,7 @@ export const Chat: React.FC<ChatProps> = ({ messages, onSendMessage }) => {
   return (
     <div
       className={cn(
-        "fixed bottom-0 z-50 bg-[var(--bg-secondary)] rounded-t-xl shadow-xl border border-[var(--border-color)]",
+        "fixed bottom-0 z-50 bg-[var(--bg-secondary)] rounded-t-2xl shadow-xl border border-[var(--border-color)]",
         "transition-all duration-300 ease-in-out",
         "left-1/2 -translate-x-1/2 md:left-auto md:right-4 md:translate-x-0",
         isMinimized ? "h-[52px]" : "h-[75vh] md:h-[calc(100vh-4rem)]",

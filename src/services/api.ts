@@ -141,6 +141,8 @@ export type Room = {
   slug: string;
   status: string;
   isSystem: boolean;
+  /** "price-guess" | "car-guess" — hangi oyun ekranının açılacağını belirler. */
+  gameType: string;
   settings: {
     minPrice?: number | null;
     maxPrice?: number | null;
@@ -231,6 +233,11 @@ export const roomApi = {
     return response.data;
   },
 
+  getCarGuessRoom: async (): Promise<{ room: Room }> => {
+    const response = await api.get<{ room: Room }>("/car-guess/room");
+    return response.data;
+  },
+
   create: async (data: CreatePrivateRoomRequest) => {
     const response = await api.post("/private-game-rooms/create", data);
     return response.data.privateRoom;
@@ -274,6 +281,221 @@ export const feedbackApi = {
   }) => {
     await api.post("/feedback", data);
     return true;
+  },
+};
+
+// ---- Admin ----
+
+export type AdminRole = "user" | "admin" | "moderator" | "junior_moderator";
+
+export interface AdminStats {
+  onlineUsers: number;
+  activeRooms: number;
+  waitingRooms: number;
+  playingRooms: number;
+  totalUsers: number;
+  bannedUsers: number;
+}
+
+export interface AdminUser {
+  id: number;
+  username: string;
+  email: string | null;
+  role: string;
+  score: number;
+  isPremium: boolean;
+  isBanned: boolean;
+  bannedUntil: string | null;
+  lastOnlineAt: string | null;
+  createdAt: string;
+}
+
+export interface AdminUsersResponse {
+  users: AdminUser[];
+  total: number;
+}
+
+export interface AdminRoom {
+  id: number;
+  slug: string;
+  name: string;
+  gameType: string;
+  status: string;
+  playerCount: number;
+  isPublic: boolean;
+}
+
+export type AdminAnnouncementType = "info" | "warning" | "success" | "error";
+
+export interface AdminAnnouncement {
+  id: number;
+  title: string;
+  content: string;
+  type: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminAnnouncementInput {
+  title?: string;
+  content?: string;
+  type?: AdminAnnouncementType;
+  isActive?: boolean;
+}
+
+export interface AdminCategory {
+  id: number;
+  name: string;
+  slug: string;
+  icon: string | null;
+  isActive: boolean;
+  minVersion: string | null;
+  metadata: unknown;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface AdminCategoryInput {
+  name?: string;
+  slug?: string;
+  icon?: string;
+  isActive?: boolean;
+  minVersion?: string;
+  metadata?: unknown;
+}
+
+export interface AdminAppConfig {
+  key: string;
+  value: unknown;
+  updatedAt: string;
+}
+
+export const adminApi = {
+  getStats: async (): Promise<AdminStats> => {
+    const response = await api.get<AdminStats>("/admin/stats");
+    return response.data;
+  },
+
+  getUsers: async (params: {
+    search?: string;
+    role?: string;
+    banned?: boolean;
+    page?: number;
+    limit?: number;
+  }): Promise<AdminUsersResponse> => {
+    const response = await api.get<AdminUsersResponse>("/admin/users", {
+      params,
+    });
+    return response.data;
+  },
+
+  updateUserRole: async (id: number, role: AdminRole) => {
+    const response = await api.patch(`/admin/users/${id}`, { role });
+    return response.data;
+  },
+
+  banUser: async (id: number, banMinutes: number | null) => {
+    const response = await api.post(`/admin/users/${id}/ban`, { banMinutes });
+    return response.data;
+  },
+
+  unbanUser: async (id: number) => {
+    const response = await api.delete(`/admin/users/${id}/ban`);
+    return response.data;
+  },
+
+  getAnnouncements: async (): Promise<AdminAnnouncement[]> => {
+    const response = await api.get<{ announcements: AdminAnnouncement[] }>(
+      "/admin/announcements"
+    );
+    return response.data.announcements;
+  },
+
+  createAnnouncement: async (data: {
+    title: string;
+    content: string;
+    type?: AdminAnnouncementType;
+    isActive?: boolean;
+  }): Promise<AdminAnnouncement> => {
+    const response = await api.post<{ announcement: AdminAnnouncement }>(
+      "/admin/announcements",
+      data
+    );
+    return response.data.announcement;
+  },
+
+  updateAnnouncement: async (
+    id: number,
+    data: AdminAnnouncementInput
+  ): Promise<AdminAnnouncement> => {
+    const response = await api.patch<{ announcement: AdminAnnouncement }>(
+      `/admin/announcements/${id}`,
+      data
+    );
+    return response.data.announcement;
+  },
+
+  deleteAnnouncement: async (id: number) => {
+    const response = await api.delete(`/admin/announcements/${id}`);
+    return response.data;
+  },
+
+  getCategories: async (): Promise<AdminCategory[]> => {
+    const response = await api.get<{ categories: AdminCategory[] }>(
+      "/admin/categories"
+    );
+    return response.data.categories;
+  },
+
+  createCategory: async (data: {
+    name: string;
+    slug?: string;
+    icon?: string;
+    minVersion?: string;
+    metadata?: unknown;
+  }): Promise<AdminCategory> => {
+    const response = await api.post<{ category: AdminCategory }>(
+      "/admin/categories",
+      data
+    );
+    return response.data.category;
+  },
+
+  updateCategory: async (
+    id: number,
+    data: AdminCategoryInput
+  ): Promise<AdminCategory> => {
+    const response = await api.patch<{ category: AdminCategory }>(
+      `/admin/categories/${id}`,
+      data
+    );
+    return response.data.category;
+  },
+
+  deleteCategory: async (id: number) => {
+    const response = await api.delete(`/admin/categories/${id}`);
+    return response.data;
+  },
+
+  getAppConfigs: async (): Promise<AdminAppConfig[]> => {
+    const response = await api.get<AdminAppConfig[]>("/admin/app-configs");
+    return response.data;
+  },
+
+  putAppConfig: async (key: string, value: unknown) => {
+    const response = await api.put(`/admin/app-configs/${key}`, { value });
+    return response.data;
+  },
+
+  deleteAppConfig: async (key: string) => {
+    const response = await api.delete(`/admin/app-configs/${key}`);
+    return response.data;
+  },
+
+  getLiveRooms: async (): Promise<AdminRoom[]> => {
+    const response = await api.get<AdminRoom[]>("/admin/live/rooms");
+    return response.data;
   },
 };
 

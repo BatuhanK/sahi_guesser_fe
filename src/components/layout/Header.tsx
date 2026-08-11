@@ -57,8 +57,8 @@ const AnimatedIcons = () => {
         transition={{ duration: 0.3 }}
       >
         {React.createElement(icons[currentIcon].component, {
-          className: "text-[var(--bg-secondary)]",
-          size: 32,
+          className: "text-[var(--accent-color)]",
+          size: 22,
         })}
       </motion.div>
     </AnimatePresence>
@@ -71,14 +71,10 @@ const ThemeToggle: React.FC<{
 }> = React.memo(({ isDarkMode, onToggleTheme }) => (
   <button
     onClick={onToggleTheme}
-    className="p-2 rounded-lg transition-colors hover:bg-[var(--accent-hover)]"
+    className="icon-btn"
     aria-label={isDarkMode ? "Switch to light mode" : "Switch to dark mode"}
   >
-    {isDarkMode ? (
-      <Sun className="text-[var(--bg-secondary)]" size={24} />
-    ) : (
-      <Moon className="text-[var(--bg-secondary)]" size={24} />
-    )}
+    {isDarkMode ? <Sun size={22} /> : <Moon size={22} />}
   </button>
 ));
 
@@ -102,6 +98,7 @@ export const Header: React.FC<HeaderProps> = ({
   const {
     status,
     currentListing,
+    carContent,
     roundStartTime,
     roundDuration,
     roomId,
@@ -122,7 +119,7 @@ export const Header: React.FC<HeaderProps> = ({
   useEffect(() => {
     let intervalId: number;
 
-    if (currentListing && roundStartTime) {
+    if ((currentListing || carContent) && roundStartTime) {
       const roundEndTime = new Date(roundStartTime.getTime() + roundDuration);
 
       const updateTimer = () => {
@@ -146,7 +143,7 @@ export const Header: React.FC<HeaderProps> = ({
         window.clearInterval(intervalId);
       }
     };
-  }, [currentListing, roundStartTime, roundDuration]);
+  }, [currentListing, carContent, roundStartTime, roundDuration]);
 
   useEffect(() => {
     const fetchAnnouncements = async () => {
@@ -197,33 +194,29 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <>
-      <header className="bg-[var(--accent-color)] p-4 shadow-md relative transition-colors">
+      <header className="sticky top-0 z-40 border-b border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 transition-colors">
         <div
           className="mx-auto flex items-center justify-between"
-          style={{ maxWidth: "95rem" }}
         >
           <div
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-3 cursor-pointer"
             onClick={() => handleLeaveRoom()}
           >
-            <div className="flex items-center gap-4">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--accent-muted)]">
               <AnimatedIcons />
             </div>
             <h1
               className={`${
                 isMobile ? "text-xl" : "text-2xl"
-              } font-bold text-[var(--bg-secondary)]`}
-              style={{
-                textShadow: "0 0 3px rgba(255, 255, 255, 0.3)",
-              }}
+              } font-extrabold tracking-tight text-[var(--text-primary)]`}
             >
-              sahi kaca?
+              sahi <span className="text-[var(--accent-color)]">kaça?</span>
             </h1>
           </div>
 
           {isMobile ? (
             <div className="flex items-center gap-2">
-              {currentListing && roundStartTime && status === "PLAYING" && (
+              {(currentListing || carContent) && roundStartTime && status === "PLAYING" && (
                 <div className="mr-2">
                   <Timer timeLeft={timeLeft} />
                 </div>
@@ -234,16 +227,17 @@ export const Header: React.FC<HeaderProps> = ({
               />
               <button
                 onClick={() => setShowMobileMenu(!showMobileMenu)}
-                className="text-[var(--bg-secondary)]"
+                className="icon-btn"
+                aria-label="Menü"
               >
-                <Menu size={24} />
+                <Menu size={22} />
               </button>
               {showMobileMenu && (
-                <div className="absolute top-full right-0 mt-2 w-full bg-[var(--bg-secondary)] shadow-lg rounded-b-lg p-4 z-50">
+                <div className="absolute top-full right-0 mt-2 w-full bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-lg rounded-b-2xl p-4 z-50">
                   <div className="flex flex-col gap-4">
                     <button
                       onClick={() => handleLeaveRoom("/kullanici-odalari")}
-                      className="flex items-center gap-2 text-[var(--text-primary)] p-2 hover:bg-[var(--bg-hover)] rounded transition-colors"
+                      className="flex items-center gap-2 text-[var(--text-primary)] p-2 hover:bg-[var(--hover-color)] rounded-lg transition-colors"
                     >
                       <Users size={20} />
                       <span>Kullanıcı Odaları</span>
@@ -252,7 +246,7 @@ export const Header: React.FC<HeaderProps> = ({
                     {user && (
                       <div className="flex flex-col gap-2">
                         <div
-                          className="flex items-center justify-between cursor-pointer p-2 hover:bg-[var(--bg-hover)] rounded transition-colors"
+                          className="flex items-center justify-between cursor-pointer p-2 hover:bg-[var(--hover-color)] rounded transition-colors"
                           onClick={() => setShowUserMenu(!showUserMenu)}
                         >
                           <span className="text-[var(--text-primary)]">
@@ -263,7 +257,7 @@ export const Header: React.FC<HeaderProps> = ({
                           <>
                             <button
                               onClick={handleLogout}
-                              className="flex items-center gap-2 text-red-500 p-2 hover:bg-[var(--bg-hover)] rounded"
+                              className="flex items-center gap-2 text-red-500 p-2 hover:bg-[var(--hover-color)] rounded"
                             >
                               <LogOut size={20} />
                               <span>Çıkış Yap</span>
@@ -273,12 +267,12 @@ export const Header: React.FC<HeaderProps> = ({
                                 setShowProfileEditModal(true);
                                 setShowUserMenu(false);
                               }}
-                              className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                              className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--hover-color)] text-[var(--text-primary)]"
                             >
                               <Settings size={20} />
                               <span>Profil Düzenle</span>
                             </button>
-                            <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
+                            <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--hover-color)]">
                               <Volume2
                                 size={20}
                                 className="text-[var(--text-primary)]"
@@ -318,20 +312,20 @@ export const Header: React.FC<HeaderProps> = ({
                     <div className="relative">
                       <button
                         onClick={() => setShowAnnouncements(!showAnnouncements)}
-                        className="relative p-2 hover:bg-[var(--accent-hover)] rounded transition-colors"
+                        className="icon-btn relative"
                       >
                         <Bell
                           className="text-[var(--text-primary)]"
                           size={24}
                         />
                         {getUnreadCount() > 0 && (
-                          <span className="absolute -top-1 -right-1 bg-[var(--error-text)] text-[var(--bg-secondary)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                          <span className="absolute -top-1 -right-1 bg-[var(--error-text)] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                             {getUnreadCount()}
                           </span>
                         )}
                       </button>
                       {showAnnouncements && (
-                        <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
+                        <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-xl rounded-2xl py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
                           <div className="px-4 py-2 border-b border-[var(--border-color)]">
                             <h3 className="font-semibold text-[var(--text-primary)]">
                               Duyurular
@@ -361,7 +355,7 @@ export const Header: React.FC<HeaderProps> = ({
                                       <h4 className="font-medium text-[var(--text-primary)] mb-1">
                                         {announcement.title}
                                       </h4>
-                                      <div className="text-[var(--text-secondary)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
+                                      <div className="text-[var(--text-secondary)] prose max-w-none prose-p:my-2 prose-headings:my-3">
                                         <LazyMarkdown>{announcement.content}</LazyMarkdown>
                                       </div>
                                       <div className="flex justify-between items-center mt-3">
@@ -410,32 +404,32 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           ) : (
             <div className="flex items-center gap-4">
-              {currentListing && roundStartTime && status === "PLAYING" && (
+              {(currentListing || carContent) && roundStartTime && status === "PLAYING" && (
                 <Timer timeLeft={timeLeft} />
               )}
               <button
                 onClick={() => handleLeaveRoom("/kullanici-odalari")}
-                className="flex items-center gap-2 text-[var(--bg-secondary)] px-4 py-2 rounded-lg hover:bg-[var(--accent-hover)] transition-colors"
+                className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-medium text-[var(--text-secondary)] transition-colors hover:bg-[var(--hover-color)] hover:text-[var(--text-primary)]"
               >
-                <Users size={20} />
+                <Users size={18} />
                 <span>Kullanıcı Odaları</span>
               </button>
               {user && <ScoreBoard totalScore={user.score} />}
               {user && (
                 <div className="relative">
                   <div
-                    className="flex items-center gap-2 cursor-pointer p-2 rounded hover:bg-[var(--accent-hover)] transition-colors"
+                    className="flex items-center gap-2 cursor-pointer rounded-full px-3 py-2 transition-colors hover:bg-[var(--hover-color)]"
                     onClick={() => setShowUserMenu(!showUserMenu)}
                   >
-                    <span className="text-[var(--bg-secondary)]">
+                    <span className="text-sm text-[var(--text-primary)]">
                       Hoşgeldin, <b>{user.username}</b>
                     </span>
                   </div>
                   {showUserMenu && (
-                    <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 min-w-[200px] z-50">
+                    <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-xl rounded-2xl py-2 min-w-[200px] z-50">
                       <button
                         onClick={handleLogout}
-                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-red-500"
+                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--hover-color)] text-red-500"
                       >
                         <LogOut size={20} />
                         <span>Çıkış Yap</span>
@@ -445,12 +439,12 @@ export const Header: React.FC<HeaderProps> = ({
                           setShowProfileEditModal(true);
                           setShowUserMenu(false);
                         }}
-                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--bg-hover)] text-[var(--text-primary)]"
+                        className="flex items-center gap-2 px-4 py-2 w-full text-left hover:bg-[var(--hover-color)] text-[var(--text-primary)]"
                       >
                         <Settings size={20} />
                         <span>Profil Düzenle</span>
                       </button>
-                      <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--bg-hover)]">
+                      <div className="flex items-center gap-2 px-4 py-2 w-full hover:bg-[var(--hover-color)]">
                         <Volume2
                           size={20}
                           className="text-[var(--text-primary)]"
@@ -473,16 +467,16 @@ export const Header: React.FC<HeaderProps> = ({
                 <div className="flex gap-2">
                   <button
                     onClick={() => onOpenAuth("login")}
-                    className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
+                    className="btn-ghost text-sm"
                   >
-                    <LogIn size={20} />
+                    <LogIn size={18} />
                     <span>Giriş</span>
                   </button>
                   <button
                     onClick={() => onOpenAuth("register")}
-                    className="flex items-center gap-2 bg-[var(--bg-secondary)] text-[var(--text-primary)] px-4 py-2 rounded-lg hover:bg-[var(--bg-primary)] transition-colors"
+                    className="btn-accent text-sm"
                   >
-                    <UserPlus size={20} />
+                    <UserPlus size={18} />
                     <span>Kayıt</span>
                   </button>
                 </div>
@@ -494,17 +488,17 @@ export const Header: React.FC<HeaderProps> = ({
               <div className="relative">
                 <button
                   onClick={() => setShowAnnouncements(!showAnnouncements)}
-                  className="relative p-2 hover:bg-[var(--accent-hover)] rounded transition-colors"
+                  className="icon-btn relative"
                 >
-                  <Bell className="text-[var(--bg-secondary)]" size={24} />
+                  <Bell size={22} />
                   {getUnreadCount() > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-[var(--error-text)] text-[var(--bg-secondary)] text-xs rounded-full h-5 w-5 flex items-center justify-center">
+                    <span className="absolute -top-1 -right-1 bg-[var(--error-text)] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">
                       {getUnreadCount()}
                     </span>
                   )}
                 </button>
                 {showAnnouncements && (
-                  <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] shadow-lg rounded-lg py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
+                  <div className="absolute top-full right-0 mt-2 bg-[var(--bg-secondary)] border border-[var(--border-color)] shadow-xl rounded-2xl py-2 w-96 max-h-[32rem] overflow-y-auto z-50">
                     <div className="px-4 py-2 border-b border-[var(--border-color)]">
                       <h3 className="font-semibold text-[var(--text-primary)]">
                         Duyurular
@@ -530,7 +524,7 @@ export const Header: React.FC<HeaderProps> = ({
                                 <h4 className="font-medium text-[var(--text-primary)] mb-1">
                                   {announcement.title}
                                 </h4>
-                                <div className="text-[var(--text-secondary)] prose prose-invert max-w-none prose-p:my-2 prose-headings:my-3">
+                                <div className="text-[var(--text-secondary)] prose max-w-none prose-p:my-2 prose-headings:my-3">
                                   <LazyMarkdown>{announcement.content}</LazyMarkdown>
                                 </div>
                                 <div className="flex justify-between items-center mt-3">
